@@ -1,0 +1,4 @@
+[mysqld]
+# Values recommended by Nextcloud's database setup checks (serverinfo app).
+max_connections = 200
+innodb_log_file_size = 256M

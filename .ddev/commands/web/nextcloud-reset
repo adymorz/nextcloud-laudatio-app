@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+## Description: Reinstall Nextcloud from scratch (drops the database, users, files and App Store apps)
+## Usage: nextcloud-reset [--full]
+## Example: "ddev nextcloud-reset" or "ddev nextcloud-reset --full" (also downloads the server code again)
+
+set -euo pipefail
+
+NC="${NEXTCLOUD_ROOT:-/var/www/nextcloud}"
+
+if [ "${1:-}" = "--full" ]; then
+	echo "[nextcloud] Deleting the server code, config and data ..."
+	find "$NC" -mindepth 1 -delete
+else
+	echo "[nextcloud] Deleting config, data and App Store apps ..."
+	rm -rf "$NC/config/config.php" "$NC/data" "$NC/custom_apps"
+fi
+
+# setup.sh recreates the database before installing.
+bash /mnt/ddev_config/nextcloud/setup.sh

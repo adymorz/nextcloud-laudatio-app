@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+## Description: Run Nextcloud's occ command
+## Usage: occ [command] [options]
+## Example: "ddev occ app:list" or "ddev occ config:system:get debug" or "ddev occ log:tail"
+
+php "${NEXTCLOUD_ROOT:-/var/www/nextcloud}/occ" "$@"

@@ -1,0 +1,127 @@
+# SPDX-FileCopyrightText: 2026 Adrian Dymorz <dev@adrian.dymorz.ch>
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Lint, static analysis, unit tests and frontend build for the Nextcloud app.
+
+workflow:
+  rules:
+    # Merge request pipelines, and branch pipelines only for branches without an open MR.
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+    - if: $CI_COMMIT_TAG
+
+stages:
+  - lint
+  - test
+  - build
+
+default:
+  interruptible: true
+
+variables:
+  COMPOSER_CACHE_DIR: $CI_PROJECT_DIR/.cache/composer
+  npm_config_cache: $CI_PROJECT_DIR/.cache/npm
+
+.composer-setup: &composer-setup
+  - apt-get update -qq && apt-get install -qq -y git unzip > /dev/null
+  - curl -fsSL https://getcomposer.org/installer | php -- --quiet --install-dir=/usr/local/bin --filename=composer
+
+.php:
+  image: php:8.3-cli
+  cache:
+    key:
+      prefix: composer
+      files: [composer.lock]
+    paths: [.cache/composer]
+  before_script:
+    - *composer-setup
+    - composer install --no-interaction --no-progress
+
+.node:
+  image: node:24
+  cache:
+    key:
+      prefix: npm
+      files: [package-lock.json]
+    paths: [.cache/npm]
+  before_script:
+    - npm ci --no-audit --no-fund
+
+lint:info-xml:
+  stage: lint
+  image: alpine:3
+  before_script:
+    - apk add --no-cache curl libxml2-utils
+  script:
+    - curl -fsSL -o /tmp/info.xsd https://apps.nextcloud.com/schema/apps/info.xsd
+    - xmllint --noout --schema /tmp/info.xsd appinfo/info.xml
+
+php:lint:
+  extends: .php
+  stage: lint
+  script:
+    - composer lint
+
+php:cs:
+  extends: .php
+  stage: lint
+  script:
+    - composer cs:check
+
+php:psalm:
+  extends: .php
+  stage: lint
+  script:
+    - composer psalm
+
+php:openapi:
+  extends: .php
+  stage: lint
+  script:
+    - composer openapi
+    - git diff --exit-code -- openapi.json || (echo "openapi.json is outdated, run 'composer openapi' and commit the result." && exit 1)
+
+php:unit:
+  stage: test
+  # Official Nextcloud image: release code in /usr/src/nextcloud plus all required PHP extensions.
+  image:
+    name: nextcloud:35-apache
+    entrypoint: [""]
+  variables:
+    NEXTCLOUD_ROOT: /usr/src/nextcloud
+  cache:
+    key:
+      prefix: composer
+      files: [composer.lock]
+    paths: [.cache/composer]
+  before_script:
+    - *composer-setup
+    - php $NEXTCLOUD_ROOT/occ maintenance:install --database=sqlite --admin-user=admin --admin-pass=admin
+    - ln -s "$CI_PROJECT_DIR" "$NEXTCLOUD_ROOT/apps/appreciation"
+    - php $NEXTCLOUD_ROOT/occ app:enable appreciation
+    - composer install --no-interaction --no-progress
+  script:
+    - composer test:unit
+
+node:lint:
+  extends: .node
+  stage: lint
+  script:
+    - npm run lint
+
+node:stylelint:
+  extends: .node
+  stage: lint
+  script:
+    - npm run stylelint
+
+node:build:
+  extends: .node
+  stage: build
+  script:
+    - npm run build
+  artifacts:
+    paths: [js/, css/]
+    expire_in: 1 week

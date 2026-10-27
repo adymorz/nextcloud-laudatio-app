@@ -1,0 +1,9 @@
+# Nextcloud server (code, config, data) lives in its own volume outside the
+# app repository. See .ddev/nextcloud/setup.sh for how it is populated.
+services:
+  web:
+    volumes:
+      - nextcloud:/var/www/nextcloud
+
+volumes:
+  nextcloud:
