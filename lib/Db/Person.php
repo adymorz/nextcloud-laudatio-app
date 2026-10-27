@@ -47,4 +47,8 @@ class Person extends Entity {
 	public function getDisplayName(): string {
 		return trim($this->firstName . ' ' . $this->lastName);
 	}
+
+	public function hasDateOfBirth(): bool {
+		return $this->dateOfBirth !== null;
+	}
 }

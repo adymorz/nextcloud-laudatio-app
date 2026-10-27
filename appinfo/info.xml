@@ -20,6 +20,13 @@
 	<dependencies>
 		<nextcloud min-version="35" max-version="35"/>
 	</dependencies>
+	<background-jobs>
+		<job>OCA\Appreciation\BackgroundJob\SyncJob</job>
+	</background-jobs>
+	<commands>
+		<command>OCA\Appreciation\Command\SyncCommand</command>
+		<command>OCA\Appreciation\Command\DemoDataCommand</command>
+	</commands>
 	<navigations>
 		<navigation>
 			<id>appreciation</id>

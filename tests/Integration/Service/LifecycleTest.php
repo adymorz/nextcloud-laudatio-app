@@ -1,0 +1,111 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * SPDX-FileCopyrightText: 2026 Adrian Dymorz <dev@adrian.dymorz.ch>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+namespace OCA\Appreciation\Tests\Integration\Service;
+
+use OCA\Appreciation\Db\AuditEntry;
+use OCA\Appreciation\Db\AuditMapper;
+use OCA\Appreciation\Db\Event;
+use OCA\Appreciation\Db\EventMapper;
+use OCA\Appreciation\Exception\ConflictException;
+use OCA\Appreciation\Exception\ValidationException;
+use OCA\Appreciation\Service\Clock;
+use OCA\Appreciation\Service\Dates;
+use OCA\Appreciation\Service\GroupService;
+use OCA\Appreciation\Service\PersonService;
+use OCA\Appreciation\Tests\Integration\IntegrationTestCase;
+
+/**
+ * Persons, slices, groups and functions through the services, including the
+ * generated events and the audit log. Uses the "admin" user that exists in
+ * every test instance.
+ */
+final class LifecycleTest extends IntegrationTestCase {
+	private GroupService $groups;
+	private PersonService $persons;
+	private EventMapper $events;
+
+	#[\Override]
+	protected function setUp(): void {
+		parent::setUp();
+		$this->groups = $this->service(GroupService::class);
+		$this->persons = $this->service(PersonService::class);
+		$this->events = $this->service(EventMapper::class);
+	}
+
+	public function testEventsFollowTheMasterData(): void {
+		$today = $this->service(Clock::class)->today();
+		$in = static fn (int $days, int $yearsBack = 0): string => Dates::format(Dates::anniversary(Dates::addDays($today, $days), -$yearsBack));
+
+		$group = $this->groups->create('admin', $this->uniqueName('Group'), 'admin', [], '1, 2');
+		$this->onTearDown(fn () => $this->groups->delete('admin', $group->getId()));
+		$function = $this->groups->createFunction('admin', $group->getId(), 'Tester');
+		$this->onTearDown(fn () => $this->groups->deleteFunction('admin', $function->getId()));
+
+		$person = $this->persons->create('admin', 'Test', $this->uniqueName('Person'), $in(10, 30), ' notes ');
+		$this->onTearDown(fn () => $this->persons->delete('admin', $person->getId()));
+		$this->assertSame('notes', $person->getNotes());
+
+		// No slice yet: not a member, so no birthday
+		$this->assertSame([], $this->events->findByPerson($person->getId()));
+
+		$nextBirthday = static fn (string $birth): string => Dates::format(Dates::anniversary(Dates::parse($birth) ?? throw new \LogicException(), 31));
+
+		$this->persons->addSlice('admin', $person->getId(), $function->getId(), $in(20, 2), null);
+		$this->assertSame([
+			['birthday', $in(10), 30],
+			['jubilee', $in(20), 2],
+			['birthday', $nextBirthday($in(10, 30)), 31],
+		], $this->describe($this->events->findByPerson($person->getId())));
+
+		try {
+			$this->persons->addSlice('admin', $person->getId(), $function->getId(), $in(0), null);
+			$this->fail('Overlapping slice was accepted');
+		} catch (ConflictException) {
+		}
+
+		// Moving the birthday updates the existing events
+		$this->persons->update('admin', $person->getId(), 'Test', $person->getLastName(), $in(12, 30), null);
+		$this->assertSame([
+			['birthday', $in(12), 30],
+			['jubilee', $in(20), 2],
+			['birthday', $nextBirthday($in(12, 30)), 31],
+		], $this->describe($this->events->findByPerson($person->getId())));
+
+		try {
+			$this->groups->deleteFunction('admin', $function->getId());
+			$this->fail('Function with slices was deleted');
+		} catch (ConflictException) {
+		}
+
+		$this->persons->delete('admin', $person->getId());
+		$this->assertSame([], $this->events->findByPerson($person->getId()));
+
+		$audit = array_filter(
+			$this->service(AuditMapper::class)->findPage(50, 0),
+			static fn (AuditEntry $entry): bool => $entry->getEntityType() === 'person' && $entry->getEntityId() === $person->getId(),
+		);
+		$this->assertSame(['delete', 'update', 'create'], array_values(array_map(static fn (AuditEntry $e): string => $e->getAction(), $audit)));
+		$update = array_values($audit)[1];
+		$this->assertSame(['date_of_birth', 'notes'], $update->getChangedFieldList());
+	}
+
+	public function testValidation(): void {
+		$this->expectException(ValidationException::class);
+		$this->groups->create('admin', 'Group', $this->uniqueName('no-such-user'), [], null);
+	}
+
+	/**
+	 * @param list<Event> $events
+	 * @return list<array{string, string, int}>
+	 */
+	private function describe(array $events): array {
+		return array_map(static fn (Event $e): array => [$e->getType(), Dates::format($e->getEventDate()), $e->getOrdinal()], $events);
+	}
+}

@@ -34,5 +34,20 @@
 				<directory name="lib/Db"/>
 			</errorLevel>
 		</PropertyNotSetInConstructor>
+		<!-- Constructors are called by the dependency injection container -->
+		<PossiblyUnusedMethod>
+			<errorLevel type="suppress">
+				<referencedMethod name="*::__construct"/>
+			</errorLevel>
+		</PossiblyUnusedMethod>
+		<!-- Instantiated by Nextcloud (info.xml, routes, registration) -->
+		<UnusedClass>
+			<errorLevel type="suppress">
+				<directory name="lib/BackgroundJob"/>
+				<directory name="lib/Command"/>
+				<directory name="lib/Controller"/>
+				<directory name="lib/Migration"/>
+			</errorLevel>
+		</UnusedClass>
 	</issueHandlers>
 </psalm>
