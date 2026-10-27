@@ -6,6 +6,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite --mode development build",
+    "l10n": "node scripts/l10n.mjs",
     "lint": "eslint src",
     "stylelint": "stylelint src/**/*.vue src/**/*.scss src/**/*.css",
     "typecheck": "vue-tsc --noEmit",
