@@ -28,10 +28,11 @@ class SyncCommand {
 	public function __invoke(IOutput $output): ExitCode {
 		$result = $this->syncService->run();
 		$output->writeln(sprintf(
-			'Events: %d inserted, %d updated, %d deleted',
+			'Events: %d inserted, %d updated, %d deleted. Notifications sent: %d',
 			$result['inserted'],
 			$result['updated'],
 			$result['deleted'],
+			$result['notified'],
 		));
 		return ExitCode::Success;
 	}

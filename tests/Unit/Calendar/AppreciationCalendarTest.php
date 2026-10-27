@@ -60,7 +60,8 @@ final class AppreciationCalendarTest extends TestCase {
 		$this->assertSame('TRANSPARENT', (string)$vEvent->TRANSP);
 		$this->assertSame('-P14D', (string)$vEvent->VALARM?->TRIGGER);
 
-		// The DAV app wraps the components into a calendar object like this
+		// The DAV app groups by $object['UID'] and wraps the components like this
+		$this->assertSame('appreciation-birthday-1-2026', (string)$vEvent['UID']);
 		$serialized = (new VCalendar([$vEvent]))->serialize();
 		$this->assertStringContainsString('DTSTART;VALUE=DATE:20261030', $serialized);
 	}

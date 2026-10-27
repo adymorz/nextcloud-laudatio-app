@@ -47,7 +47,10 @@
 				<directory name="lib/Calendar"/>
 				<directory name="lib/Command"/>
 				<directory name="lib/Controller"/>
+				<directory name="lib/Listener"/>
 				<directory name="lib/Migration"/>
+				<directory name="lib/Notification"/>
+				<directory name="lib/Settings"/>
 			</errorLevel>
 		</UnusedClass>
 	</issueHandlers>

@@ -27,13 +27,4 @@
 		<command>OCA\Appreciation\Command\SyncCommand</command>
 		<command>OCA\Appreciation\Command\DemoDataCommand</command>
 	</commands>
-	<navigations>
-		<navigation>
-			<id>appreciation</id>
-			<name>Appreciation</name>
-			<route>appreciation.page.index</route>
-			<icon>app.svg</icon>
-			<type>link</type>
-		</navigation>
-	</navigations>
 </info>

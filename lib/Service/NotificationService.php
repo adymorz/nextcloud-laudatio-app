@@ -1,0 +1,134 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * SPDX-FileCopyrightText: 2026 Adrian Dymorz <dev@adrian.dymorz.ch>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+namespace OCA\Appreciation\Service;
+
+use OCA\Appreciation\AppInfo\Application;
+use OCA\Appreciation\Db\Event;
+use OCA\Appreciation\Db\EventMapper;
+use OCA\Appreciation\Db\NotifiedMapper;
+use OCP\IDateTimeFormatter;
+use OCP\IURLGenerator;
+use OCP\IUserManager;
+use OCP\L10N\IFactory;
+use OCP\Mail\IMailer;
+use OCP\Notification\IManager as INotificationManager;
+use Psr\Log\LoggerInterface;
+
+/**
+ * Sends one reminder per event and recipient when the event enters the lead
+ * time: a Nextcloud notification and, if the user opted in, an email.
+ * Notifications of past events are removed.
+ */
+class NotificationService {
+	public const string SUBJECT_UPCOMING = 'upcoming';
+
+	public function __construct(
+		private EventMapper $eventMapper,
+		private NotifiedMapper $notifiedMapper,
+		private RecipientService $recipients,
+		private TitleBuilder $titles,
+		private SettingsService $settings,
+		private EventService $eventService,
+		private INotificationManager $notificationManager,
+		private IMailer $mailer,
+		private IUserManager $userManager,
+		private IFactory $l10nFactory,
+		private IDateTimeFormatter $dateFormatter,
+		private IURLGenerator $urlGenerator,
+		private Clock $clock,
+		private LoggerInterface $logger,
+	) {
+	}
+
+	/**
+	 * @return int number of sent notifications
+	 */
+	public function sendDue(): int {
+		$today = $this->clock->today();
+		$until = Dates::addDays($today, $this->settings->getLeadTimeDays());
+		$sent = 0;
+		foreach ($this->eventMapper->findBetween($today, $until) as $event) {
+			$alreadyNotified = $this->notifiedMapper->findUserIdsByEvent($event->getId());
+			foreach ($this->recipients->recipients($event) as $userId => $role) {
+				if (in_array($userId, $alreadyNotified, true) || !$this->userManager->userExists($userId)) {
+					continue;
+				}
+				$this->notify($event, $userId, $role);
+				$sent++;
+			}
+		}
+		return $sent;
+	}
+
+	/**
+	 * Removes the notifications of events that are over.
+	 */
+	public function cleanup(): void {
+		$eventIds = $this->notifiedMapper->findEventIdsBefore($this->clock->today());
+		if ($eventIds !== []) {
+			$this->eventService->dismissNotifications($eventIds);
+			$this->notifiedMapper->deleteByEventIds($eventIds);
+		}
+	}
+
+	/**
+	 * @param RecipientService::ROLE_* $role
+	 */
+	private function notify(Event $event, string $userId, string $role): void {
+		$notification = $this->notificationManager->createNotification();
+		$notification->setApp(Application::APP_ID)
+			->setUser($userId)
+			->setDateTime(new \DateTime('@' . $this->clock->time()))
+			->setObject('event', (string)$event->getId())
+			->setSubject(self::SUBJECT_UPCOMING);
+		$this->notificationManager->notify($notification);
+		$this->notifiedMapper->add($event->getId(), $userId, $this->clock->time());
+
+		if ($this->settings->isEmailEnabledForUser($userId)) {
+			$this->sendEmail($event, $userId, $role);
+		}
+	}
+
+	/**
+	 * @param RecipientService::ROLE_* $role
+	 */
+	private function sendEmail(Event $event, string $userId, string $role): void {
+		$user = $this->userManager->get($userId);
+		$address = $user?->getEMailAddress();
+		if ($user === null || $address === null || $address === '') {
+			return;
+		}
+
+		$language = $this->l10nFactory->getUserLanguage($user);
+		$l = $this->l10nFactory->get(Application::APP_ID, $language);
+		$title = $this->titles->build($event, $role, $language);
+		$date = $this->dateFormatter->formatDate($event->getEventDate()->getTimestamp(), 'long', new \DateTimeZone('UTC'), $l);
+
+		$template = $this->mailer->createEMailTemplate('appreciation.reminder', ['title' => $title, 'date' => $date]);
+		$template->setSubject($title);
+		$template->addHeader();
+		$template->addHeading($title);
+		$template->addBodyText($l->t('Date: %s', [$date]));
+		if ($role === RecipientService::ROLE_RESPONSIBLE) {
+			$template->addBodyText($l->t('Remember to congratulate in time.'));
+		}
+		$template->addBodyButton($l->t('Open Appreciation'), $this->urlGenerator->linkToRouteAbsolute(Application::APP_ID . '.page.index'));
+		$template->addFooter();
+
+		try {
+			$message = $this->mailer->createMessage();
+			$message->setTo([$address => $user->getDisplayName()]);
+			$message->useTemplate($template);
+			$this->mailer->send($message);
+		} catch (\Exception $e) {
+			$this->logger->error('Could not send the reminder email to ' . $userId, ['exception' => $e]);
+		}
+	}
+}

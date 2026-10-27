@@ -16,13 +16,17 @@ namespace OCA\Appreciation\Service;
 class SyncService {
 	public function __construct(
 		private EventService $eventService,
+		private NotificationService $notifications,
 	) {
 	}
 
 	/**
-	 * @return array{inserted: int, updated: int, deleted: int}
+	 * @return array{inserted: int, updated: int, deleted: int, notified: int}
 	 */
 	public function run(): array {
-		return $this->eventService->syncAll();
+		$result = $this->eventService->syncAll();
+		$result['notified'] = $this->notifications->sendDue();
+		$this->notifications->cleanup();
+		return $result;
 	}
 }

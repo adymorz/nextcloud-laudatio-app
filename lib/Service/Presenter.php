@@ -81,6 +81,7 @@ class Presenter {
 			'interestedGroupIds' => $this->access->getInterestedGroupIds($userId),
 			'greetingReminder' => $this->settings->isGreetingReminderEnabled(),
 			'leadTimeDays' => $this->settings->getLeadTimeDays(),
+			'emailNotifications' => $this->settings->isEmailEnabledForUser($userId),
 		];
 	}
 

@@ -105,8 +105,7 @@ class AppreciationCalendar implements ICalendar {
 		$title = $this->titles->build($event, $role, $this->language);
 		$date = $event->getEventDate();
 		$calendar = new VCalendar();
-		/** @var VEvent $vEvent */
-		$vEvent = $calendar->add('VEVENT', [
+		$vEvent = new EventComponent($calendar, 'VEVENT', [
 			'UID' => $event->getUid(),
 			'X-FILENAME' => $event->getUid() . '.ics',
 			'SUMMARY' => $title,
@@ -117,6 +116,7 @@ class AppreciationCalendar implements ICalendar {
 			'CLASS' => 'PRIVATE',
 			'DTSTAMP' => (new \DateTimeImmutable('@' . $event->getCreatedAt())),
 		]);
+		$calendar->add($vEvent);
 		$vEvent->add('DTSTART', $date->format('Ymd'), ['VALUE' => 'DATE']);
 		$vEvent->add('DTEND', Dates::addDays($date, 1)->format('Ymd'), ['VALUE' => 'DATE']);
 		if ($this->leadTimeDays > 0) {
@@ -138,13 +138,9 @@ class AppreciationCalendar implements ICalendar {
 	private function matches(VEvent $vEvent, string $pattern, array $searchProperties): bool {
 		$names = array_map('strtoupper', array_filter($searchProperties, 'is_string'));
 		foreach ($names === [] ? ['SUMMARY'] : $names as $name) {
-			/** @var list<mixed> $nodes */
-			$nodes = $vEvent->select($name);
-			foreach ($nodes as $node) {
-				if (!$node instanceof Property) {
-					continue;
-				}
-				$value = (string)$node;
+			$properties = array_filter($vEvent->select($name), static fn (mixed $node): bool => $node instanceof Property);
+			foreach ($properties as $property) {
+				$value = (string)$property;
 				$exact = in_array($name, ['UID', 'X-FILENAME'], true);
 				if (($exact && $value === $pattern) || (!$exact && mb_stripos($value, $pattern) !== false)) {
 					return true;

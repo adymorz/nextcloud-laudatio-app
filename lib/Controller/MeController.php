@@ -12,6 +12,7 @@ namespace OCA\Appreciation\Controller;
 use OCA\Appreciation\ResponseDefinitions;
 use OCA\Appreciation\Service\AccessService;
 use OCA\Appreciation\Service\Presenter;
+use OCA\Appreciation\Service\SettingsService;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\ApiRoute;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -29,6 +30,7 @@ class MeController extends BaseOCSController {
 		IUserSession $userSession,
 		AccessService $access,
 		private Presenter $presenter,
+		private SettingsService $settings,
 	) {
 		parent::__construct($request, $userSession, $access);
 	}
@@ -45,5 +47,23 @@ class MeController extends BaseOCSController {
 	#[ApiRoute(verb: 'GET', url: '/api/v1/me')]
 	public function show(): DataResponse {
 		return new DataResponse($this->presenter->me($this->currentUserId()));
+	}
+
+	/**
+	 * Change the personal settings of the current user
+	 *
+	 * @param bool $emailNotifications Whether reminders are also sent by email
+	 * @return DataResponse<Http::STATUS_OK, AppreciationMe, array{}>
+	 * @throws OCSForbiddenException No access to the app
+	 *
+	 * 200: Settings saved
+	 */
+	#[NoAdminRequired]
+	#[ApiRoute(verb: 'PUT', url: '/api/v1/me/settings')]
+	public function updateSettings(bool $emailNotifications): DataResponse {
+		$userId = $this->currentUserId();
+		$this->call(fn () => $this->access->requireAccess($userId));
+		$this->settings->setEmailEnabledForUser($userId, $emailNotifications);
+		return new DataResponse($this->presenter->me($userId));
 	}
 }

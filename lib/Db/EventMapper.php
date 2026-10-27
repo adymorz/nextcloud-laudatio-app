@@ -77,21 +77,4 @@ class EventMapper extends QBMapper {
 		$qb->orderBy('event_date')->addOrderBy('id');
 		return $this->findEntities($qb);
 	}
-
-	/**
-	 * @return list<int>
-	 */
-	public function findIdsBefore(DateTimeImmutable $day): array {
-		$qb = $this->db->getQueryBuilder();
-		$qb->select('id')
-			->from($this->getTableName())
-			->where($qb->expr()->lt('event_date', $qb->createNamedParameter($day, IQueryBuilder::PARAM_DATE_IMMUTABLE)));
-		$cursor = $qb->executeQuery();
-		$ids = [];
-		while (($row = $cursor->fetch()) !== false) {
-			$ids[] = (int)$row['id'];
-		}
-		$cursor->closeCursor();
-		return $ids;
-	}
 }

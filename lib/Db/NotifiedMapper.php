@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\Appreciation\Db;
 
+use DateTimeImmutable;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
@@ -36,6 +37,26 @@ class NotifiedMapper extends QBMapper {
 		}
 		$cursor->closeCursor();
 		return $userIds;
+	}
+
+	/**
+	 * IDs of events before the given day that users were notified about.
+	 *
+	 * @return list<int>
+	 */
+	public function findEventIdsBefore(DateTimeImmutable $day): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->selectDistinct('n.event_id')
+			->from($this->getTableName(), 'n')
+			->innerJoin('n', 'appreciation_events', 'e', $qb->expr()->eq('e.id', 'n.event_id'))
+			->where($qb->expr()->lt('e.event_date', $qb->createNamedParameter($day, IQueryBuilder::PARAM_DATE_IMMUTABLE)));
+		$cursor = $qb->executeQuery();
+		$ids = [];
+		while (($row = $cursor->fetch()) !== false) {
+			$ids[] = (int)$row['event_id'];
+		}
+		$cursor->closeCursor();
+		return $ids;
 	}
 
 	public function add(int $eventId, string $userId, int $time): void {

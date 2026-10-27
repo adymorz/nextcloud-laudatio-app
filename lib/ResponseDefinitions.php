@@ -25,6 +25,7 @@ namespace OCA\Appreciation;
  *     interestedGroupIds: list<int>,
  *     greetingReminder: bool,
  *     leadTimeDays: int,
+ *     emailNotifications: bool,
  * }
  *
  * @psalm-type AppreciationFunction = array{
