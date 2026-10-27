@@ -8,14 +8,23 @@
     "dev": "vite --mode development build",
     "lint": "eslint src",
     "stylelint": "stylelint src/**/*.vue src/**/*.scss src/**/*.css",
+    "typecheck": "vue-tsc --noEmit",
+    "typescript:generate": "openapi-typescript openapi.json -o src/types/openapi.ts",
     "watch": "vite --mode development build --watch"
   },
   "browserslist": [
     "extends @nextcloud/browserslist-config"
   ],
   "dependencies": {
+    "@mdi/js": "^7.4.47",
+    "@nextcloud/axios": "^2.6.0",
+    "@nextcloud/dialogs": "^7.6.0",
+    "@nextcloud/initial-state": "^3.0.0",
+    "@nextcloud/l10n": "^3.4.1",
+    "@nextcloud/router": "^3.2.0",
     "@nextcloud/vue": "^9.8.2",
-    "vue": "^3.5.41"
+    "vue": "^3.5.41",
+    "vue-router": "^5.4.0"
   },
   "devDependencies": {
     "@nextcloud/browserslist-config": "^3.1.2",
@@ -23,8 +32,10 @@
     "@nextcloud/stylelint-config": "^3.1.1",
     "@nextcloud/vite-config": "^2.5.2",
     "@vue/tsconfig": "^0.9.1",
+    "openapi-typescript": "^7.13.0",
     "typescript": "^5.9.3",
-    "vite": "^7.3.2"
+    "vite": "^7.3.2",
+    "vue-tsc": "^3.3.13"
   },
   "engines": {
     "node": "^24.0.0",
