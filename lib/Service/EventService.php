@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OCA\Appreciation\Service;
 
-use DateTimeImmutable;
 use OCA\Appreciation\AppInfo\Application;
 use OCA\Appreciation\Db\Event;
 use OCA\Appreciation\Db\EventMapper;
@@ -216,14 +215,5 @@ class EventService {
 			$changed = true;
 		}
 		return $changed;
-	}
-
-	/**
-	 * Events in a date range (both inclusive), ordered by date.
-	 *
-	 * @return list<Event>
-	 */
-	public function findBetween(DateTimeImmutable $from, ?DateTimeImmutable $to): array {
-		return $this->eventMapper->findBetween($from, $to);
 	}
 }

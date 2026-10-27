@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\Appreciation\Tests\Integration;
 
+use OCP\IDBConnection;
 use OCP\Server;
 use PHPUnit\Framework\TestCase;
 
@@ -17,11 +18,24 @@ use PHPUnit\Framework\TestCase;
  *
  * The tests run against the developer's instance in DDEV, so they must never
  * truncate tables: every test registers cleanups for exactly the rows it
- * created, which run in reverse order after the test.
+ * created, which run in reverse order after the test. Audit log entries
+ * written during the test are removed as well (assuming nobody edits data in
+ * the instance during the milliseconds a test runs).
  */
 abstract class IntegrationTestCase extends TestCase {
 	/** @var list<\Closure(): void> */
 	private array $cleanups = [];
+	private int $lastAuditId = 0;
+
+	#[\Override]
+	protected function setUp(): void {
+		parent::setUp();
+		$qb = $this->service(IDBConnection::class)->getQueryBuilder();
+		$qb->select($qb->func()->max('id'))->from('appreciation_audit');
+		$cursor = $qb->executeQuery();
+		$this->lastAuditId = (int)$cursor->fetchOne();
+		$cursor->closeCursor();
+	}
 
 	/**
 	 * @template T
@@ -56,6 +70,12 @@ abstract class IntegrationTestCase extends TestCase {
 			}
 		}
 		$this->cleanups = [];
+
+		$qb = $this->service(IDBConnection::class)->getQueryBuilder();
+		$qb->delete('appreciation_audit')
+			->where($qb->expr()->gt('id', $qb->createNamedParameter($this->lastAuditId)));
+		$qb->executeStatement();
+
 		parent::tearDown();
 	}
 }

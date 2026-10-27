@@ -9,11 +9,5 @@ declare(strict_types=1);
 
 namespace OCA\Appreciation\Exception;
 
-use OCP\AppFramework\Http;
-
 class ConflictException extends ServiceException {
-	#[\Override]
-	public function getStatus(): int {
-		return Http::STATUS_CONFLICT;
-	}
 }

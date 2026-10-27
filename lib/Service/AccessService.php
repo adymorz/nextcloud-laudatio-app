@@ -146,7 +146,7 @@ class AccessService {
 	 */
 	public function requireManager(string $userId): void {
 		if (!$this->isManager($userId)) {
-			throw new ForbiddenException($this->l10n->t('Only managers can change this data.'));
+			throw new ForbiddenException($this->l10n->t('This is only available to managers.'));
 		}
 	}
 

@@ -63,11 +63,6 @@ final class DatesTest extends TestCase {
 		$this->assertSame('2026-10-20', Dates::format(Dates::addDays($this->date('2026-10-27'), -7)));
 	}
 
-	public function testYearsBetween(): void {
-		$this->assertSame(31, Dates::yearsBetween($this->date('1994-10-28'), $this->date('2026-10-27')));
-		$this->assertSame(32, Dates::yearsBetween($this->date('1994-10-27'), $this->date('2026-10-27')));
-	}
-
 	private function date(string $value): DateTimeImmutable {
 		$date = Dates::parse($value);
 		$this->assertNotNull($date);

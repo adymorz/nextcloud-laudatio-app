@@ -79,9 +79,4 @@ class TitleBuilder {
 		}
 		return $this->functionNames[$functionId];
 	}
-
-	public function reset(): void {
-		$this->personNames = [];
-		$this->functionNames = [];
-	}
 }

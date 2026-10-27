@@ -9,11 +9,5 @@ declare(strict_types=1);
 
 namespace OCA\Appreciation\Exception;
 
-use OCP\AppFramework\Http;
-
 class NotFoundException extends ServiceException {
-	#[\Override]
-	public function getStatus(): int {
-		return Http::STATUS_NOT_FOUND;
-	}
 }

@@ -68,15 +68,4 @@ final class Dates {
 		$result = self::parse(sprintf('%04d-%02d-%02d', $year, $month, $day));
 		return $result;
 	}
-
-	/**
-	 * Full years between $from and $to (e.g. the age on a day).
-	 */
-	public static function yearsBetween(DateTimeImmutable $from, DateTimeImmutable $to): int {
-		$years = (int)$to->format('Y') - (int)$from->format('Y');
-		if ($to->format('md') < $from->format('md')) {
-			$years--;
-		}
-		return $years;
-	}
 }

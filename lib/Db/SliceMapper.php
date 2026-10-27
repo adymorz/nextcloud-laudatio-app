@@ -111,21 +111,6 @@ class SliceMapper extends QBMapper {
 		return array_values(array_unique($ids));
 	}
 
-	/**
-	 * @return list<int> IDs of all persons that have at least one slice
-	 */
-	public function findAllPersonIds(): array {
-		$qb = $this->db->getQueryBuilder();
-		$qb->selectDistinct('person_id')->from($this->getTableName());
-		$cursor = $qb->executeQuery();
-		$ids = [];
-		while (($row = $cursor->fetch()) !== false) {
-			$ids[] = (int)$row['person_id'];
-		}
-		$cursor->closeCursor();
-		return $ids;
-	}
-
 	public function deleteByPerson(int $personId): void {
 		$qb = $this->db->getQueryBuilder();
 		$qb->delete($this->getTableName())

@@ -10,11 +10,8 @@ declare(strict_types=1);
 namespace OCA\Appreciation\Exception;
 
 /**
- * Base class for expected errors whose (translated) message may be shown to the user.
+ * Base class for expected errors whose (translated) message may be shown to
+ * the user. The controllers map the subclasses to HTTP status codes.
  */
 abstract class ServiceException extends \Exception {
-	/**
-	 * HTTP status code the API responds with.
-	 */
-	abstract public function getStatus(): int;
 }

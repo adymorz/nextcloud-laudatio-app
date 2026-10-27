@@ -62,24 +62,6 @@ class OrgFunctionMapper extends QBMapper {
 		return $result;
 	}
 
-	/**
-	 * @param list<int> $ids
-	 * @return array<int, OrgFunction> functions by ID
-	 */
-	public function findByIds(array $ids): array {
-		$result = [];
-		foreach (array_chunk(array_values(array_unique($ids)), 1000) as $chunk) {
-			$qb = $this->db->getQueryBuilder();
-			$qb->select('*')
-				->from($this->getTableName())
-				->where($qb->expr()->in('id', $qb->createNamedParameter($chunk, IQueryBuilder::PARAM_INT_ARRAY)));
-			foreach ($this->findEntities($qb) as $function) {
-				$result[$function->getId()] = $function;
-			}
-		}
-		return $result;
-	}
-
 	public function countByGroup(int $groupId): int {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select($qb->func()->count('*', 'cnt'))
