@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\Appreciation\AppInfo;
 
+use OCA\Appreciation\Calendar\CalendarProvider;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
@@ -22,9 +23,12 @@ class Application extends App implements IBootstrap {
 		parent::__construct(self::APP_ID);
 	}
 
+	#[\Override]
 	public function register(IRegistrationContext $context): void {
+		$context->registerCalendarProvider(CalendarProvider::class);
 	}
 
+	#[\Override]
 	public function boot(IBootContext $context): void {
 	}
 }

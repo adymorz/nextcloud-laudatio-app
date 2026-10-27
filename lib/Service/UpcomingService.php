@@ -49,6 +49,22 @@ class UpcomingService {
 	}
 
 	/**
+	 * All stored events, past and upcoming, the user receives (for the calendar).
+	 *
+	 * @return list<array{Event, RecipientService::ROLE_*}>
+	 */
+	public function allAsRecipient(string $userId): array {
+		$result = [];
+		foreach ($this->eventMapper->findAll() as $event) {
+			$role = $this->recipients->roleOf($event, $userId);
+			if ($role !== null) {
+				$result[] = [$event, $role];
+			}
+		}
+		return $result;
+	}
+
+	/**
 	 * @return list<array{Event, RecipientService::ROLE_*|null}>
 	 */
 	public function nextDays(string $userId, int $days): array {

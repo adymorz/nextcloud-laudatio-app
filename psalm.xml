@@ -44,6 +44,7 @@
 		<UnusedClass>
 			<errorLevel type="suppress">
 				<directory name="lib/BackgroundJob"/>
+				<directory name="lib/Calendar"/>
 				<directory name="lib/Command"/>
 				<directory name="lib/Controller"/>
 				<directory name="lib/Migration"/>
