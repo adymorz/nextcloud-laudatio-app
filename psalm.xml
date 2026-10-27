@@ -22,4 +22,17 @@
 	<extraFiles>
 		<directory name="vendor"/>
 	</extraFiles>
+	<issueHandlers>
+		<!-- Entities are accessed through Entity's magic getters/setters and Entity::$id is set by the mapper -->
+		<PossiblyUnusedProperty>
+			<errorLevel type="suppress">
+				<directory name="lib/Db"/>
+			</errorLevel>
+		</PossiblyUnusedProperty>
+		<PropertyNotSetInConstructor>
+			<errorLevel type="suppress">
+				<directory name="lib/Db"/>
+			</errorLevel>
+		</PropertyNotSetInConstructor>
+	</issueHandlers>
 </psalm>

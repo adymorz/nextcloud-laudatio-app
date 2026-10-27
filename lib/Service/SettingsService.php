@@ -1,0 +1,148 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * SPDX-FileCopyrightText: 2026 Adrian Dymorz <dev@adrian.dymorz.ch>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+namespace OCA\Appreciation\Service;
+
+use OCA\Appreciation\AppInfo\Application;
+use OCA\Appreciation\Exception\ValidationException;
+use OCP\Config\IUserConfig;
+use OCP\IAppConfig;
+use OCP\IL10N;
+
+/**
+ * Typed access to the admin settings and the per-user settings of the app.
+ */
+class SettingsService {
+	public const string MANAGER_GROUP = 'manager_group';
+	public const string JUBILEE_YEARS = 'jubilee_years';
+	public const string LEAD_TIME_DAYS = 'lead_time_days';
+	public const string BIRTHDAY_EVENTS = 'birthday_events';
+	public const string JUBILEE_EVENTS = 'jubilee_events';
+	public const string GREETING_REMINDER = 'greeting_reminder';
+	public const string EMAIL_DEFAULT = 'email_default';
+	/** Per-user setting */
+	public const string EMAIL_NOTIFICATIONS = 'email_notifications';
+
+	/** @var list<int> */
+	public const array DEFAULT_JUBILEE_YEARS = [1, 5, 10, 15, 20, 25, 40];
+	public const int DEFAULT_LEAD_TIME_DAYS = 14;
+	public const int MAX_LEAD_TIME_DAYS = 365;
+	public const int MAX_JUBILEE_YEAR = 100;
+
+	public function __construct(
+		private IAppConfig $appConfig,
+		private IUserConfig $userConfig,
+		private IL10N $l10n,
+	) {
+	}
+
+	/**
+	 * Nextcloud group whose members may edit master data ('' = admins only).
+	 */
+	public function getManagerGroup(): string {
+		return $this->appConfig->getValueString(Application::APP_ID, self::MANAGER_GROUP);
+	}
+
+	public function setManagerGroup(string $groupId): void {
+		$this->appConfig->setValueString(Application::APP_ID, self::MANAGER_GROUP, $groupId);
+	}
+
+	/**
+	 * @return list<int>
+	 */
+	public function getJubileeYears(): array {
+		$value = $this->appConfig->getValueString(Application::APP_ID, self::JUBILEE_YEARS, self::formatJubileeYears(self::DEFAULT_JUBILEE_YEARS));
+		try {
+			return $this->parseJubileeYears($value);
+		} catch (ValidationException) {
+			return self::DEFAULT_JUBILEE_YEARS;
+		}
+	}
+
+	/**
+	 * @throws ValidationException
+	 */
+	public function setJubileeYears(string $value): void {
+		$years = $this->parseJubileeYears($value);
+		$this->appConfig->setValueString(Application::APP_ID, self::JUBILEE_YEARS, self::formatJubileeYears($years));
+	}
+
+	public function getLeadTimeDays(): int {
+		return $this->appConfig->getValueInt(Application::APP_ID, self::LEAD_TIME_DAYS, self::DEFAULT_LEAD_TIME_DAYS);
+	}
+
+	/**
+	 * @throws ValidationException
+	 */
+	public function setLeadTimeDays(int $days): void {
+		if ($days < 0 || $days > self::MAX_LEAD_TIME_DAYS) {
+			throw new ValidationException($this->l10n->t('The lead time must be between 0 and %d days.', [self::MAX_LEAD_TIME_DAYS]));
+		}
+		$this->appConfig->setValueInt(Application::APP_ID, self::LEAD_TIME_DAYS, $days);
+	}
+
+	public function isBirthdayEventsEnabled(): bool {
+		return $this->appConfig->getValueBool(Application::APP_ID, self::BIRTHDAY_EVENTS, true);
+	}
+
+	public function isJubileeEventsEnabled(): bool {
+		return $this->appConfig->getValueBool(Application::APP_ID, self::JUBILEE_EVENTS, true);
+	}
+
+	public function isGreetingReminderEnabled(): bool {
+		return $this->appConfig->getValueBool(Application::APP_ID, self::GREETING_REMINDER, true);
+	}
+
+	public function isEmailDefaultEnabled(): bool {
+		return $this->appConfig->getValueBool(Application::APP_ID, self::EMAIL_DEFAULT, false);
+	}
+
+	/**
+	 * @param self::BIRTHDAY_EVENTS|self::JUBILEE_EVENTS|self::GREETING_REMINDER|self::EMAIL_DEFAULT $key
+	 */
+	public function setFlag(string $key, bool $value): void {
+		$this->appConfig->setValueBool(Application::APP_ID, $key, $value);
+	}
+
+	public function isEmailEnabledForUser(string $userId): bool {
+		return $this->userConfig->getValueBool($userId, Application::APP_ID, self::EMAIL_NOTIFICATIONS, $this->isEmailDefaultEnabled());
+	}
+
+	public function setEmailEnabledForUser(string $userId, bool $enabled): void {
+		$this->userConfig->setValueBool($userId, Application::APP_ID, self::EMAIL_NOTIFICATIONS, $enabled);
+	}
+
+	/**
+	 * Parses a list like "1, 5,10" into sorted unique years. An empty string
+	 * yields an empty list (no jubilees).
+	 *
+	 * @return list<int>
+	 * @throws ValidationException
+	 */
+	public function parseJubileeYears(string $value): array {
+		$years = [];
+		$tokens = preg_split('/[\s,;]+/', trim($value), -1, PREG_SPLIT_NO_EMPTY);
+		foreach ($tokens === false ? [] : $tokens as $token) {
+			if (!ctype_digit($token) || (int)$token < 1 || (int)$token > self::MAX_JUBILEE_YEAR) {
+				throw new ValidationException($this->l10n->t('Jubilee years must be whole numbers between 1 and %d, separated by commas.', [self::MAX_JUBILEE_YEAR]));
+			}
+			$years[] = (int)$token;
+		}
+		$years = array_values(array_unique($years));
+		sort($years);
+		return $years;
+	}
+
+	/**
+	 * @param list<int> $years
+	 */
+	public static function formatJubileeYears(array $years): string {
+		return implode(', ', $years);
+	}
+}

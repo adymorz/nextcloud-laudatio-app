@@ -7,9 +7,9 @@
 	  xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
 	<id>appreciation</id>
 	<name>Appreciation</name>
-	<summary>Appreciation the engagement of a person in an organization</summary>
+	<summary>Appreciate the engagement of people in an organization</summary>
 	<description><![CDATA[A Nextcloud app for managing the people involved in an organization: members, employees, elected officials, and volunteers. Includes reminders so those responsible can celebrate birthdays and work anniversaries, as well as tracking gifts and anniversary budgets.]]></description>
-	<version>0.1.0</version>
+	<version>0.2.0</version>
 	<licence>AGPL-3.0-or-later</licence>
 	<author mail="dev@adrian.dymorz.ch">Adrian Dymorz</author>
 	<namespace>Appreciation</namespace>

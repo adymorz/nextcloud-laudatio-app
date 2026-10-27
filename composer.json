@@ -13,6 +13,11 @@
 			"OCA\\Appreciation\\": "lib/"
 		}
 	},
+	"autoload-dev": {
+		"psr-4": {
+			"OCA\\Appreciation\\Tests\\": "tests/"
+		}
+	},
 	"scripts": {
 		"post-install-cmd": [
 			"@composer bin all install --ansi"
