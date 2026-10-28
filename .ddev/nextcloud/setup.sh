@@ -100,8 +100,10 @@ if ! config_says_installed; then
 	# Background jobs are run by the nextcloud-cron daemon (see config.yaml).
 	occ background:cron
 
-	# Allow trivial passwords for the test users below.
+	# Allow trivial passwords for the test users below, and skip the welcome
+	# wizard that would otherwise greet every test user.
 	occ app:disable password_policy
+	occ app:disable firstrunwizard
 	for user in alice bob; do
 		OC_PASS="$user" occ user:add --password-from-env --display-name="${user^}" "$user"
 		occ user:setting "$user" settings email "$user@example.com"

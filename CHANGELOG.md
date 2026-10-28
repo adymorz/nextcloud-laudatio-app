@@ -14,4 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- App skeleton based on the Nextcloud app template
+- Persons, groups with responsible and interested users, functions and time slices
+- Access control for managers, responsible and interested users
+- Birthday and jubilee events with continuous service periods and per-group jubilee years
+- Read-only calendar per user in the Calendar app and via CalDAV
+- Reminder notifications and optional emails
+- Upcoming view with "greeted" checklist
+- Audit log of master data changes
+- Admin settings and personal email setting
+- English and German (informal and formal)

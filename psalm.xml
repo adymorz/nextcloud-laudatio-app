@@ -22,4 +22,36 @@
 	<extraFiles>
 		<directory name="vendor"/>
 	</extraFiles>
+	<issueHandlers>
+		<!-- Entities are accessed through Entity's magic getters/setters and Entity::$id is set by the mapper -->
+		<PossiblyUnusedProperty>
+			<errorLevel type="suppress">
+				<directory name="lib/Db"/>
+			</errorLevel>
+		</PossiblyUnusedProperty>
+		<PropertyNotSetInConstructor>
+			<errorLevel type="suppress">
+				<directory name="lib/Db"/>
+			</errorLevel>
+		</PropertyNotSetInConstructor>
+		<!-- Constructors are called by the dependency injection container -->
+		<PossiblyUnusedMethod>
+			<errorLevel type="suppress">
+				<referencedMethod name="*::__construct"/>
+			</errorLevel>
+		</PossiblyUnusedMethod>
+		<!-- Instantiated by Nextcloud (info.xml, routes, registration) -->
+		<UnusedClass>
+			<errorLevel type="suppress">
+				<directory name="lib/BackgroundJob"/>
+				<directory name="lib/Calendar"/>
+				<directory name="lib/Command"/>
+				<directory name="lib/Controller"/>
+				<directory name="lib/Listener"/>
+				<directory name="lib/Migration"/>
+				<directory name="lib/Notification"/>
+				<directory name="lib/Settings"/>
+			</errorLevel>
+		</UnusedClass>
+	</issueHandlers>
 </psalm>

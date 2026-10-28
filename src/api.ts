@@ -1,0 +1,113 @@
+/**
+ * SPDX-FileCopyrightText: 2026 Adrian Dymorz <dev@adrian.dymorz.ch>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+import type {
+	AppreciationEvent,
+	AuditPage,
+	Group,
+	GroupInput,
+	Me,
+	OrgFunction,
+	Person,
+	PersonDetail,
+	PersonInput,
+	Slice,
+	SliceInput,
+	User,
+} from './types'
+
+import axios, { isAxiosError } from '@nextcloud/axios'
+import { t } from '@nextcloud/l10n'
+import { generateOcsUrl } from '@nextcloud/router'
+
+interface OcsResponse<T> {
+	ocs: {
+		meta: { message?: string }
+		data: T
+	}
+}
+
+const headers = { 'OCS-APIRequest': 'true', Accept: 'application/json' }
+
+function url(path: string): string {
+	return generateOcsUrl('/apps/appreciation/api/v1' + path)
+}
+
+async function get<T>(path: string, params?: Record<string, unknown>): Promise<T> {
+	const response = await axios.get<OcsResponse<T>>(url(path), { headers, params })
+	return response.data.ocs.data
+}
+
+async function post<T>(path: string, body: unknown): Promise<T> {
+	const response = await axios.post<OcsResponse<T>>(url(path), body, { headers })
+	return response.data.ocs.data
+}
+
+async function put<T>(path: string, body: unknown): Promise<T> {
+	const response = await axios.put<OcsResponse<T>>(url(path), body, { headers })
+	return response.data.ocs.data
+}
+
+async function del(path: string): Promise<void> {
+	await axios.delete(url(path), { headers })
+}
+
+export const api = {
+	saveSettings: (emailNotifications: boolean) => put<Me>('/me/settings', { emailNotifications }),
+
+	persons: () => get<Person[]>('/persons'),
+	person: (id: number) => get<PersonDetail>(`/persons/${id}`),
+	createPerson: (input: PersonInput) => post<PersonDetail>('/persons', input),
+	updatePerson: (id: number, input: PersonInput) => put<PersonDetail>(`/persons/${id}`, input),
+	deletePerson: (id: number) => del(`/persons/${id}`),
+
+	createSlice: (personId: number, input: SliceInput) => post<Slice>(`/persons/${personId}/slices`, input),
+	updateSlice: (id: number, input: SliceInput) => put<Slice>(`/slices/${id}`, input),
+	deleteSlice: (id: number) => del(`/slices/${id}`),
+
+	groups: () => get<Group[]>('/groups'),
+	createGroup: (input: GroupInput) => post<Group>('/groups', input),
+	updateGroup: (id: number, input: GroupInput) => put<Group>(`/groups/${id}`, input),
+	deleteGroup: (id: number) => del(`/groups/${id}`),
+
+	createFunction: (groupId: number, name: string) => post<OrgFunction>(`/groups/${groupId}/functions`, { name }),
+	updateFunction: (id: number, name: string) => put<OrgFunction>(`/functions/${id}`, { name }),
+	deleteFunction: (id: number) => del(`/functions/${id}`),
+
+	events: (days: number) => get<AppreciationEvent[]>('/events', { days }),
+	setGreeted: (id: number, greeted: boolean) => put<AppreciationEvent>(`/events/${id}/greeted`, { greeted }),
+
+	audit: (limit: number, offset: number) => get<AuditPage>('/audit', { limit, offset }),
+}
+
+/**
+ * Searches Nextcloud users for user pickers.
+ *
+ * @param search Search term
+ */
+export async function searchUsers(search: string): Promise<User[]> {
+	const response = await axios.get<OcsResponse<{ id: string, label: string }[]>>(generateOcsUrl('/core/autocomplete/get'), {
+		headers,
+		params: { search, itemType: 'appreciation', itemId: 'group', shareTypes: [0], limit: 20 },
+	})
+	return response.data.ocs.data.map((entry) => ({ id: entry.id, displayName: entry.label }))
+}
+
+/**
+ * The message to show for a failed request: the (translated) message of the
+ * server if there is one.
+ *
+ * @param error Error thrown by an API call
+ */
+export function errorMessage(error: unknown): string {
+	if (isAxiosError<OcsResponse<{ message?: string }>>(error)) {
+		const ocs = error.response?.data?.ocs
+		const message = ocs?.data?.message || ocs?.meta?.message
+		if (message) {
+			return message
+		}
+	}
+	return t('appreciation', 'Something went wrong. Please try again.')
+}

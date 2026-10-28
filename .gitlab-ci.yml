@@ -19,6 +19,7 @@ stages:
 
 default:
   interruptible: true
+  tags: [linux]
 
 variables:
   COMPOSER_CACHE_DIR: $CI_PROJECT_DIR/.cache/composer
@@ -116,6 +117,20 @@ node:stylelint:
   stage: lint
   script:
     - npm run stylelint
+
+node:typecheck:
+  extends: .node
+  stage: lint
+  script:
+    - npm run typecheck
+
+# Every translatable string must be translated, and l10n/*.js must match l10n/*.json
+lint:l10n:
+  stage: lint
+  image: node:24
+  script:
+    - npm run l10n
+    - git diff --exit-code -- l10n/ || (echo "l10n/*.js is outdated, run 'npm run l10n' and commit the result." && exit 1)
 
 node:build:
   extends: .node
