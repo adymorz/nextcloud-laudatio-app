@@ -19,6 +19,7 @@ stages:
 
 default:
   interruptible: true
+  tags: [linux]
 
 variables:
   COMPOSER_CACHE_DIR: $CI_PROJECT_DIR/.cache/composer
