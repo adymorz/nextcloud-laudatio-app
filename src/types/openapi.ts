@@ -30,7 +30,7 @@ export interface paths {
         };
         /**
          * List the upcoming events of the current user
-         * @description Responsible and interested users get the events of their groups, managers all events. Titles are in the language of the user.
+         * @description Responsible and interested users get the events of their groups, managers all events. Titles are in the language of the user. Birthdays and jubilees of the period come first, followed by the yearly gifts of every calendar year the period touches, including overdue ones of this year.
          */
         get: operations["event-index"];
         put?: never;
@@ -49,7 +49,10 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** Mark an event as greeted or not greeted */
+        /**
+         * Mark an event as greeted or not greeted
+         * @description For yearly gifts this marks the gift as presented, also when the "greeted" checklist is disabled.
+         */
         put: operations["event-greet"];
         post?: never;
         delete?: never;
@@ -83,7 +86,10 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** Rename a function */
+        /**
+         * Update a function
+         * @description Changing the yearly gift recalculates the gifts of all holders: switching it off removes the gifts of the current year, also presented ones.
+         */
         put: operations["function-update"];
         post?: never;
         /** Delete a function without time slices */
@@ -172,7 +178,7 @@ export interface paths {
         };
         /**
          * List the persons visible to the current user
-         * @description Managers see all persons, responsible and interested users the current members of their groups. Date of birth and notes are only included when the user may see them.
+         * @description Managers see all persons, responsible and interested users the current members of their groups. Date of birth, contact data and notes are only included when the user may see them.
          */
         get: operations["person-index"];
         put?: never;
@@ -193,7 +199,10 @@ export interface paths {
         };
         /** Get a person with the history of time slices */
         get: operations["person-show"];
-        /** Update a person */
+        /**
+         * Update a person
+         * @description All fields are replaced: optional fields that are left out are cleared.
+         */
         put: operations["person-update"];
         post?: never;
         /** Delete a person with all time slices and events */
@@ -267,7 +276,7 @@ export interface components {
             /** Format: int64 */
             id: number;
             /** @enum {string} */
-            type: "birthday" | "jubilee";
+            type: "birthday" | "jubilee" | "gift";
             date: string;
             /** Format: int64 */
             ordinal: number;
@@ -292,6 +301,7 @@ export interface components {
             /** Format: int64 */
             groupId: number;
             name: string;
+            yearlyGift: boolean;
         };
         Group: {
             /** Format: int64 */
@@ -314,6 +324,7 @@ export interface components {
             /** Format: int64 */
             leadTimeDays: number;
             emailNotifications: boolean;
+            regulationsUrl: string | null;
         };
         OCSMeta: {
             status: string;
@@ -330,6 +341,13 @@ export interface components {
             displayName: string;
             dateOfBirth: string | null;
             notes: string | null;
+            street: string | null;
+            streetNumber: string | null;
+            postalCode: string | null;
+            city: string | null;
+            country: string | null;
+            mobilePhone: string | null;
+            otherPhone: string | null;
             sensitiveVisible: boolean;
             currentFunctions: components["schemas"]["Slice"][];
         };
@@ -341,6 +359,13 @@ export interface components {
             displayName: string;
             dateOfBirth: string | null;
             notes: string | null;
+            street: string | null;
+            streetNumber: string | null;
+            postalCode: string | null;
+            city: string | null;
+            country: string | null;
+            mobilePhone: string | null;
+            otherPhone: string | null;
             sensitiveVisible: boolean;
             currentFunctions: components["schemas"]["Slice"][];
             slices: components["schemas"]["Slice"][];
@@ -448,7 +473,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Events returned, ordered by date */
+            /** @description Events returned, each part ordered by date */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -508,7 +533,7 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    /** @description Whether the person has been greeted */
+                    /** @description Whether the person has been greeted (gifts: the gift was presented) */
                     greeted: boolean;
                 };
             };
@@ -590,6 +615,11 @@ export interface operations {
                 "application/json": {
                     /** @description Name of the function, e.g. "Treasurer" */
                     name: string;
+                    /**
+                     * @description Whether the holders get one gift per calendar year
+                     * @default false
+                     */
+                    yearlyGift?: boolean;
                 };
             };
         };
@@ -684,6 +714,8 @@ export interface operations {
                 "application/json": {
                     /** @description Name of the function */
                     name: string;
+                    /** @description Whether the holders get one gift per calendar year */
+                    yearlyGift: boolean;
                 };
             };
         };
@@ -1384,6 +1416,41 @@ export interface operations {
                      * @default null
                      */
                     notes?: string | null;
+                    /**
+                     * @description Street
+                     * @default null
+                     */
+                    street?: string | null;
+                    /**
+                     * @description House number
+                     * @default null
+                     */
+                    streetNumber?: string | null;
+                    /**
+                     * @description ZIP code
+                     * @default null
+                     */
+                    postalCode?: string | null;
+                    /**
+                     * @description City
+                     * @default null
+                     */
+                    city?: string | null;
+                    /**
+                     * @description Country
+                     * @default null
+                     */
+                    country?: string | null;
+                    /**
+                     * @description Mobile phone number
+                     * @default null
+                     */
+                    mobilePhone?: string | null;
+                    /**
+                     * @description Additional phone number
+                     * @default null
+                     */
+                    otherPhone?: string | null;
                 };
             };
         };
@@ -1546,6 +1613,41 @@ export interface operations {
                      * @default null
                      */
                     notes?: string | null;
+                    /**
+                     * @description Street
+                     * @default null
+                     */
+                    street?: string | null;
+                    /**
+                     * @description House number
+                     * @default null
+                     */
+                    streetNumber?: string | null;
+                    /**
+                     * @description ZIP code
+                     * @default null
+                     */
+                    postalCode?: string | null;
+                    /**
+                     * @description City
+                     * @default null
+                     */
+                    city?: string | null;
+                    /**
+                     * @description Country
+                     * @default null
+                     */
+                    country?: string | null;
+                    /**
+                     * @description Mobile phone number
+                     * @default null
+                     */
+                    mobilePhone?: string | null;
+                    /**
+                     * @description Additional phone number
+                     * @default null
+                     */
+                    otherPhone?: string | null;
                 };
             };
         };

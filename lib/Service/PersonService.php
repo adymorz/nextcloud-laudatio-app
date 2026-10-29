@@ -18,6 +18,7 @@ use OCA\Appreciation\Db\SliceMapper;
 use OCA\Appreciation\Exception\ConflictException;
 use OCA\Appreciation\Exception\NotFoundException;
 use OCA\Appreciation\Exception\ValidationException;
+use OCA\Appreciation\Model\PersonInput;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\TTransactional;
 use OCP\IDBConnection;
@@ -32,6 +33,9 @@ class PersonService {
 
 	public const MAX_NAME_LENGTH = 255;
 	public const MAX_NOTES_LENGTH = 10000;
+	public const MAX_TEXT_LENGTH = 255;
+	public const MAX_SHORT_LENGTH = 32;
+	public const MAX_PHONE_LENGTH = 32;
 
 	public function __construct(
 		private PersonMapper $personMapper,
@@ -72,9 +76,9 @@ class PersonService {
 	/**
 	 * @throws ValidationException
 	 */
-	public function create(?string $actor, string $firstName, string $lastName, string $dateOfBirth, ?string $notes): Person {
+	public function create(?string $actor, PersonInput $input): Person {
 		$person = new Person();
-		$this->apply($person, $firstName, $lastName, $dateOfBirth, $notes);
+		$this->apply($person, $input);
 		$now = $this->clock->time();
 		$person->setCreatedAt($now);
 		$person->setUpdatedAt($now);
@@ -90,9 +94,9 @@ class PersonService {
 	/**
 	 * @throws NotFoundException|ValidationException
 	 */
-	public function update(?string $actor, int $id, string $firstName, string $lastName, string $dateOfBirth, ?string $notes): Person {
+	public function update(?string $actor, int $id, PersonInput $input): Person {
 		$person = $this->get($id);
-		$this->apply($person, $firstName, $lastName, $dateOfBirth, $notes);
+		$this->apply($person, $input);
 		$changed = $this->fieldNames($person);
 		if ($changed === []) {
 			return $person;
@@ -231,9 +235,9 @@ class PersonService {
 	 *
 	 * @throws ValidationException
 	 */
-	private function apply(Person $person, string $firstName, string $lastName, string $dateOfBirth, ?string $notes): void {
-		$firstName = trim($firstName);
-		$lastName = trim($lastName);
+	private function apply(Person $person, PersonInput $input): void {
+		$firstName = trim($input->firstName);
+		$lastName = trim($input->lastName);
 		if ($firstName === '' || $lastName === '') {
 			throw new ValidationException($this->l10n->t('First and last name are required.'));
 		}
@@ -241,7 +245,7 @@ class PersonService {
 			throw new ValidationException($this->l10n->t('Names must not be longer than %d characters.', [self::MAX_NAME_LENGTH]));
 		}
 
-		$birth = Dates::parse($dateOfBirth);
+		$birth = Dates::parse($input->dateOfBirth);
 		if ($birth === null) {
 			throw new ValidationException($this->l10n->t('The date of birth must be a valid date (YYYY-MM-DD).'));
 		}
@@ -249,7 +253,7 @@ class PersonService {
 			throw new ValidationException($this->l10n->t('The date of birth must be between 1900 and today.'));
 		}
 
-		$notes = $notes === null ? null : trim($notes);
+		$notes = $input->notes === null ? null : trim($input->notes);
 		if ($notes === '') {
 			$notes = null;
 		}
@@ -257,18 +261,55 @@ class PersonService {
 			throw new ValidationException($this->l10n->t('Notes must not be longer than %d characters.', [self::MAX_NOTES_LENGTH]));
 		}
 
-		if ($person->getFirstName() !== $firstName) {
-			$person->setFirstName($firstName);
-		}
-		if ($person->getLastName() !== $lastName) {
-			$person->setLastName($lastName);
-		}
+		$street = $this->optionalText($input->street, self::MAX_TEXT_LENGTH, $this->l10n->t('Street'));
+		$streetNumber = $this->optionalText($input->streetNumber, self::MAX_SHORT_LENGTH, $this->l10n->t('House number'));
+		$postalCode = $this->optionalText($input->postalCode, self::MAX_SHORT_LENGTH, $this->l10n->t('ZIP code'));
+		$city = $this->optionalText($input->city, self::MAX_TEXT_LENGTH, $this->l10n->t('City'));
+		$country = $this->optionalText($input->country, self::MAX_TEXT_LENGTH, $this->l10n->t('Country'));
+		$mobilePhone = $this->phone($input->mobilePhone, $this->l10n->t('Mobile phone'));
+		$otherPhone = $this->phone($input->otherPhone, $this->l10n->t('Additional phone number'));
+
+		// Entity setters ignore unchanged values, dates are objects and need a comparison
+		$person->setFirstName($firstName);
+		$person->setLastName($lastName);
 		if (!$person->hasDateOfBirth() || Dates::compare($person->getDateOfBirth(), $birth) !== 0) {
 			$person->setDateOfBirth($birth);
 		}
-		if ($person->getNotes() !== $notes) {
-			$person->setNotes($notes);
+		$person->setNotes($notes);
+		$person->setStreet($street);
+		$person->setStreetNumber($streetNumber);
+		$person->setPostalCode($postalCode);
+		$person->setCity($city);
+		$person->setCountry($country);
+		$person->setMobilePhone($mobilePhone);
+		$person->setOtherPhone($otherPhone);
+	}
+
+	/**
+	 * Trims an optional text, empty becomes null.
+	 *
+	 * @throws ValidationException when the text is too long
+	 */
+	private function optionalText(?string $value, int $maxLength, string $label): ?string {
+		$value = $value === null ? '' : trim($value);
+		if ($value === '') {
+			return null;
 		}
+		if (mb_strlen($value) > $maxLength) {
+			throw new ValidationException($this->l10n->t('%1$s must not be longer than %2$d characters.', [$label, $maxLength]));
+		}
+		return $value;
+	}
+
+	/**
+	 * @throws ValidationException when the phone number contains other characters
+	 */
+	private function phone(?string $value, string $label): ?string {
+		$value = $this->optionalText($value, self::MAX_PHONE_LENGTH, $label);
+		if ($value !== null && (preg_match('#^[0-9+()/. -]+$#', $value) !== 1 || preg_match('/\d/', $value) !== 1)) {
+			throw new ValidationException($this->l10n->t('%s may only contain digits, spaces and + ( ) / . -', [$label]));
+		}
+		return $value;
 	}
 
 	/**
@@ -277,7 +318,19 @@ class PersonService {
 	 * @return list<string>
 	 */
 	private function fieldNames(Person $person): array {
-		$map = ['firstName' => 'first_name', 'lastName' => 'last_name', 'dateOfBirth' => 'date_of_birth', 'notes' => 'notes'];
+		$map = [
+			'firstName' => 'first_name',
+			'lastName' => 'last_name',
+			'dateOfBirth' => 'date_of_birth',
+			'notes' => 'notes',
+			'street' => 'street',
+			'streetNumber' => 'street_number',
+			'postalCode' => 'postal_code',
+			'city' => 'city',
+			'country' => 'country',
+			'mobilePhone' => 'mobile_phone',
+			'otherPhone' => 'other_phone',
+		];
 		$fields = [];
 		foreach (array_keys($person->getUpdatedFields()) as $property) {
 			if (isset($map[$property])) {

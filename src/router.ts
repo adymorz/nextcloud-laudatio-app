@@ -9,6 +9,7 @@ import { me } from './store'
 import AuditView from './views/AuditView.vue'
 import GroupsView from './views/GroupsView.vue'
 import PersonDetailView from './views/PersonDetailView.vue'
+import PersonSheetView from './views/PersonSheetView.vue'
 import PersonsView from './views/PersonsView.vue'
 import UpcomingView from './views/UpcomingView.vue'
 
@@ -20,6 +21,7 @@ export const router = createRouter({
 		{ path: '/upcoming', name: 'upcoming', component: UpcomingView },
 		{ path: '/persons', name: 'persons', component: PersonsView },
 		{ path: '/persons/:id(\\d+)', name: 'person', component: PersonDetailView, props: (route) => ({ id: Number(route.params.id) }) },
+		{ path: '/persons/:id(\\d+)/sheet', name: 'person-sheet', component: PersonSheetView, props: (route) => ({ id: Number(route.params.id) }) },
 		{ path: '/groups', name: 'groups', component: GroupsView },
 		{ path: '/audit', name: 'audit', component: AuditView, beforeEnter: () => me.isManager || { name: 'upcoming' } },
 		{ path: '/:pathMatch(.*)*', redirect: { name: 'upcoming' } },

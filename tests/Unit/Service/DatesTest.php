@@ -36,6 +36,11 @@ final class DatesTest extends TestCase {
 		$this->assertNull(Dates::parse($value));
 	}
 
+	public function testYearStartAndEnd(): void {
+		$this->assertSame('2026-01-01', Dates::format(Dates::yearStart(2026)));
+		$this->assertSame('2026-12-31', Dates::format(Dates::yearEnd(2026)));
+	}
+
 	public function testNormalizeKeepsTheLocalDay(): void {
 		$lateEvening = new DateTimeImmutable('2026-10-27 23:30:00', new DateTimeZone('Europe/Zurich'));
 		$this->assertSame('2026-10-27', Dates::format(Dates::normalize($lateEvening)));

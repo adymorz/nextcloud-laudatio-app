@@ -26,6 +26,7 @@ class SettingsService {
 	public const JUBILEE_EVENTS = 'jubilee_events';
 	public const GREETING_REMINDER = 'greeting_reminder';
 	public const EMAIL_DEFAULT = 'email_default';
+	public const REGULATIONS_URL = 'regulations_url';
 	/** Per-user setting */
 	public const EMAIL_NOTIFICATIONS = 'email_notifications';
 
@@ -34,6 +35,7 @@ class SettingsService {
 	public const DEFAULT_LEAD_TIME_DAYS = 14;
 	public const MAX_LEAD_TIME_DAYS = 365;
 	public const MAX_JUBILEE_YEAR = 100;
+	public const MAX_URL_LENGTH = 2000;
 
 	public function __construct(
 		private IAppConfig $appConfig,
@@ -101,6 +103,36 @@ class SettingsService {
 
 	public function isEmailDefaultEnabled(): bool {
 		return $this->appConfig->getValueBool(Application::APP_ID, self::EMAIL_DEFAULT, false);
+	}
+
+	/**
+	 * Link to the gift regulations: an external page or the internal link of a
+	 * file in Nextcloud. Null when not set.
+	 */
+	public function getRegulationsUrl(): ?string {
+		$url = $this->appConfig->getValueString(Application::APP_ID, self::REGULATIONS_URL);
+		return $url === '' ? null : $url;
+	}
+
+	/**
+	 * @param string $url absolute http(s) URL, '' to remove the link
+	 * @throws ValidationException
+	 */
+	public function setRegulationsUrl(string $url): void {
+		$url = trim($url);
+		if ($url !== '') {
+			if (mb_strlen($url) > self::MAX_URL_LENGTH) {
+				throw new ValidationException($this->l10n->t('The link must not be longer than %d characters.', [self::MAX_URL_LENGTH]));
+			}
+			// Only web links: rules out javascript: and other schemes in the navigation
+			$parts = parse_url($url);
+			$scheme = strtolower($parts['scheme'] ?? '');
+			$host = $parts === false ? '' : ($parts['host'] ?? '');
+			if (!in_array($scheme, ['http', 'https'], true) || $host === '' || preg_match('/[\s\x00-\x1F\x7F]/u', $url) === 1) {
+				throw new ValidationException($this->l10n->t('The link must be a complete web address starting with https:// or http://.'));
+			}
+		}
+		$this->appConfig->setValueString(Application::APP_ID, self::REGULATIONS_URL, $url);
 	}
 
 	/**

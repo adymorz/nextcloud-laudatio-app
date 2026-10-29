@@ -75,6 +75,51 @@ final class SettingsServiceTest extends TestCase {
 		$this->settings->setLeadTimeDays(366);
 	}
 
+	/**
+	 * @return array<string, array{string, string}>
+	 */
+	public static function validRegulationsUrls(): array {
+		return [
+			'internal link' => [' https://cloud.example.com/f/123 ', 'https://cloud.example.com/f/123'],
+			'external page' => ['http://intranet/regulations.pdf?v=2#gifts', 'http://intranet/regulations.pdf?v=2#gifts'],
+			'upper case scheme' => ['HTTPS://example.com', 'HTTPS://example.com'],
+			'removed' => ['  ', ''],
+		];
+	}
+
+	#[DataProvider('validRegulationsUrls')]
+	public function testRegulationsUrlIsStored(string $value, string $stored): void {
+		$this->appConfig->expects($this->once())->method('setValueString')->with('appreciation', SettingsService::REGULATIONS_URL, $stored);
+		$this->settings->setRegulationsUrl($value);
+	}
+
+	/**
+	 * @return array<string, array{string}>
+	 */
+	public static function invalidRegulationsUrls(): array {
+		return [
+			'script' => ['javascript:alert(1)'],
+			'other scheme' => ['ftp://example.com/regulations.pdf'],
+			'no scheme' => ['cloud.example.com/f/123'],
+			'relative' => ['/f/123'],
+			'no host' => ['https://'],
+			'space' => ['https://example.com/a b'],
+			'too long' => ['https://example.com/' . str_repeat('a', 2000)],
+		];
+	}
+
+	#[DataProvider('invalidRegulationsUrls')]
+	public function testInvalidRegulationsUrlIsRejected(string $value): void {
+		$this->appConfig->expects($this->never())->method('setValueString');
+		$this->expectException(ValidationException::class);
+		$this->settings->setRegulationsUrl($value);
+	}
+
+	public function testEmptyRegulationsUrlIsNull(): void {
+		$this->appConfig->method('getValueString')->willReturn('');
+		$this->assertNull($this->settings->getRegulationsUrl());
+	}
+
 	public function testUserEmailSettingDefaultsToAdminDefault(): void {
 		$this->appConfig->method('getValueBool')->willReturnMap([
 			['appreciation', SettingsService::EMAIL_DEFAULT, false, false, true],

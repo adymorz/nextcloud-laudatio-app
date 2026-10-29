@@ -23,12 +23,24 @@ export interface PersonInput {
 	lastName: string
 	dateOfBirth: string
 	notes: string | null
+	street: string | null
+	streetNumber: string | null
+	postalCode: string | null
+	city: string | null
+	country: string | null
+	mobilePhone: string | null
+	otherPhone: string | null
 }
 
 export interface SliceInput {
 	functionId: number
 	startDate: string
 	endDate: string | null
+}
+
+export interface FunctionInput {
+	name: string
+	yearlyGift: boolean
 }
 
 export interface GroupInput {

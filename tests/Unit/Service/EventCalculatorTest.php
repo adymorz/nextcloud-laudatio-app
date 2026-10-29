@@ -75,12 +75,54 @@ final class EventCalculatorTest extends TestCase {
 		$this->assertSame(['birthday', 'jubilee'], array_map(static fn (PlannedEvent $e): string => $e->type, $events));
 	}
 
+	public function testYearlyGiftForEveryYearOfTheWindow(): void {
+		$person = $this->person(7, '1990-03-15');
+		$slices = [$this->slice(4, '2020-06-01', null), $this->slice(5, '2020-06-01', null)];
+
+		// Only function 4 has a yearly gift; the window touches 2026 and 2027
+		$events = $this->calculate($person, $slices, [], '2026-11-30', '2027-12-30', false, false, [4]);
+		$this->assertSame([
+			['appreciation-gift-7-4-2026', 'gift', 4, '2026-12-31', 2026],
+			['appreciation-gift-7-4-2027', 'gift', 4, '2027-12-31', 2027],
+		], $this->describe($events));
+	}
+
+	public function testYearlyGiftDueWhenLeavingDuringTheYear(): void {
+		$person = $this->person(7, '1990-03-15');
+		// Left in March, before the window starts: this year's gift is still open
+		$events = $this->calculate($person, [$this->slice(4, '2020-06-01', '2026-03-31')], [], '2026-10-29', '2027-12-02', false, false, [4]);
+		$this->assertSame([['appreciation-gift-7-4-2026', 'gift', 4, '2026-03-31', 2026]], $this->describe($events));
+
+		$endsJanuaryFirst = [$this->slice(4, '2020-06-01', '2027-01-01')];
+		$events = $this->calculate($person, $endsJanuaryFirst, [], '2026-10-29', '2027-12-02', false, false, [4]);
+		$this->assertSame(['2026-12-31', '2027-01-01'], array_map(static fn (PlannedEvent $e): string => Dates::format($e->date), $events));
+	}
+
+	public function testOneYearlyGiftForSeveralPeriodsInTheSameYear(): void {
+		$person = $this->person(7, '1990-03-15');
+		$slices = [$this->slice(4, '2026-01-01', '2026-03-31'), $this->slice(4, '2026-09-01', '2026-10-31')];
+		$events = $this->calculate($person, $slices, [], '2026-01-01', '2026-12-31', false, false, [4]);
+		$this->assertSame([['appreciation-gift-7-4-2026', 'gift', 4, '2026-10-31', 2026]], $this->describe($events));
+	}
+
+	public function testYearlyGiftOnlyInYearsWithTheFunction(): void {
+		$person = $this->person(7, '1990-03-15');
+		$startsNextYear = [$this->slice(4, '2027-07-01', null)];
+		$endedLastYear = [$this->slice(4, '2020-06-01', '2025-12-31')];
+
+		$events = $this->calculate($person, $startsNextYear, [], '2026-10-29', '2027-12-02', false, false, [4]);
+		$this->assertSame([['appreciation-gift-7-4-2027', 'gift', 4, '2027-12-31', 2027]], $this->describe($events));
+		$this->assertSame([], $this->calculate($person, $endedLastYear, [], '2026-10-29', '2027-12-02', false, false, [4]));
+		$this->assertSame([], $this->calculate($person, $startsNextYear, [], '2026-10-29', '2027-12-02', false, false, []));
+	}
+
 	/**
 	 * @param list<Slice> $slices
 	 * @param array<int, list<int>> $years
+	 * @param list<int> $giftFunctionIds
 	 * @return list<PlannedEvent>
 	 */
-	private function calculate(Person $person, array $slices, array $years, string $from, string $to, bool $birthdays, bool $jubilees): array {
+	private function calculate(Person $person, array $slices, array $years, string $from, string $to, bool $birthdays, bool $jubilees, array $giftFunctionIds = []): array {
 		return $this->calculator->calculate(
 			$person,
 			$slices,
@@ -89,6 +131,7 @@ final class EventCalculatorTest extends TestCase {
 			Dates::parse($to) ?? throw new \LogicException(),
 			$birthdays,
 			$jubilees,
+			$giftFunctionIds,
 		);
 	}
 

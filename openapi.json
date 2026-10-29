@@ -128,7 +128,8 @@
                         "type": "string",
                         "enum": [
                             "birthday",
-                            "jubilee"
+                            "jubilee",
+                            "gift"
                         ]
                     },
                     "date": {
@@ -191,7 +192,8 @@
                 "required": [
                     "id",
                     "groupId",
-                    "name"
+                    "name",
+                    "yearlyGift"
                 ],
                 "properties": {
                     "id": {
@@ -204,6 +206,9 @@
                     },
                     "name": {
                         "type": "string"
+                    },
+                    "yearlyGift": {
+                        "type": "boolean"
                     }
                 }
             },
@@ -272,7 +277,8 @@
                     "interestedGroupIds",
                     "greetingReminder",
                     "leadTimeDays",
-                    "emailNotifications"
+                    "emailNotifications",
+                    "regulationsUrl"
                 ],
                 "properties": {
                     "userId": {
@@ -304,6 +310,10 @@
                     },
                     "emailNotifications": {
                         "type": "boolean"
+                    },
+                    "regulationsUrl": {
+                        "type": "string",
+                        "nullable": true
                     }
                 }
             },
@@ -340,6 +350,13 @@
                     "displayName",
                     "dateOfBirth",
                     "notes",
+                    "street",
+                    "streetNumber",
+                    "postalCode",
+                    "city",
+                    "country",
+                    "mobilePhone",
+                    "otherPhone",
                     "sensitiveVisible",
                     "currentFunctions"
                 ],
@@ -365,6 +382,34 @@
                         "type": "string",
                         "nullable": true
                     },
+                    "street": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "streetNumber": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "postalCode": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "city": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "country": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "mobilePhone": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "otherPhone": {
+                        "type": "string",
+                        "nullable": true
+                    },
                     "sensitiveVisible": {
                         "type": "boolean"
                     },
@@ -385,6 +430,13 @@
                     "displayName",
                     "dateOfBirth",
                     "notes",
+                    "street",
+                    "streetNumber",
+                    "postalCode",
+                    "city",
+                    "country",
+                    "mobilePhone",
+                    "otherPhone",
                     "sensitiveVisible",
                     "currentFunctions",
                     "slices"
@@ -408,6 +460,34 @@
                         "nullable": true
                     },
                     "notes": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "street": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "streetNumber": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "postalCode": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "city": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "country": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "mobilePhone": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "otherPhone": {
                         "type": "string",
                         "nullable": true
                     },
@@ -631,7 +711,7 @@
             "get": {
                 "operationId": "event-index",
                 "summary": "List the upcoming events of the current user",
-                "description": "Responsible and interested users get the events of their groups, managers all events. Titles are in the language of the user.",
+                "description": "Responsible and interested users get the events of their groups, managers all events. Titles are in the language of the user. Birthdays and jubilees of the period come first, followed by the yearly gifts of every calendar year the period touches, including overdue ones of this year.",
                 "tags": [
                     "event"
                 ],
@@ -667,7 +747,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Events returned, ordered by date",
+                        "description": "Events returned, each part ordered by date",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -762,6 +842,7 @@
             "put": {
                 "operationId": "event-greet",
                 "summary": "Mark an event as greeted or not greeted",
+                "description": "For yearly gifts this marks the gift as presented, also when the \"greeted\" checklist is disabled.",
                 "tags": [
                     "event"
                 ],
@@ -785,7 +866,7 @@
                                 "properties": {
                                     "greeted": {
                                         "type": "boolean",
-                                        "description": "Whether the person has been greeted"
+                                        "description": "Whether the person has been greeted (gifts: the gift was presented)"
                                     }
                                 }
                             }
@@ -960,6 +1041,11 @@
                                     "name": {
                                         "type": "string",
                                         "description": "Name of the function, e.g. \"Treasurer\""
+                                    },
+                                    "yearlyGift": {
+                                        "type": "boolean",
+                                        "default": false,
+                                        "description": "Whether the holders get one gift per calendar year"
                                     }
                                 }
                             }
@@ -1137,7 +1223,8 @@
         "/ocs/v2.php/apps/appreciation/api/v1/functions/{id}": {
             "put": {
                 "operationId": "function-update",
-                "summary": "Rename a function",
+                "summary": "Update a function",
+                "description": "Changing the yearly gift recalculates the gifts of all holders: switching it off removes the gifts of the current year, also presented ones.",
                 "tags": [
                     "function"
                 ],
@@ -1156,12 +1243,17 @@
                             "schema": {
                                 "type": "object",
                                 "required": [
-                                    "name"
+                                    "name",
+                                    "yearlyGift"
                                 ],
                                 "properties": {
                                     "name": {
                                         "type": "string",
                                         "description": "Name of the function"
+                                    },
+                                    "yearlyGift": {
+                                        "type": "boolean",
+                                        "description": "Whether the holders get one gift per calendar year"
                                     }
                                 }
                             }
@@ -2477,7 +2569,7 @@
             "get": {
                 "operationId": "person-index",
                 "summary": "List the persons visible to the current user",
-                "description": "Managers see all persons, responsible and interested users the current members of their groups. Date of birth and notes are only included when the user may see them.",
+                "description": "Managers see all persons, responsible and interested users the current members of their groups. Date of birth, contact data and notes are only included when the user may see them.",
                 "tags": [
                     "person"
                 ],
@@ -2636,6 +2728,48 @@
                                         "nullable": true,
                                         "default": null,
                                         "description": "Free text notes"
+                                    },
+                                    "street": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Street"
+                                    },
+                                    "streetNumber": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "House number"
+                                    },
+                                    "postalCode": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "ZIP code"
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "City"
+                                    },
+                                    "country": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Country"
+                                    },
+                                    "mobilePhone": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Mobile phone number"
+                                    },
+                                    "otherPhone": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Additional phone number"
                                     }
                                 }
                             }
@@ -2929,6 +3063,7 @@
             "put": {
                 "operationId": "person-update",
                 "summary": "Update a person",
+                "description": "All fields are replaced: optional fields that are left out are cleared.",
                 "tags": [
                     "person"
                 ],
@@ -2969,6 +3104,48 @@
                                         "nullable": true,
                                         "default": null,
                                         "description": "Free text notes"
+                                    },
+                                    "street": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Street"
+                                    },
+                                    "streetNumber": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "House number"
+                                    },
+                                    "postalCode": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "ZIP code"
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "City"
+                                    },
+                                    "country": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Country"
+                                    },
+                                    "mobilePhone": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Mobile phone number"
+                                    },
+                                    "otherPhone": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Additional phone number"
                                     }
                                 }
                             }

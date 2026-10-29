@@ -20,6 +20,7 @@ use OCP\DB\Types;
  * @method void setGroupId(int $groupId)
  * @method string getName()
  * @method void setName(string $name)
+ * @method void setYearlyGift(bool $yearlyGift)
  * @method int getCreatedAt()
  * @method void setCreatedAt(int $createdAt)
  * @method int getUpdatedAt()
@@ -28,13 +29,23 @@ use OCP\DB\Types;
 class OrgFunction extends Entity {
 	protected int $groupId = 0;
 	protected string $name = '';
+	/** Nullable column, see isYearlyGift() */
+	protected ?bool $yearlyGift = false;
 	protected int $createdAt = 0;
 	protected int $updatedAt = 0;
 
 	public function __construct() {
 		$this->addType('groupId', Types::BIGINT);
 		$this->addType('name', Types::STRING);
+		$this->addType('yearlyGift', Types::BOOLEAN);
 		$this->addType('createdAt', Types::BIGINT);
 		$this->addType('updatedAt', Types::BIGINT);
+	}
+
+	/**
+	 * Whether the holders get one gift per calendar year.
+	 */
+	public function isYearlyGift(): bool {
+		return $this->yearlyGift === true;
 	}
 }

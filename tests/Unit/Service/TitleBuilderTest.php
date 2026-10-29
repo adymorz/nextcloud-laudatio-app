@@ -59,6 +59,14 @@ final class TitleBuilderTest extends TestCase {
 		$this->assertSame('5th Anniversary for Anna Muster as Treasurer', $builder->build($jubilee, null, 'en'));
 	}
 
+	public function testYearlyGiftTitle(): void {
+		$builder = $this->builder('en');
+		$gift = $this->event(Event::TYPE_GIFT, 9, 2026);
+
+		$this->assertSame('Yearly gift for Anna Muster (Treasurer)', $builder->build($gift, RecipientService::ROLE_RESPONSIBLE, 'en'));
+		$this->assertSame('Yearly gift for Anna Muster (Treasurer) (for information)', $builder->build($gift, RecipientService::ROLE_INTERESTED, 'en'));
+	}
+
 	public function testGermanTitlesUseGermanOrdinals(): void {
 		$translations = [
 			'%1$s Birthday of %2$s' => '%1$s Geburtstag von %2$s',

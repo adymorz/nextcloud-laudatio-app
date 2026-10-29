@@ -56,6 +56,21 @@ final class MapperTest extends IntegrationTestCase {
 		$this->assertNull($loadedSlice->getEndDate());
 	}
 
+	public function testContactDataRoundTrip(): void {
+		$person = $this->createPerson('1980-01-01');
+		$this->assertNull($this->persons->find($person->getId())->getStreet());
+
+		$person->setStreet('Bahnhofstrasse');
+		$person->setPostalCode('8001');
+		$person->setMobilePhone('+41 79 123 45 67');
+		$this->persons->update($person);
+		$loaded = $this->persons->find($person->getId());
+		$this->assertSame('Bahnhofstrasse', $loaded->getStreet());
+		$this->assertSame('8001', $loaded->getPostalCode());
+		$this->assertSame('+41 79 123 45 67', $loaded->getMobilePhone());
+		$this->assertNull($loaded->getOtherPhone());
+	}
+
 	public function testCurrentMembersOfGroups(): void {
 		$responsible = $this->uniqueName('resp');
 		$group = $this->createGroup($responsible);
@@ -115,6 +130,19 @@ final class MapperTest extends IntegrationTestCase {
 		$this->assertContains($event->getId(), $ids($this->events->findBetween($from, Dates::parse('2026-11-05'))));
 		$this->assertNotContains($event->getId(), $ids($this->events->findBetween($from, Dates::parse('2026-11-04'))));
 		$this->assertSame([$event->getId()], $ids($this->events->findByPerson($person->getId())));
+
+		$this->assertContains($event->getId(), $ids($this->events->findBetween($from, null, [Event::TYPE_BIRTHDAY, Event::TYPE_JUBILEE])));
+		$this->assertNotContains($event->getId(), $ids($this->events->findBetween($from, null, [Event::TYPE_GIFT])));
+		$this->assertNotContains($event->getId(), $ids($this->events->findAll([Event::TYPE_GIFT])));
+	}
+
+	public function testYearlyGiftFlagRoundTrip(): void {
+		$function = $this->createFunction($this->createGroup('responsible'));
+		$this->assertFalse($this->functions->find($function->getId())->isYearlyGift());
+
+		$function->setYearlyGift(true);
+		$this->functions->update($function);
+		$this->assertTrue($this->functions->find($function->getId())->isYearlyGift());
 	}
 
 	private function createPerson(string $dateOfBirth): Person {

@@ -26,12 +26,14 @@ namespace OCA\Appreciation;
  *     greetingReminder: bool,
  *     leadTimeDays: int,
  *     emailNotifications: bool,
+ *     regulationsUrl: ?string,
  * }
  *
  * @psalm-type AppreciationFunction = array{
  *     id: int,
  *     groupId: int,
  *     name: string,
+ *     yearlyGift: bool,
  * }
  *
  * @psalm-type AppreciationGroup = array{
@@ -63,6 +65,13 @@ namespace OCA\Appreciation;
  *     displayName: string,
  *     dateOfBirth: ?string,
  *     notes: ?string,
+ *     street: ?string,
+ *     streetNumber: ?string,
+ *     postalCode: ?string,
+ *     city: ?string,
+ *     country: ?string,
+ *     mobilePhone: ?string,
+ *     otherPhone: ?string,
  *     sensitiveVisible: bool,
  *     currentFunctions: list<AppreciationSlice>,
  * }
@@ -74,6 +83,13 @@ namespace OCA\Appreciation;
  *     displayName: string,
  *     dateOfBirth: ?string,
  *     notes: ?string,
+ *     street: ?string,
+ *     streetNumber: ?string,
+ *     postalCode: ?string,
+ *     city: ?string,
+ *     country: ?string,
+ *     mobilePhone: ?string,
+ *     otherPhone: ?string,
  *     sensitiveVisible: bool,
  *     currentFunctions: list<AppreciationSlice>,
  *     slices: list<AppreciationSlice>,
@@ -81,7 +97,7 @@ namespace OCA\Appreciation;
  *
  * @psalm-type AppreciationEvent = array{
  *     id: int,
- *     type: 'birthday'|'jubilee',
+ *     type: 'birthday'|'jubilee'|'gift',
  *     date: string,
  *     ordinal: int,
  *     title: string,

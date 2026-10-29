@@ -45,6 +45,11 @@ final class RecipientServiceTest extends TestCase {
 		$this->assertSame(['bob' => 'interested', 'carol' => 'interested', 'alice' => 'responsible'], $recipients);
 	}
 
+	public function testYearlyGiftGoesToTheFunctionsGroup(): void {
+		$recipients = $this->service->recipients($this->event(Event::TYPE_GIFT, 20, '2026-12-31'));
+		$this->assertSame(['alice' => 'interested', 'bob' => 'responsible'], $recipients);
+	}
+
 	public function testBirthdayGoesToAllGroupsActiveOnTheDayAndResponsibleWins(): void {
 		$recipients = $this->service->recipients($this->event(Event::TYPE_BIRTHDAY, null, '2026-03-01'));
 		ksort($recipients);

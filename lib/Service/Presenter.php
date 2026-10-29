@@ -26,8 +26,8 @@ use OCP\L10N\IFactory;
 
 /**
  * Turns entities into API payloads and applies the visibility rules: date of
- * birth and notes only for viewers allowed to see them, and only slices of
- * groups the viewer can see.
+ * birth, contact data and notes only for viewers allowed to see them, and only
+ * slices of groups the viewer can see.
  *
  * @psalm-import-type AppreciationUser from ResponseDefinitions
  * @psalm-import-type AppreciationMe from ResponseDefinitions
@@ -57,6 +57,7 @@ class Presenter {
 		private AccessService $access,
 		private SettingsService $settings,
 		private EventService $eventService,
+		private UpcomingService $upcoming,
 		private TitleBuilder $titles,
 		private Clock $clock,
 	) {
@@ -82,6 +83,7 @@ class Presenter {
 			'greetingReminder' => $this->settings->isGreetingReminderEnabled(),
 			'leadTimeDays' => $this->settings->getLeadTimeDays(),
 			'emailNotifications' => $this->settings->isEmailEnabledForUser($userId),
+			'regulationsUrl' => $this->settings->getRegulationsUrl(),
 		];
 	}
 
@@ -93,6 +95,7 @@ class Presenter {
 			'id' => $function->getId(),
 			'groupId' => $function->getGroupId(),
 			'name' => $function->getName(),
+			'yearlyGift' => $function->isYearlyGift(),
 		];
 	}
 
@@ -160,6 +163,13 @@ class Presenter {
 			'displayName' => $person->getDisplayName(),
 			'dateOfBirth' => $sensitive ? Dates::format($person->getDateOfBirth()) : null,
 			'notes' => $sensitive ? $person->getNotes() : null,
+			'street' => $sensitive ? $person->getStreet() : null,
+			'streetNumber' => $sensitive ? $person->getStreetNumber() : null,
+			'postalCode' => $sensitive ? $person->getPostalCode() : null,
+			'city' => $sensitive ? $person->getCity() : null,
+			'country' => $sensitive ? $person->getCountry() : null,
+			'mobilePhone' => $sensitive ? $person->getMobilePhone() : null,
+			'otherPhone' => $sensitive ? $person->getOtherPhone() : null,
 			'sensitiveVisible' => $sensitive,
 			'currentFunctions' => array_map($this->slice(...), array_values($current)),
 		];
@@ -183,7 +193,11 @@ class Presenter {
 		$language = $this->l10nFactory->getUserLanguage($this->userManager->get($viewer));
 		$functionId = $event->getFunctionId();
 		$greetedBy = $event->getGreetedBy();
-		$type = $event->getType() === Event::TYPE_JUBILEE ? 'jubilee' : 'birthday';
+		$type = match ($event->getType()) {
+			Event::TYPE_JUBILEE => 'jubilee',
+			Event::TYPE_GIFT => 'gift',
+			default => 'birthday',
+		};
 		return [
 			'id' => $event->getId(),
 			'type' => $type,
@@ -198,16 +212,8 @@ class Presenter {
 			'greeted' => $event->getGreetedAt() !== null,
 			'greetedAt' => $event->getGreetedAt(),
 			'greetedBy' => $greetedBy === null ? null : $this->user($greetedBy),
-			'canGreet' => $this->canGreet($role, $viewer),
+			'canGreet' => $this->upcoming->canMark($event, $role, $viewer),
 		];
-	}
-
-	/**
-	 * @param RecipientService::ROLE_*|null $role
-	 */
-	public function canGreet(?string $role, string $viewer): bool {
-		return $this->settings->isGreetingReminderEnabled()
-			&& ($role === RecipientService::ROLE_RESPONSIBLE || $this->access->isManager($viewer));
 	}
 
 	/**

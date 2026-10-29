@@ -53,6 +53,18 @@ final class Dates {
 		return $days >= 0 ? $normalized->add($interval) : $normalized->sub($interval);
 	}
 
+	public static function yearStart(int $year): DateTimeImmutable {
+		/** @var DateTimeImmutable $result always a valid date */
+		$result = self::parse(sprintf('%04d-01-01', $year));
+		return $result;
+	}
+
+	public static function yearEnd(int $year): DateTimeImmutable {
+		/** @var DateTimeImmutable $result always a valid date */
+		$result = self::parse(sprintf('%04d-12-31', $year));
+		return $result;
+	}
+
 	/**
 	 * The date $years years after $date. February 29 falls on February 28 in
 	 * years that are not leap years.

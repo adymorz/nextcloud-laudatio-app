@@ -6,7 +6,7 @@
 <script setup lang="ts">
 import type { Group, PersonDetail, Slice } from '../types'
 
-import { mdiArrowLeft, mdiDelete, mdiPencil, mdiPlus } from '@mdi/js'
+import { mdiArrowLeft, mdiDelete, mdiFileDocumentOutline, mdiPencil, mdiPlus } from '@mdi/js'
 import { showConfirmation, showError } from '@nextcloud/dialogs'
 import { n, t } from '@nextcloud/l10n'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
@@ -37,6 +37,28 @@ const sliceDialogOpen = ref(false)
 const editedSlice = ref<Slice | null>(null)
 
 const slices = computed(() => [...(person.value?.slices ?? [])].sort((a, b) => b.startDate.localeCompare(a.startDate)))
+
+const addressLines = computed(() => {
+	const p = person.value
+	if (p === null) {
+		return []
+	}
+	return [[p.street, p.streetNumber], [p.postalCode, p.city], [p.country]]
+		.map((parts) => parts.filter((part) => part).join(' '))
+		.filter((line) => line !== '')
+})
+
+const phones = computed(() => [
+	{ label: t('appreciation', 'Mobile phone'), number: person.value?.mobilePhone },
+	{ label: t('appreciation', 'Additional phone number'), number: person.value?.otherPhone },
+].filter((phone): phone is { label: string, number: string } => !!phone.number))
+
+/**
+ * @param number Phone number as entered
+ */
+function telLink(number: string): string {
+	return 'tel:' + number.replace(/[^0-9+]/g, '')
+}
 
 /**
  * Loads the person (and, for managers, the groups for the slice dialog).
@@ -136,19 +158,27 @@ watch(() => props.id, load, { immediate: true })
 		<template v-else>
 			<div class="view__header">
 				<h2>{{ person.displayName }}</h2>
-				<div v-if="me.isManager" class="view__actions">
-					<NcButton @click="personDialogOpen = true">
+				<div class="view__actions">
+					<NcButton v-if="person.sensitiveVisible" :to="{ name: 'person-sheet', params: { id: person.id } }">
 						<template #icon>
-							<NcIconSvgWrapper :path="mdiPencil" />
+							<NcIconSvgWrapper :path="mdiFileDocumentOutline" />
 						</template>
-						{{ t('appreciation', 'Edit') }}
+						{{ t('appreciation', 'Data sheet') }}
 					</NcButton>
-					<NcButton variant="error" @click="deletePerson">
-						<template #icon>
-							<NcIconSvgWrapper :path="mdiDelete" />
-						</template>
-						{{ t('appreciation', 'Delete') }}
-					</NcButton>
+					<template v-if="me.isManager">
+						<NcButton @click="personDialogOpen = true">
+							<template #icon>
+								<NcIconSvgWrapper :path="mdiPencil" />
+							</template>
+							{{ t('appreciation', 'Edit') }}
+						</NcButton>
+						<NcButton variant="error" @click="deletePerson">
+							<template #icon>
+								<NcIconSvgWrapper :path="mdiDelete" />
+							</template>
+							{{ t('appreciation', 'Delete') }}
+						</NcButton>
+					</template>
 				</div>
 			</div>
 
@@ -158,6 +188,18 @@ watch(() => props.id, load, { immediate: true })
 					{{ formatDate(person.dateOfBirth) }}
 					<span class="muted">({{ n('appreciation', '%n year old', '%n years old', age(person.dateOfBirth)) }})</span>
 				</dd>
+				<template v-if="addressLines.length > 0">
+					<dt>{{ t('appreciation', 'Address') }}</dt>
+					<dd class="profile__address">
+						{{ addressLines.join('\n') }}
+					</dd>
+				</template>
+				<template v-for="phone in phones" :key="phone.label">
+					<dt>{{ phone.label }}</dt>
+					<dd>
+						<a class="profile__link" :href="telLink(phone.number)">{{ phone.number }}</a>
+					</dd>
+				</template>
 				<dt>{{ t('appreciation', 'Notes') }}</dt>
 				<dd class="profile__notes">
 					{{ person.notes ?? t('appreciation', 'No notes') }}
@@ -255,6 +297,14 @@ watch(() => props.id, load, { immediate: true })
 
 .profile__notes {
 	white-space: pre-wrap;
+}
+
+.profile__address {
+	white-space: pre-line;
+}
+
+.profile__link {
+	text-decoration: underline;
 }
 
 .timeline {
