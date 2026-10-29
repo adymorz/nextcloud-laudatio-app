@@ -10,22 +10,26 @@ declare(strict_types=1);
 namespace OCA\Appreciation\Command;
 
 use OCA\Appreciation\Service\SyncService;
-use OCP\Console\Attribute\AsCommand;
-use OCP\Console\ExitCode;
-use OCP\Console\IOutput;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
-#[AsCommand(
-	name: 'appreciation:sync',
-	description: 'Generate upcoming birthday and jubilee events and send due notifications now',
-	help: 'Does the same as the hourly background job.',
-)]
-class SyncCommand {
+class SyncCommand extends Command {
 	public function __construct(
 		private SyncService $syncService,
 	) {
+		parent::__construct();
 	}
 
-	public function __invoke(IOutput $output): ExitCode {
+	#[\Override]
+	protected function configure(): void {
+		$this->setName('appreciation:sync')
+			->setDescription('Generate upcoming birthday and jubilee events and send due notifications now')
+			->setHelp('Does the same as the hourly background job.');
+	}
+
+	#[\Override]
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$result = $this->syncService->run();
 		$output->writeln(sprintf(
 			'Events: %d inserted, %d updated, %d deleted. Notifications sent: %d',
@@ -34,6 +38,6 @@ class SyncCommand {
 			$result['deleted'],
 			$result['notified'],
 		));
-		return ExitCode::Success;
+		return self::SUCCESS;
 	}
 }

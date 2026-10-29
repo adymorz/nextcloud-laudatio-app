@@ -23,3 +23,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Audit log of master data changes
 - Admin settings and personal email setting
 - English and German (informal and formal)
+- Support for Nextcloud 34 and 35, PHP 8.2 to 8.5

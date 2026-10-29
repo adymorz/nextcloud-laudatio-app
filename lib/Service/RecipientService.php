@@ -30,8 +30,8 @@ use OCA\Appreciation\Db\SliceMapper;
  * reset() after changing them.
  */
 class RecipientService {
-	public const string ROLE_RESPONSIBLE = 'responsible';
-	public const string ROLE_INTERESTED = 'interested';
+	public const ROLE_RESPONSIBLE = 'responsible';
+	public const ROLE_INTERESTED = 'interested';
 
 	/** @var array<int, Group>|null */
 	private ?array $groups = null;

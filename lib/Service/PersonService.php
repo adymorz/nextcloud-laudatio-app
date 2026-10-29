@@ -30,8 +30,8 @@ use OCP\IL10N;
 class PersonService {
 	use TTransactional;
 
-	public const int MAX_NAME_LENGTH = 255;
-	public const int MAX_NOTES_LENGTH = 10000;
+	public const MAX_NAME_LENGTH = 255;
+	public const MAX_NOTES_LENGTH = 10000;
 
 	public function __construct(
 		private PersonMapper $personMapper,

@@ -27,7 +27,7 @@ use Psr\Log\LoggerInterface;
  * Notifications of past events are removed.
  */
 class NotificationService {
-	public const string SUBJECT_UPCOMING = 'upcoming';
+	public const SUBJECT_UPCOMING = 'upcoming';
 
 	public function __construct(
 		private EventMapper $eventMapper,

@@ -31,7 +31,7 @@ use OCP\IUserManager;
 class GroupService {
 	use TTransactional;
 
-	public const int MAX_NAME_LENGTH = 255;
+	public const MAX_NAME_LENGTH = 255;
 
 	public function __construct(
 		private GroupMapper $groupMapper,

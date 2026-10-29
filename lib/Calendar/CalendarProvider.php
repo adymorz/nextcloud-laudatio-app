@@ -26,7 +26,7 @@ use OCP\L10N\IFactory;
  * "app-generated--appreciation--events".
  */
 class CalendarProvider implements ICalendarProvider {
-	private const string PRINCIPAL_PREFIX = 'principals/users/';
+	private const PRINCIPAL_PREFIX = 'principals/users/';
 
 	public function __construct(
 		private AccessService $access,
