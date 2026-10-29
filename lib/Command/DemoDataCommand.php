@@ -14,25 +14,20 @@ use OCA\Appreciation\Service\Clock;
 use OCA\Appreciation\Service\Dates;
 use OCA\Appreciation\Service\GroupService;
 use OCA\Appreciation\Service\PersonService;
-use OCP\Console\Attribute\AsCommand;
-use OCP\Console\Attribute\Option;
-use OCP\Console\ExitCode;
-use OCP\Console\IOutput;
 use OCP\IUserManager;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Seeds demo data for development: two groups with the DDEV test users as
  * responsible and interested persons, and persons whose birthdays and
  * jubilees fall within the next weeks (relative to today).
  */
-#[AsCommand(
-	name: 'appreciation:demo-data',
-	description: 'Create demo groups, functions and persons (for development)',
-	help: 'Requires the users "alice" and "bob". Alice is responsible for "Demo: Board" and interested in "Demo: Volunteers", Bob the other way round.',
-)]
-class DemoDataCommand {
-	private const string BOARD = 'Demo: Board';
-	private const string VOLUNTEERS = 'Demo: Volunteers';
+class DemoDataCommand extends Command {
+	private const BOARD = 'Demo: Board';
+	private const VOLUNTEERS = 'Demo: Volunteers';
 
 	public function __construct(
 		private GroupService $groups,
@@ -40,23 +35,29 @@ class DemoDataCommand {
 		private IUserManager $userManager,
 		private Clock $clock,
 	) {
+		parent::__construct();
 	}
 
-	public function __invoke(
-		IOutput $output,
-		#[Option(description: 'Create the demo data even if demo groups already exist')]
-		bool $force = false,
-	): ExitCode {
+	#[\Override]
+	protected function configure(): void {
+		$this->setName('appreciation:demo-data')
+			->setDescription('Create demo groups, functions and persons (for development)')
+			->setHelp('Requires the users "alice" and "bob". Alice is responsible for "Demo: Board" and interested in "Demo: Volunteers", Bob the other way round.')
+			->addOption('force', null, InputOption::VALUE_NONE, 'Create the demo data even if demo groups already exist');
+	}
+
+	#[\Override]
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		foreach (['alice', 'bob'] as $userId) {
 			if (!$this->userManager->userExists($userId)) {
 				$output->writeln('<error>The user "' . $userId . '" does not exist. It is created by the DDEV setup.</error>');
-				return ExitCode::Failure;
+				return self::FAILURE;
 			}
 		}
 		foreach ($this->groups->findAll() as $group) {
-			if (in_array($group->getName(), [self::BOARD, self::VOLUNTEERS], true) && !$force) {
+			if (in_array($group->getName(), [self::BOARD, self::VOLUNTEERS], true) && $input->getOption('force') !== true) {
 				$output->writeln('<comment>Demo data already exists, use --force to add it again.</comment>');
-				return ExitCode::Success;
+				return self::SUCCESS;
 			}
 		}
 
@@ -90,7 +91,7 @@ class DemoDataCommand {
 		$this->persons->addSlice(null, $eva->getId(), $helper->getId(), $this->ago($today, 100, 1), null);
 
 		$output->writeln('Created 2 groups, 3 functions and 5 persons.');
-		return ExitCode::Success;
+		return self::SUCCESS;
 	}
 
 	/**

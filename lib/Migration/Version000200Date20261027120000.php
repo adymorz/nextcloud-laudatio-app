@@ -11,7 +11,6 @@ namespace OCA\Appreciation\Migration;
 
 use Closure;
 use OCP\DB\ISchemaWrapper;
-use OCP\DB\Schema\ITable;
 use OCP\DB\Types;
 use OCP\Migration\Attributes\CreateTable;
 use OCP\Migration\IOutput;
@@ -20,6 +19,9 @@ use OCP\Migration\SimpleMigrationStep;
 /**
  * Initial schema. Relations are enforced by the services (no DB foreign keys),
  * timestamps are unix seconds, calendar dates use DATE columns.
+ *
+ * The table objects are only used inside createTable(): Nextcloud 34 returns
+ * Doctrine tables, Nextcloud 35 its own ITable, both with the same methods.
  */
 #[CreateTable(table: 'appreciation_persons', description: 'Tracked persons')]
 #[CreateTable(table: 'appreciation_groups', description: 'Groups with their responsible user')]
@@ -30,6 +32,11 @@ use OCP\Migration\SimpleMigrationStep;
 #[CreateTable(table: 'appreciation_notified', description: 'Users already notified about an event')]
 #[CreateTable(table: 'appreciation_audit', description: 'Audit log of master data changes')]
 class Version000200Date20261027120000 extends SimpleMigrationStep {
+	private const NOT_NULL = ['notnull' => true];
+	private const NULLABLE = ['notnull' => false];
+	private const ID = ['notnull' => true, 'unsigned' => true];
+	private const ID_NULLABLE = ['notnull' => false, 'unsigned' => true];
+
 	/**
 	 * @param Closure(): ISchemaWrapper $schemaClosure
 	 */
@@ -37,99 +44,95 @@ class Version000200Date20261027120000 extends SimpleMigrationStep {
 	public function changeSchema(IOutput $output, Closure $schemaClosure, array $options): ?ISchemaWrapper {
 		$schema = $schemaClosure();
 
-		if (!$schema->hasTable('appreciation_persons')) {
-			$table = $this->createTableWithId($schema, 'appreciation_persons');
-			$table->addColumn('first_name', Types::STRING, ['notnull' => true, 'length' => 255]);
-			$table->addColumn('last_name', Types::STRING, ['notnull' => true, 'length' => 255]);
-			$table->addColumn('date_of_birth', Types::DATE, ['notnull' => true]);
-			$table->addColumn('notes', Types::TEXT, ['notnull' => false]);
-			$this->addTimestamps($table);
-			$table->addIndex(['last_name', 'first_name'], 'appr_persons_name');
-		}
+		$this->createTable($schema, 'appreciation_persons', [
+			'first_name' => [Types::STRING, ['notnull' => true, 'length' => 255]],
+			'last_name' => [Types::STRING, ['notnull' => true, 'length' => 255]],
+			'date_of_birth' => [Types::DATE, self::NOT_NULL],
+			'notes' => [Types::TEXT, self::NULLABLE],
+		], true, ['appr_persons_name' => ['last_name', 'first_name']]);
 
-		if (!$schema->hasTable('appreciation_groups')) {
-			$table = $this->createTableWithId($schema, 'appreciation_groups');
-			$table->addColumn('name', Types::STRING, ['notnull' => true, 'length' => 255]);
-			$table->addColumn('responsible_uid', Types::STRING, ['notnull' => true, 'length' => 64]);
-			$table->addColumn('jubilee_years', Types::STRING, ['notnull' => false, 'length' => 255]);
-			$this->addTimestamps($table);
-			$table->addIndex(['responsible_uid'], 'appr_groups_resp');
-		}
+		$this->createTable($schema, 'appreciation_groups', [
+			'name' => [Types::STRING, ['notnull' => true, 'length' => 255]],
+			'responsible_uid' => [Types::STRING, ['notnull' => true, 'length' => 64]],
+			'jubilee_years' => [Types::STRING, ['notnull' => false, 'length' => 255]],
+		], true, ['appr_groups_resp' => ['responsible_uid']]);
 
-		if (!$schema->hasTable('appreciation_interested')) {
-			$table = $this->createTableWithId($schema, 'appreciation_interested');
-			$table->addColumn('group_id', Types::BIGINT, ['notnull' => true, 'unsigned' => true]);
-			$table->addColumn('user_id', Types::STRING, ['notnull' => true, 'length' => 64]);
-			$table->addUniqueIndex(['group_id', 'user_id'], 'appr_interested_uniq');
-			$table->addIndex(['user_id'], 'appr_interested_user');
-		}
+		$this->createTable($schema, 'appreciation_interested', [
+			'group_id' => [Types::BIGINT, self::ID],
+			'user_id' => [Types::STRING, ['notnull' => true, 'length' => 64]],
+		], false, ['appr_interested_user' => ['user_id']], ['appr_interested_uniq' => ['group_id', 'user_id']]);
 
-		if (!$schema->hasTable('appreciation_functions')) {
-			$table = $this->createTableWithId($schema, 'appreciation_functions');
-			$table->addColumn('group_id', Types::BIGINT, ['notnull' => true, 'unsigned' => true]);
-			$table->addColumn('name', Types::STRING, ['notnull' => true, 'length' => 255]);
-			$this->addTimestamps($table);
-			$table->addIndex(['group_id'], 'appr_functions_group');
-		}
+		$this->createTable($schema, 'appreciation_functions', [
+			'group_id' => [Types::BIGINT, self::ID],
+			'name' => [Types::STRING, ['notnull' => true, 'length' => 255]],
+		], true, ['appr_functions_group' => ['group_id']]);
 
-		if (!$schema->hasTable('appreciation_slices')) {
-			$table = $this->createTableWithId($schema, 'appreciation_slices');
-			$table->addColumn('person_id', Types::BIGINT, ['notnull' => true, 'unsigned' => true]);
-			$table->addColumn('function_id', Types::BIGINT, ['notnull' => true, 'unsigned' => true]);
-			$table->addColumn('start_date', Types::DATE, ['notnull' => true]);
-			$table->addColumn('end_date', Types::DATE, ['notnull' => false]);
-			$this->addTimestamps($table);
-			$table->addIndex(['person_id'], 'appr_slices_person');
-			$table->addIndex(['function_id'], 'appr_slices_function');
-		}
+		$this->createTable($schema, 'appreciation_slices', [
+			'person_id' => [Types::BIGINT, self::ID],
+			'function_id' => [Types::BIGINT, self::ID],
+			'start_date' => [Types::DATE, self::NOT_NULL],
+			'end_date' => [Types::DATE, self::NULLABLE],
+		], true, ['appr_slices_person' => ['person_id'], 'appr_slices_function' => ['function_id']]);
 
-		if (!$schema->hasTable('appreciation_events')) {
-			$table = $this->createTableWithId($schema, 'appreciation_events');
-			$table->addColumn('uid', Types::STRING, ['notnull' => true, 'length' => 255]);
-			$table->addColumn('type', Types::STRING, ['notnull' => true, 'length' => 16]);
-			$table->addColumn('person_id', Types::BIGINT, ['notnull' => true, 'unsigned' => true]);
-			$table->addColumn('function_id', Types::BIGINT, ['notnull' => false, 'unsigned' => true]);
-			$table->addColumn('event_date', Types::DATE, ['notnull' => true]);
-			$table->addColumn('ordinal', Types::INTEGER, ['notnull' => true, 'unsigned' => true]);
-			$table->addColumn('greeted_at', Types::BIGINT, ['notnull' => false, 'unsigned' => true]);
-			$table->addColumn('greeted_by', Types::STRING, ['notnull' => false, 'length' => 64]);
-			$table->addColumn('created_at', Types::BIGINT, ['notnull' => true, 'unsigned' => true]);
-			$table->addUniqueIndex(['uid'], 'appr_events_uid');
-			$table->addIndex(['event_date'], 'appr_events_date');
-			$table->addIndex(['person_id'], 'appr_events_person');
-		}
+		$this->createTable($schema, 'appreciation_events', [
+			'uid' => [Types::STRING, ['notnull' => true, 'length' => 255]],
+			'type' => [Types::STRING, ['notnull' => true, 'length' => 16]],
+			'person_id' => [Types::BIGINT, self::ID],
+			'function_id' => [Types::BIGINT, self::ID_NULLABLE],
+			'event_date' => [Types::DATE, self::NOT_NULL],
+			'ordinal' => [Types::INTEGER, self::ID],
+			'greeted_at' => [Types::BIGINT, self::ID_NULLABLE],
+			'greeted_by' => [Types::STRING, ['notnull' => false, 'length' => 64]],
+			'created_at' => [Types::BIGINT, self::ID],
+		], false, ['appr_events_date' => ['event_date'], 'appr_events_person' => ['person_id']], ['appr_events_uid' => ['uid']]);
 
-		if (!$schema->hasTable('appreciation_notified')) {
-			$table = $this->createTableWithId($schema, 'appreciation_notified');
-			$table->addColumn('event_id', Types::BIGINT, ['notnull' => true, 'unsigned' => true]);
-			$table->addColumn('user_id', Types::STRING, ['notnull' => true, 'length' => 64]);
-			$table->addColumn('notified_at', Types::BIGINT, ['notnull' => true, 'unsigned' => true]);
-			$table->addUniqueIndex(['event_id', 'user_id'], 'appr_notified_uniq');
-		}
+		$this->createTable($schema, 'appreciation_notified', [
+			'event_id' => [Types::BIGINT, self::ID],
+			'user_id' => [Types::STRING, ['notnull' => true, 'length' => 64]],
+			'notified_at' => [Types::BIGINT, self::ID],
+		], false, [], ['appr_notified_uniq' => ['event_id', 'user_id']]);
 
-		if (!$schema->hasTable('appreciation_audit')) {
-			$table = $this->createTableWithId($schema, 'appreciation_audit');
-			$table->addColumn('actor_uid', Types::STRING, ['notnull' => false, 'length' => 64]);
-			$table->addColumn('action', Types::STRING, ['notnull' => true, 'length' => 16]);
-			$table->addColumn('entity_type', Types::STRING, ['notnull' => true, 'length' => 32]);
-			$table->addColumn('entity_id', Types::BIGINT, ['notnull' => true, 'unsigned' => true]);
-			$table->addColumn('changed_fields', Types::TEXT, ['notnull' => false]);
-			$table->addColumn('created_at', Types::BIGINT, ['notnull' => true, 'unsigned' => true]);
-			$table->addIndex(['created_at'], 'appr_audit_created');
-		}
+		$this->createTable($schema, 'appreciation_audit', [
+			'actor_uid' => [Types::STRING, ['notnull' => false, 'length' => 64]],
+			'action' => [Types::STRING, ['notnull' => true, 'length' => 16]],
+			'entity_type' => [Types::STRING, ['notnull' => true, 'length' => 32]],
+			'entity_id' => [Types::BIGINT, self::ID],
+			'changed_fields' => [Types::TEXT, self::NULLABLE],
+			'created_at' => [Types::BIGINT, self::ID],
+		], false, ['appr_audit_created' => ['created_at']]);
 
 		return $schema;
 	}
 
-	private function createTableWithId(ISchemaWrapper $schema, string $name): ITable {
+	/**
+	 * Creates a table with an autoincrement "id" primary key, unless it exists.
+	 *
+	 * @param non-empty-string $name
+	 * @param array<non-empty-string, array{Types::*, array{notnull?: bool, length?: int, unsigned?: bool}}> $columns name => [type, options]
+	 * @param bool $timestamps whether to add created_at and updated_at
+	 * @param array<non-empty-string, list<non-empty-string>> $indexes index name => columns
+	 * @param array<non-empty-string, list<non-empty-string>> $uniqueIndexes index name => columns
+	 */
+	private function createTable(ISchemaWrapper $schema, string $name, array $columns, bool $timestamps, array $indexes = [], array $uniqueIndexes = []): void {
+		if ($schema->hasTable($name)) {
+			return;
+		}
+
 		$table = $schema->createTable($name);
 		$table->addColumn('id', Types::BIGINT, ['autoincrement' => true, 'notnull' => true, 'unsigned' => true]);
+		foreach ($columns as $column => [$type, $options]) {
+			$table->addColumn($column, $type, $options);
+		}
+		if ($timestamps) {
+			$table->addColumn('created_at', Types::BIGINT, self::ID);
+			$table->addColumn('updated_at', Types::BIGINT, self::ID);
+		}
 		$table->setPrimaryKey(['id']);
-		return $table;
-	}
-
-	private function addTimestamps(ITable $table): void {
-		$table->addColumn('created_at', Types::BIGINT, ['notnull' => true, 'unsigned' => true]);
-		$table->addColumn('updated_at', Types::BIGINT, ['notnull' => true, 'unsigned' => true]);
+		foreach ($uniqueIndexes as $indexName => $indexColumns) {
+			$table->addUniqueIndex($indexColumns, $indexName);
+		}
+		foreach ($indexes as $indexName => $indexColumns) {
+			$table->addIndex($indexColumns, $indexName);
+		}
 	}
 }

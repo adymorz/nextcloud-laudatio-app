@@ -36,7 +36,7 @@ use Sabre\VObject\Property;
  * searches with options return no results.
  */
 class AppreciationCalendar implements ICalendar {
-	public const string URI = 'events';
+	public const URI = 'events';
 
 	public function __construct(
 		private string $userId,

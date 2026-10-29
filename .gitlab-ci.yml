@@ -30,7 +30,8 @@ variables:
   - curl -fsSL https://getcomposer.org/installer | php -- --quiet --install-dir=/usr/local/bin --filename=composer
 
 .php:
-  image: php:8.3-cli
+  # Lowest PHP version supported by the app (Nextcloud 34)
+  image: php:8.2-cli
   cache:
     key:
       prefix: composer
@@ -71,10 +72,21 @@ php:cs:
   script:
     - composer cs:check
 
+# Static analysis against the public API of every supported Nextcloud version.
+# composer.json pins the lowest one; nextcloud/ocp for 35 needs PHP 8.3.
 php:psalm:
   extends: .php
+  image: php:8.3-cli
   stage: lint
+  parallel:
+    matrix:
+      - OCP_VERSION: [dev-stable34, dev-stable35]
   script:
+    - |
+      if [ "$OCP_VERSION" != "dev-stable34" ]; then
+        composer config platform.php 8.3
+        composer require --dev "nextcloud/ocp:$OCP_VERSION" --with-all-dependencies --no-interaction --no-progress
+      fi
     - composer psalm
 
 php:openapi:
@@ -88,8 +100,11 @@ php:unit:
   stage: test
   # Official Nextcloud image: release code in /usr/src/nextcloud plus all required PHP extensions.
   image:
-    name: nextcloud:35-apache
+    name: nextcloud:${NEXTCLOUD_VERSION}-apache
     entrypoint: [""]
+  parallel:
+    matrix:
+      - NEXTCLOUD_VERSION: ["34", "35"]
   variables:
     NEXTCLOUD_ROOT: /usr/src/nextcloud
   cache:

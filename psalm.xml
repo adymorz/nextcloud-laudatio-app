@@ -11,7 +11,7 @@
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
     findUnusedBaselineEntry="true"
     findUnusedCode="true"
-	phpVersion="8.3"
+	phpVersion="8.2"
 >
     <projectFiles>
         <directory name="lib" />
@@ -23,6 +23,12 @@
 		<directory name="vendor"/>
 	</extraFiles>
 	<issueHandlers>
+		<!-- Nextcloud 34's schema API returns Doctrine tables; Doctrine is not part of nextcloud/ocp -->
+		<UndefinedDocblockClass>
+			<errorLevel type="suppress">
+				<referencedClass name="Doctrine\DBAL\Schema\Table"/>
+			</errorLevel>
+		</UndefinedDocblockClass>
 		<!-- Entities are accessed through Entity's magic getters/setters and Entity::$id is set by the mapper -->
 		<PossiblyUnusedProperty>
 			<errorLevel type="suppress">

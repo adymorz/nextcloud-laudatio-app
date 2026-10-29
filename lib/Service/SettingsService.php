@@ -19,21 +19,21 @@ use OCP\IL10N;
  * Typed access to the admin settings and the per-user settings of the app.
  */
 class SettingsService {
-	public const string MANAGER_GROUP = 'manager_group';
-	public const string JUBILEE_YEARS = 'jubilee_years';
-	public const string LEAD_TIME_DAYS = 'lead_time_days';
-	public const string BIRTHDAY_EVENTS = 'birthday_events';
-	public const string JUBILEE_EVENTS = 'jubilee_events';
-	public const string GREETING_REMINDER = 'greeting_reminder';
-	public const string EMAIL_DEFAULT = 'email_default';
+	public const MANAGER_GROUP = 'manager_group';
+	public const JUBILEE_YEARS = 'jubilee_years';
+	public const LEAD_TIME_DAYS = 'lead_time_days';
+	public const BIRTHDAY_EVENTS = 'birthday_events';
+	public const JUBILEE_EVENTS = 'jubilee_events';
+	public const GREETING_REMINDER = 'greeting_reminder';
+	public const EMAIL_DEFAULT = 'email_default';
 	/** Per-user setting */
-	public const string EMAIL_NOTIFICATIONS = 'email_notifications';
+	public const EMAIL_NOTIFICATIONS = 'email_notifications';
 
 	/** @var list<int> */
-	public const array DEFAULT_JUBILEE_YEARS = [1, 5, 10, 15, 20, 25, 40];
-	public const int DEFAULT_LEAD_TIME_DAYS = 14;
-	public const int MAX_LEAD_TIME_DAYS = 365;
-	public const int MAX_JUBILEE_YEAR = 100;
+	public const DEFAULT_JUBILEE_YEARS = [1, 5, 10, 15, 20, 25, 40];
+	public const DEFAULT_LEAD_TIME_DAYS = 14;
+	public const MAX_LEAD_TIME_DAYS = 365;
+	public const MAX_JUBILEE_YEAR = 100;
 
 	public function __construct(
 		private IAppConfig $appConfig,

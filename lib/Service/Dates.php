@@ -17,7 +17,7 @@ use DateTimeZone;
  * DateTimeImmutable at midnight UTC and compared by their Y-m-d value.
  */
 final class Dates {
-	private const string FORMAT = 'Y-m-d';
+	private const FORMAT = 'Y-m-d';
 
 	/**
 	 * Parses a strict Y-m-d string, returns null for anything else.

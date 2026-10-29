@@ -32,7 +32,7 @@ use Psr\Log\LoggerInterface;
  * future events that are no longer valid. Past events are kept as history.
  */
 class EventService {
-	public const int WINDOW_DAYS = 400;
+	public const WINDOW_DAYS = 400;
 
 	public function __construct(
 		private PersonMapper $personMapper,

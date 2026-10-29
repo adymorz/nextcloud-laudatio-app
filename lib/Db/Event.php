@@ -37,8 +37,8 @@ use OCP\DB\Types;
  * @method void setCreatedAt(int $createdAt)
  */
 class Event extends Entity {
-	public const string TYPE_BIRTHDAY = 'birthday';
-	public const string TYPE_JUBILEE = 'jubilee';
+	public const TYPE_BIRTHDAY = 'birthday';
+	public const TYPE_JUBILEE = 'jubilee';
 
 	protected string $uid = '';
 	protected string $type = '';

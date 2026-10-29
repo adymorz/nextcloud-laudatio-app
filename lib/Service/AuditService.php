@@ -20,10 +20,10 @@ use OCP\Log\Audit\CriticalActionPerformedEvent;
  * admin_audit app writes it to the Nextcloud audit log when it is enabled.
  */
 class AuditService {
-	public const string ENTITY_PERSON = 'person';
-	public const string ENTITY_SLICE = 'slice';
-	public const string ENTITY_GROUP = 'group';
-	public const string ENTITY_FUNCTION = 'function';
+	public const ENTITY_PERSON = 'person';
+	public const ENTITY_SLICE = 'slice';
+	public const ENTITY_GROUP = 'group';
+	public const ENTITY_FUNCTION = 'function';
 
 	public function __construct(
 		private AuditMapper $mapper,

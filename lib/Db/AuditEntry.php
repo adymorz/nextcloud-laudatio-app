@@ -30,9 +30,9 @@ use OCP\DB\Types;
  * @method void setCreatedAt(int $createdAt)
  */
 class AuditEntry extends Entity {
-	public const string ACTION_CREATE = 'create';
-	public const string ACTION_UPDATE = 'update';
-	public const string ACTION_DELETE = 'delete';
+	public const ACTION_CREATE = 'create';
+	public const ACTION_UPDATE = 'update';
+	public const ACTION_DELETE = 'delete';
 
 	protected ?string $actorUid = null;
 	protected string $action = '';

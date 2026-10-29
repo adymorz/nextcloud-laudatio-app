@@ -7,7 +7,7 @@
 
 Manage the people engaged in your organization (members, employees, elected officials, volunteers) and never miss their birthdays and work anniversaries (jubilees).
 
-Requires Nextcloud 35. Available in English and German.
+Requires Nextcloud 34 or 35 (PHP 8.2 or newer). Available in English and German.
 
 ## Features
 
@@ -117,7 +117,15 @@ Breakpoints work in the app's code. The Nextcloud server code is only available 
 
 ### Updating Nextcloud
 
-Change `NEXTCLOUD_VERSION` in [.ddev/config.yaml](.ddev/config.yaml) and run `ddev restart`. The server code is replaced and `occ upgrade` runs; your data is kept. Downgrades are not supported, use `ddev nextcloud-reset --full` instead.
+Change `NEXTCLOUD_VERSION` in [.ddev/config.yaml](.ddev/config.yaml) and run `ddev restart`. The server code is replaced and `occ upgrade` runs; your data is kept. Downgrades are not possible: `ddev restart` then only prints a warning, and `ddev nextcloud-reset --full` installs the configured version from scratch.
+
+### Supporting Nextcloud 34 and 35
+
+The app supports Nextcloud 34 and 35 and PHP 8.2 to 8.5. The development instance runs Nextcloud 35.
+
+- `composer.json` pins `nextcloud/ocp` to the **lowest** supported version (`dev-stable34`), so autocompletion and psalm only offer API that exists in both. CI also runs psalm against `dev-stable35` and the PHP unit and integration tests in Nextcloud 34 and 35.
+- Avoid PHP 8.3 syntax (e.g. typed class constants); CI lints on PHP 8.2.
+- To try the app on Nextcloud 34 locally, run `ddev exec 'NEXTCLOUD_VERSION=34.0.5 bash /mnt/ddev_config/commands/web/nextcloud-reset --full'`. A later `ddev restart` upgrades the instance back to the configured Nextcloud 35, which also tests the upgrade path.
 
 ### Translations
 

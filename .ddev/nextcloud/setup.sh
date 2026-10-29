@@ -63,6 +63,9 @@ if [ -z "$current" ]; then
 	src="$(download_release)"
 	cp -a "$src/." "$NC/"
 	rm -rf "$(dirname "$src")"
+elif php -r 'exit(version_compare($argv[1], $argv[2], ">") ? 0 : 1);' "$current" "$NEXTCLOUD_VERSION"; then
+	log "WARNING: Nextcloud $current is installed, but NEXTCLOUD_VERSION is $NEXTCLOUD_VERSION. Downgrades are not possible,"
+	log "         run 'ddev nextcloud-reset --full' to install $NEXTCLOUD_VERSION from scratch. Keeping $current for now."
 elif [ "$current" != "$NEXTCLOUD_VERSION" ]; then
 	log "Updating server code from $current to $NEXTCLOUD_VERSION ..."
 	src="$(download_release)"

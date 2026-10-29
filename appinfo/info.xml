@@ -18,7 +18,7 @@
 	<bugs>https://gitlab.home.dymorz.net/nextcloud-apps/nextcloud-appreciation-app/-/issues</bugs>
 	<repository type="git">https://gitlab.home.dymorz.net/nextcloud-apps/nextcloud-appreciation-app.git</repository>
 	<dependencies>
-		<nextcloud min-version="35" max-version="35"/>
+		<nextcloud min-version="34" max-version="35"/>
 	</dependencies>
 	<background-jobs>
 		<job>OCA\Appreciation\BackgroundJob\SyncJob</job>
