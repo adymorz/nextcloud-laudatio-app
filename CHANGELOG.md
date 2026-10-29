@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Persons, groups with responsible and interested users, functions and time slices
 - Address, mobile and additional phone number of persons, visible like date of birth and notes
+- Printable data sheet per person to check and complete their data, without notes
 - Access control for managers, responsible and interested users
 - Birthday and jubilee events with continuous service periods and per-group jubilee years
 - Read-only calendar per user in the Calendar app and via CalDAV

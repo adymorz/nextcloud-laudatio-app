@@ -6,7 +6,7 @@
 <script setup lang="ts">
 import type { Group, PersonDetail, Slice } from '../types'
 
-import { mdiArrowLeft, mdiDelete, mdiPencil, mdiPlus } from '@mdi/js'
+import { mdiArrowLeft, mdiDelete, mdiFileDocumentOutline, mdiPencil, mdiPlus } from '@mdi/js'
 import { showConfirmation, showError } from '@nextcloud/dialogs'
 import { n, t } from '@nextcloud/l10n'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
@@ -158,19 +158,27 @@ watch(() => props.id, load, { immediate: true })
 		<template v-else>
 			<div class="view__header">
 				<h2>{{ person.displayName }}</h2>
-				<div v-if="me.isManager" class="view__actions">
-					<NcButton @click="personDialogOpen = true">
+				<div class="view__actions">
+					<NcButton v-if="person.sensitiveVisible" :to="{ name: 'person-sheet', params: { id: person.id } }">
 						<template #icon>
-							<NcIconSvgWrapper :path="mdiPencil" />
+							<NcIconSvgWrapper :path="mdiFileDocumentOutline" />
 						</template>
-						{{ t('appreciation', 'Edit') }}
+						{{ t('appreciation', 'Data sheet') }}
 					</NcButton>
-					<NcButton variant="error" @click="deletePerson">
-						<template #icon>
-							<NcIconSvgWrapper :path="mdiDelete" />
-						</template>
-						{{ t('appreciation', 'Delete') }}
-					</NcButton>
+					<template v-if="me.isManager">
+						<NcButton @click="personDialogOpen = true">
+							<template #icon>
+								<NcIconSvgWrapper :path="mdiPencil" />
+							</template>
+							{{ t('appreciation', 'Edit') }}
+						</NcButton>
+						<NcButton variant="error" @click="deletePerson">
+							<template #icon>
+								<NcIconSvgWrapper :path="mdiDelete" />
+							</template>
+							{{ t('appreciation', 'Delete') }}
+						</NcButton>
+					</template>
 				</div>
 			</div>
 

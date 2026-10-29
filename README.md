@@ -16,6 +16,7 @@ Requires Nextcloud 34 or 35 (PHP 8.2 or newer). Available in English and German.
 - **Calendar**: everybody involved in a group gets a read-only calendar "Birthdays & anniversaries" in the Calendar app and on CalDAV devices, with a reminder before each event.
 - **Reminders**: a Nextcloud notification when an event comes within the lead time (default 14 days), optionally also by email.
 - **Upcoming** view with a "greeted" checklist for the responsible persons.
+- **Data sheet** per person to print (or save as PDF) and hand over, so the person can check, correct and complete their data. Notes are never printed.
 - **Audit log** of who created, changed or deleted master data.
 
 ### Roles
@@ -23,7 +24,7 @@ Requires Nextcloud 34 or 35 (PHP 8.2 or newer). Available in English and German.
 | Role | Who | Can |
 | --- | --- | --- |
 | Manager | Nextcloud admins and members of the manager group (admin settings) | See and edit everything, see the audit log |
-| Responsible person | Exactly one Nextcloud user per group | See the current members of the group including date of birth, contact data and notes, get their events, mark events as greeted |
+| Responsible person | Exactly one Nextcloud user per group | See the current members of the group including date of birth, contact data and notes, print their data sheets, get their events, mark events as greeted |
 | Interested person | Any number of Nextcloud users per group | See the current members of the group (name and functions) and get their events "(for information)" |
 | Everybody else | | No access; the app is not shown in the navigation |
 
