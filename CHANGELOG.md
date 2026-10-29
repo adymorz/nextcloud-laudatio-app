@@ -24,5 +24,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upcoming view with "greeted" checklist
 - Audit log of master data changes
 - Admin settings and personal email setting
+- Link to the gift regulations (external page or internal link of a Nextcloud file) in the app navigation
 - English and German (informal and formal)
 - Support for Nextcloud 34 and 35, PHP 8.2 to 8.5

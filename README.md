@@ -39,7 +39,7 @@ Access is checked on the server for every request. Persons themselves need no Ne
 
 ### Settings
 
-- **Admin** (Administration settings → Groupware → Appreciation): manager group, jubilee years, reminder lead time, which events are generated, the "greeted" checklist, and whether reminder emails are on by default.
+- **Admin** (Administration settings → Groupware → Appreciation): manager group, jubilee years, reminder lead time, which events are generated, the "greeted" checklist, whether reminder emails are on by default, and the link to the gift regulations (an external page or the internal link of a file in Nextcloud), shown to all users in the app navigation.
 - **Personal** (Settings at the bottom of the app navigation): reminder emails on or off.
 
 ## Development

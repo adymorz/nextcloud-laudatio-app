@@ -103,6 +103,14 @@ class AdminForm implements IDeclarativeSettingsFormWithHandlers {
 					'type' => DeclarativeSettingsTypes::CHECKBOX,
 					'default' => false,
 				],
+				[
+					'id' => SettingsService::REGULATIONS_URL,
+					'title' => $this->l10n->t('Gift regulations'),
+					'description' => $this->l10n->t('Link shown to all users of the app, starting with https://. For a document in Nextcloud, use "Copy internal link" in the sharing tab of the file and share the file with the users of the app.'),
+					'type' => DeclarativeSettingsTypes::URL,
+					'placeholder' => 'https://',
+					'default' => '',
+				],
 			],
 		];
 	}
@@ -117,6 +125,7 @@ class AdminForm implements IDeclarativeSettingsFormWithHandlers {
 			SettingsService::JUBILEE_EVENTS => $this->settings->isJubileeEventsEnabled(),
 			SettingsService::GREETING_REMINDER => $this->settings->isGreetingReminderEnabled(),
 			SettingsService::EMAIL_DEFAULT => $this->settings->isEmailDefaultEnabled(),
+			SettingsService::REGULATIONS_URL => $this->settings->getRegulationsUrl() ?? '',
 			default => null,
 		};
 	}
@@ -152,6 +161,9 @@ class AdminForm implements IDeclarativeSettingsFormWithHandlers {
 			case SettingsService::GREETING_REMINDER:
 			case SettingsService::EMAIL_DEFAULT:
 				$this->settings->setFlag($fieldId, $this->toBool($value));
+				return;
+			case SettingsService::REGULATIONS_URL:
+				$this->settings->setRegulationsUrl(is_string($value) ? $value : '');
 				return;
 		}
 	}

@@ -4,7 +4,7 @@
 -->
 
 <script setup lang="ts">
-import { mdiAccountGroup, mdiAccountMultiple, mdiCakeVariant, mdiCog, mdiHistory } from '@mdi/js'
+import { mdiAccountGroup, mdiAccountMultiple, mdiCakeVariant, mdiCog, mdiHistory, mdiScaleBalance } from '@mdi/js'
 import { t } from '@nextcloud/l10n'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
 import NcAppNavigation from '@nextcloud/vue/components/NcAppNavigation'
@@ -44,6 +44,11 @@ const settingsOpen = ref(false)
 				</NcAppNavigationItem>
 			</template>
 			<template #footer>
+				<NcAppNavigationItem v-if="me.regulationsUrl" :name="t('appreciation', 'Gift regulations')" :href="me.regulationsUrl">
+					<template #icon>
+						<NcIconSvgWrapper :path="mdiScaleBalance" />
+					</template>
+				</NcAppNavigationItem>
 				<NcAppNavigationItem :name="t('appreciation', 'Settings')" @click="settingsOpen = true">
 					<template #icon>
 						<NcIconSvgWrapper :path="mdiCog" />

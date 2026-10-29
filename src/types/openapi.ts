@@ -317,6 +317,7 @@ export interface components {
             /** Format: int64 */
             leadTimeDays: number;
             emailNotifications: boolean;
+            regulationsUrl: string | null;
         };
         OCSMeta: {
             status: string;

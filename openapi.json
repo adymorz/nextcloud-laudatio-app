@@ -272,7 +272,8 @@
                     "interestedGroupIds",
                     "greetingReminder",
                     "leadTimeDays",
-                    "emailNotifications"
+                    "emailNotifications",
+                    "regulationsUrl"
                 ],
                 "properties": {
                     "userId": {
@@ -304,6 +305,10 @@
                     },
                     "emailNotifications": {
                         "type": "boolean"
+                    },
+                    "regulationsUrl": {
+                        "type": "string",
+                        "nullable": true
                     }
                 }
             },

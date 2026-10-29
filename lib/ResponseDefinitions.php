@@ -26,6 +26,7 @@ namespace OCA\Appreciation;
  *     greetingReminder: bool,
  *     leadTimeDays: int,
  *     emailNotifications: bool,
+ *     regulationsUrl: ?string,
  * }
  *
  * @psalm-type AppreciationFunction = array{

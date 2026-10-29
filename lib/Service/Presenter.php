@@ -82,6 +82,7 @@ class Presenter {
 			'greetingReminder' => $this->settings->isGreetingReminderEnabled(),
 			'leadTimeDays' => $this->settings->getLeadTimeDays(),
 			'emailNotifications' => $this->settings->isEmailEnabledForUser($userId),
+			'regulationsUrl' => $this->settings->getRegulationsUrl(),
 		];
 	}
 
