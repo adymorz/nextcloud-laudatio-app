@@ -7,7 +7,9 @@
 
 Manage the people engaged in your organization (members, employees, elected officials, volunteers) and never miss their birthdays and work anniversaries (jubilees).
 
-Requires Nextcloud 34 or 35 (PHP 8.2 or newer). Available in English and German.
+Requires Nextcloud 34 or 35 (PHP 8.2 or newer). Available in English and German. Report bugs and ideas in the [issue tracker](https://github.com/adymorz/nextcloud-appreciation-app/issues).
+
+![Upcoming birthdays and anniversaries](screenshots/upcoming.png)
 
 ## Features
 
@@ -50,14 +52,20 @@ Access is checked on the server for every request. Persons themselves need no Ne
 - **Admin** (Administration settings → Groupware → Appreciation): manager group, jubilee years, reminder lead time, which events are generated, the "greeted" checklist, whether reminder emails are on by default, and the link to the gift regulations (an external page or the internal link of a file in Nextcloud), shown to all users in the app navigation.
 - **Personal** (Settings at the bottom of the app navigation): reminder emails on or off.
 
+## Installation
+
+As an administrator, open **Apps**, search for "Appreciation" (category "Organization") and click **Download and enable**, or run `occ app:install appreciation`.
+
+Then choose the manager group and adjust the jubilee years and reminders in Administration settings → Groupware → Appreciation. Background jobs (cron) must run, they generate the events and send the reminders hourly. Install the Calendar app to see the birthdays and anniversaries in a calendar.
+
 ## Development
 
-The development environment is based on [DDEV](https://ddev.com). Docker and DDEV (v1.25 or newer) are the only requirements on your machine; PHP, Composer and Node.js run inside the DDEV containers.
+The app is developed on a self-hosted GitLab, [GitHub](https://github.com/adymorz/nextcloud-appreciation-app) is a public mirror. The development environment is based on [DDEV](https://ddev.com). Docker and DDEV (v1.25 or newer) are the only requirements on your machine; PHP, Composer and Node.js run inside the DDEV containers.
 
 ### Getting started
 
 ```sh
-git clone https://gitlab.home.dymorz.net/nextcloud-apps/nextcloud-appreciation-app.git
+git clone https://github.com/adymorz/nextcloud-appreciation-app.git
 cd nextcloud-appreciation-app
 ddev start             # the first start downloads and installs Nextcloud 35
 ddev composer install  # PHP dev tools and the OCP API for IDE autocompletion
@@ -94,6 +102,7 @@ To get some data to work with, run `ddev occ appreciation:demo-data`. It creates
 | `ddev npm run l10n` | Check translations and compile `l10n/*.js`, see below |
 | `ddev occ appreciation:sync` | Generate events and send due reminders now (otherwise hourly) |
 | `ddev occ appreciation:demo-data` | Create demo data |
+| `ddev exec scripts/appstore-package.sh` | Build the unsigned App Store archive in `build/appstore/` (after `ddev npm run build`), see [Releasing](#releasing) |
 | `ddev occ <command>` | Run Nextcloud's `occ`, e.g. `ddev occ app:list` |
 | `ddev occ log:watch` | Follow the Nextcloud log |
 | `ddev mailpit` | Open Mailpit to see sent mails |
@@ -147,6 +156,32 @@ Source strings are English: `$l->t('…')` in PHP and `t('appreciation', '…')`
 - `lib/Calendar`: the calendar provider (public `ICalendarProvider` API).
 - `lib/Notification`, `lib/BackgroundJob`, `lib/Command`, `lib/Settings`: notifier, hourly job, occ commands, admin settings form.
 - `src`: Vue 3 frontend with `@nextcloud/vue`.
+
+### Releasing
+
+Releases go to the [Nextcloud App Store](https://apps.nextcloud.com/apps/appreciation) through the GitLab CI pipeline of a version tag. The release archives are attached to the GitHub releases of the mirror, from where the App Store and every Nextcloud server download them.
+
+For each release:
+
+1. Set the new version in [appinfo/info.xml](appinfo/info.xml) and `package.json`.
+2. In [CHANGELOG.md](CHANGELOG.md), rename `## [Unreleased]` to `## X.Y.Z – YYYY-MM-DD` and add a new empty `## [Unreleased]` above it. The App Store only finds headings that start with the plain version (no brackets). Pre-releases (`X.Y.Z-beta.1`) take their notes from `## [Unreleased]`.
+3. Merge to `main`, then tag and push: `git tag vX.Y.Z && git push origin vX.Y.Z`.
+
+After all checks pass, `release:package` builds the archive and signs both the code (`appinfo/signature.json`) and the archive ([scripts/appstore-package.sh](scripts/appstore-package.sh)). `release:publish` then attaches it to the GitHub release and registers it in the App Store ([scripts/appstore-publish.sh](scripts/appstore-publish.sh)). The pipeline fails if the tag, the version in info.xml and the changelog heading don't match.
+
+One-time setup:
+
+1. **GitHub mirror**: a public repository `adymorz/nextcloud-appreciation-app` with issues enabled, created empty (no README or license) so the mirror can push to it. In GitLab, Settings → Repository → Mirroring repositories, push to `https://github.com/adymorz/nextcloud-appreciation-app.git` with a fine-grained GitHub token (Contents: read and write), including tags.
+2. **Certificate**: the private key `appreciation.key` and the signing request `appreciation.csr` are in `~/.nextcloud/certificates/`. Never commit or share the key. The GitHub profile must show its email address, then submit the request as `appreciation/appreciation.csr` in a pull request to [nextcloud/app-certificate-requests](https://github.com/nextcloud/app-certificate-requests) and save the signed certificate as `~/.nextcloud/certificates/appreciation.crt`.
+3. **App Store**: log in at [apps.nextcloud.com](https://apps.nextcloud.com) and [register the app](https://apps.nextcloud.com/developer/apps/new) with the certificate and the signature of the app ID: `echo -n appreciation | openssl dgst -sha512 -sign ~/.nextcloud/certificates/appreciation.key | openssl base64`.
+4. **GitLab CI/CD**: protect the tags `v*` (Settings → Repository → Protected tags) and add these protected variables (Settings → CI/CD → Variables):
+
+| Variable | Type | Value |
+| --- | --- | --- |
+| `APP_PRIVATE_KEY` | File | Contents of `appreciation.key` |
+| `APP_CERTIFICATE` | File | Contents of `appreciation.crt` |
+| `GITHUB_TOKEN` | Variable, masked | Fine-grained GitHub token for the mirror repository with "Contents: read and write" |
+| `APPSTORE_TOKEN` | Variable, masked | API token from [apps.nextcloud.com/account/token](https://apps.nextcloud.com/account/token) |
 
 ## Known issues
 

@@ -7,17 +7,57 @@
 	  xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
 	<id>appreciation</id>
 	<name>Appreciation</name>
-	<summary>Appreciate the engagement of people in an organization</summary>
-	<description><![CDATA[A Nextcloud app for managing the people involved in an organization: members, employees, elected officials, and volunteers. Includes reminders so those responsible can celebrate birthdays and work anniversaries, as well as tracking gifts and anniversary budgets.]]></description>
+	<summary>Never miss the birthdays, anniversaries and yearly gifts of the people engaged in your organization</summary>
+	<summary lang="de">Verpasse keine Geburtstage, Dienstjubiläen und Jahresgeschenke der Personen, die sich in deiner Organisation engagieren</summary>
+	<description><![CDATA[Appreciation helps clubs, associations, parishes and companies to appreciate the people engaged with them: members, employees, elected officials and volunteers. Record who holds which function since when, and the app reminds the right people of every birthday, anniversary and yearly gift.
+
+- **Persons, groups and functions**: persons with date of birth, address, phone numbers and notes, and the functions they hold over time, e.g. "Treasurer" of the "Board" from 2021 to 2024.
+- **Birthdays and jubilees** are generated automatically. Jubilees are counted from the start of a continuous period of service, so a re-election does not reset the count. The jubilee years can be set globally and per group.
+- **Yearly gifts**: mark a function "One gift per year", and the responsible person is reminded to present one gift per calendar year to everybody holding it. A link to the gift regulations can be shown in the app navigation.
+- **Calendar**: everybody involved in a group gets a read-only calendar "Birthdays & anniversaries" in the Calendar app and on CalDAV devices.
+- **Reminders** as Nextcloud notifications before each event, optionally also by email.
+- **Upcoming** view with a "greeted" checklist, and the yearly gifts with a "presented" checklist.
+- **Data sheet** per person to print or save as PDF, so the person can check and complete their data.
+- **Roles**: managers see and edit everything. Each group has one responsible person and any number of interested persons, who only see the persons and events of their groups. Everybody else does not see the app.
+- **Audit log** of all changes to persons, groups and functions.
+
+Persons don't need a Nextcloud account. Available in English and German.]]></description>
+	<description lang="de"><![CDATA[Appreciation hilft Vereinen, Verbänden, Pfarreien und Firmen, die Menschen wertzuschätzen, die sich bei ihnen engagieren: Mitglieder, Mitarbeitende, Gewählte und Freiwillige. Erfasse, wer welche Funktion seit wann innehat, und die App erinnert die richtigen Personen an jeden Geburtstag, jedes Jubiläum und jedes Jahresgeschenk.
+
+- **Personen, Gruppen und Funktionen**: Personen mit Geburtsdatum, Adresse, Telefonnummern und Notizen sowie den Funktionen, die sie im Lauf der Zeit innehaben, z. B. „Kassier“ im „Vorstand“ von 2021 bis 2024.
+- **Geburtstage und Jubiläen** werden automatisch erzeugt. Jubiläen zählen ab dem Beginn einer ununterbrochenen Amtszeit, eine Wiederwahl setzt die Zählung also nicht zurück. Die Jubiläumsjahre lassen sich global und pro Gruppe festlegen.
+- **Jahresgeschenke**: Markiere eine Funktion mit „Ein Geschenk pro Jahr“, und die verantwortliche Person wird daran erinnert, allen, die sie innehaben, einmal pro Kalenderjahr ein Geschenk zu überreichen. Ein Link auf das Geschenkreglement lässt sich in der App-Navigation anzeigen.
+- **Kalender**: Alle Beteiligten einer Gruppe erhalten einen schreibgeschützten Kalender „Geburtstage & Jubiläen“ in der Kalender-App und auf CalDAV-Geräten.
+- **Erinnerungen** als Nextcloud-Benachrichtigung vor jedem Ereignis, auf Wunsch auch per E-Mail.
+- Ansicht **Demnächst** mit einer „Gratuliert“-Checkliste sowie den Jahresgeschenken mit einer „Überreicht“-Checkliste.
+- **Datenblatt** pro Person zum Drucken oder Speichern als PDF, damit die Person ihre Angaben prüfen und ergänzen kann.
+- **Rollen**: Die Verwaltung sieht und bearbeitet alles. Jede Gruppe hat eine verantwortliche Person und beliebig viele interessierte Personen, die nur die Personen und Ereignisse ihrer Gruppen sehen. Alle anderen sehen die App nicht.
+- **Änderungsprotokoll** aller Änderungen an Personen, Gruppen und Funktionen.
+
+Die Personen brauchen kein Nextcloud-Konto. Verfügbar auf Englisch und Deutsch.]]></description>
 	<version>0.3.0</version>
 	<licence>AGPL-3.0-or-later</licence>
 	<author mail="dev@adrian.dymorz.ch">Adrian Dymorz</author>
 	<namespace>Appreciation</namespace>
+	<documentation>
+		<user>https://github.com/adymorz/nextcloud-appreciation-app#features</user>
+		<admin>https://github.com/adymorz/nextcloud-appreciation-app#installation</admin>
+		<developer>https://github.com/adymorz/nextcloud-appreciation-app#development</developer>
+	</documentation>
+	<category>organization</category>
 	<category>social</category>
-	<website>https://gitlab.home.dymorz.net/nextcloud-apps/nextcloud-appreciation-app</website>
-	<bugs>https://gitlab.home.dymorz.net/nextcloud-apps/nextcloud-appreciation-app/-/issues</bugs>
-	<repository type="git">https://gitlab.home.dymorz.net/nextcloud-apps/nextcloud-appreciation-app.git</repository>
+	<website>https://github.com/adymorz/nextcloud-appreciation-app</website>
+	<bugs>https://github.com/adymorz/nextcloud-appreciation-app/issues</bugs>
+	<repository type="git">https://github.com/adymorz/nextcloud-appreciation-app.git</repository>
+	<screenshot>https://raw.githubusercontent.com/adymorz/nextcloud-appreciation-app/main/screenshots/upcoming.png</screenshot>
+	<screenshot>https://raw.githubusercontent.com/adymorz/nextcloud-appreciation-app/main/screenshots/persons.png</screenshot>
+	<screenshot>https://raw.githubusercontent.com/adymorz/nextcloud-appreciation-app/main/screenshots/person.png</screenshot>
+	<screenshot>https://raw.githubusercontent.com/adymorz/nextcloud-appreciation-app/main/screenshots/sheet.png</screenshot>
+	<screenshot>https://raw.githubusercontent.com/adymorz/nextcloud-appreciation-app/main/screenshots/groups.png</screenshot>
+	<screenshot>https://raw.githubusercontent.com/adymorz/nextcloud-appreciation-app/main/screenshots/calendar.png</screenshot>
+	<screenshot>https://raw.githubusercontent.com/adymorz/nextcloud-appreciation-app/main/screenshots/settings.png</screenshot>
 	<dependencies>
+		<php min-version="8.2"/>
 		<nextcloud min-version="34" max-version="35"/>
 	</dependencies>
 	<background-jobs>
