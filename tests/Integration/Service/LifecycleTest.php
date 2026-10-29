@@ -18,8 +18,10 @@ use OCA\Appreciation\Exception\ValidationException;
 use OCA\Appreciation\Model\PersonInput;
 use OCA\Appreciation\Service\Clock;
 use OCA\Appreciation\Service\Dates;
+use OCA\Appreciation\Service\EventService;
 use OCA\Appreciation\Service\GroupService;
 use OCA\Appreciation\Service\PersonService;
+use OCA\Appreciation\Service\UpcomingService;
 use OCA\Appreciation\Tests\Integration\IntegrationTestCase;
 
 /**
@@ -97,6 +99,44 @@ final class LifecycleTest extends IntegrationTestCase {
 		$this->assertSame(['delete', 'update', 'create'], array_values(array_map(static fn (AuditEntry $e): string => $e->getAction(), $audit)));
 		$update = array_values($audit)[1];
 		$this->assertSame(['date_of_birth', 'notes', 'city'], $update->getChangedFieldList());
+	}
+
+	public function testYearlyGifts(): void {
+		$today = $this->service(Clock::class)->today();
+		$thisYear = (int)$today->format('Y');
+		$lastYear = (int)Dates::addDays($today, EventService::WINDOW_DAYS)->format('Y');
+		$start = sprintf('%d-01-01', $thisYear - 1);
+
+		$group = $this->groups->create('admin', $this->uniqueName('Group'), 'admin', [], null);
+		$this->onTearDown(fn () => $this->groups->delete('admin', $group->getId()));
+		$function = $this->groups->createFunction('admin', $group->getId(), 'Gift tester', true);
+		$this->onTearDown(fn () => $this->groups->deleteFunction('admin', $function->getId()));
+		$person = $this->persons->create('admin', new PersonInput('Test', $this->uniqueName('Person'), '1980-01-01'));
+		$this->onTearDown(fn () => $this->persons->delete('admin', $person->getId()));
+		$slice = $this->persons->addSlice('admin', $person->getId(), $function->getId(), $start, null);
+
+		$gifts = fn (): array => array_values(array_filter(
+			$this->events->findByPerson($person->getId()),
+			static fn (Event $e): bool => $e->getType() === Event::TYPE_GIFT,
+		));
+		$this->assertSame(
+			array_map(static fn (int $year): array => ['gift', $year . '-12-31', $year], range($thisYear, $lastYear)),
+			$this->describe($gifts()),
+		);
+
+		// Leaving today: this year's gift is due today, no later ones
+		$this->persons->updateSlice('admin', $slice->getId(), $function->getId(), $start, Dates::format($today));
+		$this->assertSame([['gift', Dates::format($today), $thisYear]], $this->describe($gifts()));
+
+		// Presented stays presented when the events are synchronized again
+		$gift = $gifts()[0];
+		$this->service(UpcomingService::class)->setGreeted('admin', $gift->getId(), true);
+		$this->service(EventService::class)->syncPerson($person->getId());
+		$this->assertNotNull($this->events->find($gift->getId())->getGreetedAt());
+
+		// Switching the yearly gift off removes this year's gift
+		$this->groups->updateFunction('admin', $function->getId(), 'Gift tester', false);
+		$this->assertSame([], $gifts());
 	}
 
 	public function testValidation(): void {

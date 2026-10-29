@@ -37,9 +37,10 @@ class EventMapper extends QBMapper {
 	/**
 	 * Events between two days (both inclusive), ordered by date.
 	 *
+	 * @param list<Event::TYPE_*> $types only these types, all if empty
 	 * @return list<Event>
 	 */
-	public function findBetween(DateTimeImmutable $from, ?DateTimeImmutable $to = null): array {
+	public function findBetween(DateTimeImmutable $from, ?DateTimeImmutable $to = null, array $types = []): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->getTableName())
@@ -47,19 +48,25 @@ class EventMapper extends QBMapper {
 		if ($to !== null) {
 			$qb->andWhere($qb->expr()->lte('event_date', $qb->createNamedParameter($to, IQueryBuilder::PARAM_DATE_IMMUTABLE)));
 		}
+		if ($types !== []) {
+			$qb->andWhere($qb->expr()->in('type', $qb->createNamedParameter($types, IQueryBuilder::PARAM_STR_ARRAY)));
+		}
 		$qb->orderBy('event_date')->addOrderBy('id');
 		return $this->findEntities($qb);
 	}
 
 	/**
+	 * @param list<Event::TYPE_*> $types only these types, all if empty
 	 * @return list<Event>
 	 */
-	public function findAll(): array {
+	public function findAll(array $types = []): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
-			->from($this->getTableName())
-			->orderBy('event_date')
-			->addOrderBy('id');
+			->from($this->getTableName());
+		if ($types !== []) {
+			$qb->where($qb->expr()->in('type', $qb->createNamedParameter($types, IQueryBuilder::PARAM_STR_ARRAY)));
+		}
+		$qb->orderBy('event_date')->addOrderBy('id');
 		return $this->findEntities($qb);
 	}
 

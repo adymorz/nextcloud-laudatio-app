@@ -41,7 +41,7 @@ final class NotifierTest extends TestCase {
 		$this->eventMapper = $this->createMock(EventMapper::class);
 		$this->recipients = $this->createMock(RecipientService::class);
 		$titles = $this->createMock(TitleBuilder::class);
-		$titles->method('build')->willReturnCallback(static fn (Event $e, ?string $role): string => '40th Birthday of Anna Muster' . ($role === 'interested' ? ' (for information)' : ''));
+		$titles->method('build')->willReturnCallback(static fn (Event $e, ?string $role): string => ($e->getType() === Event::TYPE_GIFT ? 'Yearly gift for Anna Muster (Treasurer)' : '40th Birthday of Anna Muster') . ($role === 'interested' ? ' (for information)' : ''));
 		$formatter = $this->createMock(IDateTimeFormatter::class);
 		$formatter->method('formatDate')->willReturn('October 30, 2026');
 		$urls = $this->createMock(IURLGenerator::class);
@@ -67,6 +67,32 @@ final class NotifierTest extends TestCase {
 
 		$notification = $this->notification('appreciation', NotificationService::SUBJECT_UPCOMING);
 		$notification->expects($this->once())->method('setParsedMessage')->with('Remember to congratulate in time.')->willReturnSelf();
+		$this->notifier->prepare($notification, 'en');
+	}
+
+	public function testYearlyGiftHasADueDateAndAHint(): void {
+		$this->eventMapper->method('find')->willReturn($this->event(Event::TYPE_GIFT));
+		$this->recipients->method('roleOf')->willReturn(RecipientService::ROLE_RESPONSIBLE);
+
+		$notification = $this->notification('appreciation', NotificationService::SUBJECT_UPCOMING);
+		$notification->expects($this->once())->method('setParsedSubject')->with('Yearly gift for Anna Muster (Treasurer) due by October 30, 2026')->willReturnSelf();
+		$notification->expects($this->once())->method('setParsedMessage')->with('Remember to present the gift in time.')->willReturnSelf();
+		$this->notifier->prepare($notification, 'en');
+	}
+
+	public function testPresentedGiftRemovesTheNotification(): void {
+		$this->eventMapper->method('find')->willReturn($this->event(Event::TYPE_GIFT, 1000));
+		$this->recipients->method('roleOf')->willReturn(RecipientService::ROLE_RESPONSIBLE);
+		$this->expectException(AlreadyProcessedException::class);
+		$this->notifier->prepare($this->notification('appreciation', NotificationService::SUBJECT_UPCOMING), 'en');
+	}
+
+	public function testGreetedBirthdayKeepsTheNotification(): void {
+		$this->eventMapper->method('find')->willReturn($this->event(Event::TYPE_BIRTHDAY, 1000));
+		$this->recipients->method('roleOf')->willReturn(RecipientService::ROLE_INTERESTED);
+
+		$notification = $this->notification('appreciation', NotificationService::SUBJECT_UPCOMING);
+		$notification->expects($this->once())->method('setParsedSubject')->willReturnSelf();
 		$this->notifier->prepare($notification, 'en');
 	}
 
@@ -101,11 +127,12 @@ final class NotifierTest extends TestCase {
 		return $notification;
 	}
 
-	private function event(): Event {
+	private function event(string $type = Event::TYPE_BIRTHDAY, ?int $greetedAt = null): Event {
 		$event = new Event();
 		$event->setId(7);
-		$event->setType(Event::TYPE_BIRTHDAY);
+		$event->setType($type);
 		$event->setEventDate(Dates::parse('2026-10-30') ?? throw new \LogicException());
+		$event->setGreetedAt($greetedAt);
 		return $event;
 	}
 }

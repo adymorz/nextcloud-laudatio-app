@@ -16,14 +16,18 @@ use OCA\Appreciation\Db\Slice;
 use OCA\Appreciation\Model\PlannedEvent;
 
 /**
- * Calculates which birthday and jubilee events a person should have within a
- * date window. Pure logic, no database access.
+ * Calculates which events a person should have within a date window. Pure
+ * logic, no database access.
  *
  * - Birthdays: only on days the person holds at least one active time slice,
  *   i.e. while they belong to the organization.
  * - Jubilees: per continuous service period in a function, on the
  *   anniversaries of its start that are in the jubilee years. Generated while
  *   the period is open or if it ended on or after the jubilee date.
+ * - Yearly gifts: one per function with a yearly gift and calendar year in
+ *   which the person holds it on at least one day, for every year the window
+ *   touches (also days before it). Due at the end of the year, or on the last
+ *   day in the function if the person leaves it during the year.
  */
 class EventCalculator {
 	public function __construct(
@@ -34,6 +38,7 @@ class EventCalculator {
 	/**
 	 * @param list<Slice> $slices all slices of the person
 	 * @param array<int, list<int>> $jubileeYearsByFunction jubilee years per function ID
+	 * @param list<int> $giftFunctionIds IDs of the functions with a yearly gift
 	 * @return list<PlannedEvent> ordered by date
 	 */
 	public function calculate(
@@ -44,6 +49,7 @@ class EventCalculator {
 		DateTimeImmutable $to,
 		bool $withBirthdays,
 		bool $withJubilees,
+		array $giftFunctionIds = [],
 	): array {
 		$events = [];
 		if ($withBirthdays) {
@@ -51,6 +57,9 @@ class EventCalculator {
 		}
 		if ($withJubilees) {
 			array_push($events, ...$this->jubilees($person, $slices, $jubileeYearsByFunction, $from, $to));
+		}
+		if ($giftFunctionIds !== []) {
+			array_push($events, ...$this->gifts($person, $slices, $giftFunctionIds, $from, $to));
 		}
 		usort($events, static fn (PlannedEvent $a, PlannedEvent $b): int => [Dates::format($a->date), $a->uid] <=> [Dates::format($b->date), $b->uid]);
 		return $events;
@@ -112,6 +121,33 @@ class EventCalculator {
 			}
 		}
 		return $events;
+	}
+
+	/**
+	 * @param list<Slice> $slices
+	 * @param list<int> $giftFunctionIds
+	 * @return list<PlannedEvent>
+	 */
+	private function gifts(Person $person, array $slices, array $giftFunctionIds, DateTimeImmutable $from, DateTimeImmutable $to): array {
+		$lastYear = (int)$to->format('Y');
+		/** @var array<string, PlannedEvent> $events by UID */
+		$events = [];
+		foreach ($this->periodCalculator->periods($slices) as $period) {
+			if (!in_array($period->functionId, $giftFunctionIds, true)) {
+				continue;
+			}
+			$endYear = $period->end === null ? $lastYear : min($lastYear, (int)$period->end->format('Y'));
+			for ($year = max((int)$from->format('Y'), (int)$period->start->format('Y')); $year <= $endYear; $year++) {
+				$due = $period->end !== null && (int)$period->end->format('Y') === $year ? $period->end : Dates::yearEnd($year);
+				$uid = sprintf('appreciation-gift-%d-%d-%d', $person->getId(), $period->functionId, $year);
+				// Several periods in the same function and year: one gift, due after the last one
+				if (isset($events[$uid]) && Dates::compare($events[$uid]->date, $due) >= 0) {
+					continue;
+				}
+				$events[$uid] = new PlannedEvent($uid, Event::TYPE_GIFT, $person->getId(), $period->functionId, $due, $year);
+			}
+		}
+		return array_values($events);
 	}
 
 	private function inWindow(DateTimeImmutable $date, DateTimeImmutable $from, DateTimeImmutable $to): bool {

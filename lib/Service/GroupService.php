@@ -187,40 +187,57 @@ class GroupService {
 	/**
 	 * @throws NotFoundException|ValidationException
 	 */
-	public function createFunction(?string $actor, int $groupId, string $name): OrgFunction {
+	/**
+	 * @param bool $yearlyGift whether the holders get one gift per calendar year
+	 * @throws NotFoundException|ValidationException
+	 */
+	public function createFunction(?string $actor, int $groupId, string $name, bool $yearlyGift = false): OrgFunction {
 		$this->get($groupId);
 		$function = new OrgFunction();
 		$function->setGroupId($groupId);
 		$function->setName($this->validateName($name));
+		$function->setYearlyGift($yearlyGift);
 		$now = $this->clock->time();
 		$function->setCreatedAt($now);
 		$function->setUpdatedAt($now);
 
 		$this->atomic(function () use ($actor, $function): void {
 			$this->functionMapper->insert($function);
-			$this->audit->log($actor, AuditEntry::ACTION_CREATE, AuditService::ENTITY_FUNCTION, $function->getId(), ['group_id', 'name']);
+			$this->audit->log($actor, AuditEntry::ACTION_CREATE, AuditService::ENTITY_FUNCTION, $function->getId(), ['group_id', 'name', 'yearly_gift']);
 		}, $this->db);
+		// A new function has no time slices yet, so no events
 		$this->afterChange(false);
 		return $function;
 	}
 
 	/**
+	 * @param bool $yearlyGift whether the holders get one gift per calendar year
 	 * @throws NotFoundException|ValidationException
 	 */
-	public function updateFunction(?string $actor, int $id, string $name): OrgFunction {
+	public function updateFunction(?string $actor, int $id, string $name, bool $yearlyGift): OrgFunction {
 		$function = $this->getFunction($id);
 		$name = $this->validateName($name);
-		if ($function->getName() === $name) {
+
+		$changed = [];
+		if ($function->getName() !== $name) {
+			$function->setName($name);
+			$changed[] = 'name';
+		}
+		$giftChanged = $function->isYearlyGift() !== $yearlyGift;
+		if ($giftChanged) {
+			$function->setYearlyGift($yearlyGift);
+			$changed[] = 'yearly_gift';
+		}
+		if ($changed === []) {
 			return $function;
 		}
-		$function->setName($name);
 		$function->setUpdatedAt($this->clock->time());
 
-		$this->atomic(function () use ($actor, $function): void {
+		$this->atomic(function () use ($actor, $function, $changed): void {
 			$this->functionMapper->update($function);
-			$this->audit->log($actor, AuditEntry::ACTION_UPDATE, AuditService::ENTITY_FUNCTION, $function->getId(), ['name']);
+			$this->audit->log($actor, AuditEntry::ACTION_UPDATE, AuditService::ENTITY_FUNCTION, $function->getId(), $changed);
 		}, $this->db);
-		$this->afterChange(false);
+		$this->afterChange($giftChanged);
 		return $function;
 	}
 
@@ -292,10 +309,14 @@ class GroupService {
 		return $a === $b;
 	}
 
-	private function afterChange(bool $jubileeYearsChanged): void {
+	/**
+	 * @param bool $resync whether the events of all persons must be recalculated
+	 *                     (jubilee years or yearly gift changed)
+	 */
+	private function afterChange(bool $resync): void {
 		$this->recipients->reset();
 		$this->access->clearCache();
-		if ($jubileeYearsChanged) {
+		if ($resync) {
 			$this->eventService->syncAll();
 		}
 	}

@@ -47,6 +47,7 @@ class FunctionController extends BaseOCSController {
 	 *
 	 * @param int $groupId ID of the group
 	 * @param string $name Name of the function, e.g. "Treasurer"
+	 * @param bool $yearlyGift Whether the holders get one gift per calendar year
 	 * @return DataResponse<Http::STATUS_CREATED, AppreciationFunction, array{}>
 	 * @throws OCSBadRequestException Invalid name
 	 * @throws OCSForbiddenException Not a manager
@@ -56,20 +57,24 @@ class FunctionController extends BaseOCSController {
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'POST', url: '/api/v1/groups/{groupId}/functions', requirements: ['groupId' => '\d+'])]
-	public function create(int $groupId, string $name): DataResponse {
+	public function create(int $groupId, string $name, bool $yearlyGift = false): DataResponse {
 		$userId = $this->currentUserId();
-		$function = $this->call(function () use ($userId, $groupId, $name): OrgFunction {
+		$function = $this->call(function () use ($userId, $groupId, $name, $yearlyGift): OrgFunction {
 			$this->access->requireManager($userId);
-			return $this->groups->createFunction($userId, $groupId, $name);
+			return $this->groups->createFunction($userId, $groupId, $name, $yearlyGift);
 		});
 		return new DataResponse($this->presenter->function($function), Http::STATUS_CREATED);
 	}
 
 	/**
-	 * Rename a function
+	 * Update a function
+	 *
+	 * Changing the yearly gift recalculates the gifts of all holders: switching
+	 * it off removes the gifts of the current year, also presented ones.
 	 *
 	 * @param int $id ID of the function
 	 * @param string $name Name of the function
+	 * @param bool $yearlyGift Whether the holders get one gift per calendar year
 	 * @return DataResponse<Http::STATUS_OK, AppreciationFunction, array{}>
 	 * @throws OCSBadRequestException Invalid name
 	 * @throws OCSForbiddenException Not a manager
@@ -79,11 +84,11 @@ class FunctionController extends BaseOCSController {
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'PUT', url: '/api/v1/functions/{id}', requirements: ['id' => '\d+'])]
-	public function update(int $id, string $name): DataResponse {
+	public function update(int $id, string $name, bool $yearlyGift): DataResponse {
 		$userId = $this->currentUserId();
-		$function = $this->call(function () use ($userId, $id, $name): OrgFunction {
+		$function = $this->call(function () use ($userId, $id, $name, $yearlyGift): OrgFunction {
 			$this->access->requireManager($userId);
-			return $this->groups->updateFunction($userId, $id, $name);
+			return $this->groups->updateFunction($userId, $id, $name, $yearlyGift);
 		});
 		return new DataResponse($this->presenter->function($function));
 	}

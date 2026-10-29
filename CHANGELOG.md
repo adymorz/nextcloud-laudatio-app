@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Read-only calendar per user in the Calendar app and via CalDAV
 - Reminder notifications and optional emails
 - Upcoming view with "greeted" checklist
+- Yearly gift per function: one open item per holder and calendar year, with reminder and "presented" checklist
 - Audit log of master data changes
 - Admin settings and personal email setting
 - Link to the gift regulations (external page or internal link of a Nextcloud file) in the app navigation

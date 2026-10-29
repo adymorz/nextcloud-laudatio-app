@@ -21,7 +21,8 @@ use OCA\Appreciation\Db\SliceMapper;
 /**
  * Determines who receives an event and in which role.
  *
- * - Jubilee: the responsible and interested users of the function's group.
+ * - Jubilee and yearly gift: the responsible and interested users of the
+ *   function's group.
  * - Birthday: those of all groups the person holds an active slice in on the
  *   day of the birthday.
  *
@@ -82,7 +83,7 @@ class RecipientService {
 	 */
 	public function groupIdsFor(Event $event): array {
 		$functionId = $event->getFunctionId();
-		if ($event->getType() === Event::TYPE_JUBILEE && $functionId !== null) {
+		if (in_array($event->getType(), [Event::TYPE_JUBILEE, Event::TYPE_GIFT], true) && $functionId !== null) {
 			$function = $this->functions()[$functionId] ?? null;
 			return $function === null ? [] : [$function->getGroupId()];
 		}

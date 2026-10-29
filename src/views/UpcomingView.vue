@@ -6,7 +6,7 @@
 <script setup lang="ts">
 import type { AppreciationEvent } from '../types'
 
-import { mdiCakeVariant, mdiTrophyAward } from '@mdi/js'
+import { mdiCakeVariant, mdiGift, mdiTrophyAward } from '@mdi/js'
 import { showError } from '@nextcloud/dialogs'
 import { n, t } from '@nextcloud/l10n'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
@@ -14,10 +14,9 @@ import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { api, errorMessage } from '../api'
 import { formatDate, relativeDay } from '../dates'
-import { me } from '../store'
 
 interface RangeOption {
 	label: string
@@ -28,6 +27,22 @@ const ranges: RangeOption[] = [30, 60, 90, 365].map((days) => ({ days, label: n(
 const range = ref<RangeOption>(ranges[1]!)
 const events = ref<AppreciationEvent[]>([])
 const loading = ref(true)
+
+const dated = computed(() => events.value.filter((event) => event.type !== 'gift'))
+
+// Yearly gifts per calendar year (the ordinal), open ones first
+const giftYears = computed(() => {
+	const byYear = new Map<number, AppreciationEvent[]>()
+	for (const event of events.value.filter((e) => e.type === 'gift')) {
+		byYear.set(event.ordinal, [...(byYear.get(event.ordinal) ?? []), event])
+	}
+	return [...byYear.entries()]
+		.sort(([a], [b]) => a - b)
+		.map(([year, gifts]) => ({
+			year,
+			gifts: gifts.sort((a, b) => Number(a.greeted) - Number(b.greeted) || a.date.localeCompare(b.date) || a.personName.localeCompare(b.personName)),
+		}))
+})
 
 /**
  * Loads the events of the selected range.
@@ -82,32 +97,72 @@ watch(range, load)
 				<NcIconSvgWrapper :path="mdiCakeVariant" />
 			</template>
 		</NcEmptyContent>
-		<ul v-else class="events">
-			<li
-				v-for="event in events"
-				:key="event.id"
-				class="event"
-				:class="{ 'event--info': event.role === 'interested', 'event--greeted': event.greeted }">
-				<NcIconSvgWrapper class="event__icon" :path="event.type === 'jubilee' ? mdiTrophyAward : mdiCakeVariant" />
-				<div class="event__text">
-					<RouterLink class="event__title" :to="{ name: 'person', params: { id: event.personId } }">
-						{{ event.title }}
-					</RouterLink>
-					<span class="event__date">
-						{{ formatDate(event.date) }} · {{ relativeDay(event.date) }}
-						<template v-if="event.greeted && event.greetedBy">
-							· {{ t('appreciation', 'greeted by {name}', { name: event.greetedBy.displayName }) }}
-						</template>
-					</span>
-				</div>
-				<NcCheckboxRadioSwitch
-					v-if="me.greetingReminder && event.canGreet"
-					:model-value="event.greeted"
-					@update:model-value="setGreeted(event, $event)">
-					{{ t('appreciation', 'Greeted') }}
-				</NcCheckboxRadioSwitch>
-			</li>
-		</ul>
+		<template v-else>
+			<section v-for="giftYear in giftYears" :key="giftYear.year" class="events-section">
+				<h3>{{ t('appreciation', 'Yearly gifts {year}', { year: giftYear.year }) }}</h3>
+				<ul class="events">
+					<li
+						v-for="event in giftYear.gifts"
+						:key="event.id"
+						class="event"
+						:class="{ 'event--info': event.role === 'interested', 'event--greeted': event.greeted }">
+						<NcIconSvgWrapper class="event__icon" :path="mdiGift" />
+						<div class="event__text">
+							<RouterLink class="event__title" :to="{ name: 'person', params: { id: event.personId } }">
+								{{ event.title }}
+							</RouterLink>
+							<span class="event__date">
+								{{ t('appreciation', 'due {date}', { date: formatDate(event.date) }) }} · {{ relativeDay(event.date) }}
+								<template v-if="event.greeted && event.greetedBy">
+									· {{ t('appreciation', 'presented by {name}', { name: event.greetedBy.displayName }) }}
+								</template>
+							</span>
+						</div>
+						<NcCheckboxRadioSwitch
+							v-if="event.canGreet"
+							:model-value="event.greeted"
+							@update:model-value="setGreeted(event, $event)">
+							{{ t('appreciation', 'Presented') }}
+						</NcCheckboxRadioSwitch>
+					</li>
+				</ul>
+			</section>
+
+			<section class="events-section">
+				<h3 v-if="giftYears.length > 0">
+					{{ t('appreciation', 'Birthdays and anniversaries') }}
+				</h3>
+				<p v-if="dated.length === 0" class="muted">
+					{{ t('appreciation', 'There are no birthdays or anniversaries in your groups in this period.') }}
+				</p>
+				<ul v-else class="events">
+					<li
+						v-for="event in dated"
+						:key="event.id"
+						class="event"
+						:class="{ 'event--info': event.role === 'interested', 'event--greeted': event.greeted }">
+						<NcIconSvgWrapper class="event__icon" :path="event.type === 'jubilee' ? mdiTrophyAward : mdiCakeVariant" />
+						<div class="event__text">
+							<RouterLink class="event__title" :to="{ name: 'person', params: { id: event.personId } }">
+								{{ event.title }}
+							</RouterLink>
+							<span class="event__date">
+								{{ formatDate(event.date) }} · {{ relativeDay(event.date) }}
+								<template v-if="event.greeted && event.greetedBy">
+									· {{ t('appreciation', 'greeted by {name}', { name: event.greetedBy.displayName }) }}
+								</template>
+							</span>
+						</div>
+						<NcCheckboxRadioSwitch
+							v-if="event.canGreet"
+							:model-value="event.greeted"
+							@update:model-value="setGreeted(event, $event)">
+							{{ t('appreciation', 'Greeted') }}
+						</NcCheckboxRadioSwitch>
+					</li>
+				</ul>
+			</section>
+		</template>
 	</div>
 </template>
 
@@ -129,6 +184,14 @@ watch(range, load)
 
 .view__range {
 	min-width: 200px;
+}
+
+.events-section + .events-section {
+	margin-block-start: calc(var(--default-grid-baseline) * 6);
+}
+
+.muted {
+	color: var(--color-text-maxcontrast);
 }
 
 .events {

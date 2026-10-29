@@ -6,7 +6,7 @@
 <script setup lang="ts">
 import type { Group, OrgFunction } from '../types'
 
-import { mdiAccountGroup, mdiDelete, mdiPencil, mdiPlus } from '@mdi/js'
+import { mdiAccountGroup, mdiDelete, mdiGift, mdiPencil, mdiPlus } from '@mdi/js'
 import { showConfirmation, showError } from '@nextcloud/dialogs'
 import { t } from '@nextcloud/l10n'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
@@ -18,16 +18,17 @@ import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import NcUserBubble from '@nextcloud/vue/components/NcUserBubble'
 import { onMounted, ref } from 'vue'
 import { api, errorMessage } from '../api'
+import FunctionDialog from '../components/FunctionDialog.vue'
 import GroupDialog from '../components/GroupDialog.vue'
-import NameDialog from '../components/NameDialog.vue'
 import { me } from '../store'
 
 const groups = ref<Group[]>([])
 const loading = ref(true)
 const groupDialogOpen = ref(false)
 const editedGroup = ref<Group | null>(null)
-const nameDialogOpen = ref(false)
-const nameDialog = ref<{ title: string, value: string, save: (name: string) => Promise<unknown> }>({ title: '', value: '', save: async () => {} })
+const functionDialogOpen = ref(false)
+const functionGroup = ref<Group | null>(null)
+const editedFunction = ref<OrgFunction | null>(null)
 
 const roleLabels: Record<Group['role'], string> = {
 	manager: t('appreciation', 'Manager'),
@@ -73,27 +74,13 @@ async function deleteGroup(group: Group) {
 }
 
 /**
- * @param group The group
+ * @param group Group of the function
+ * @param fn Function to edit, null to add one
  */
-function addFunction(group: Group) {
-	nameDialog.value = {
-		title: t('appreciation', 'New function in {group}', { group: group.name }),
-		value: '',
-		save: (name) => api.createFunction(group.id, name),
-	}
-	nameDialogOpen.value = true
-}
-
-/**
- * @param fn The function
- */
-function renameFunction(fn: OrgFunction) {
-	nameDialog.value = {
-		title: t('appreciation', 'Rename function'),
-		value: fn.name,
-		save: (name) => api.updateFunction(fn.id, name),
-	}
-	nameDialogOpen.value = true
+function openFunction(group: Group, fn: OrgFunction | null) {
+	functionGroup.value = group
+	editedFunction.value = fn
+	functionDialogOpen.value = true
 }
 
 /**
@@ -158,7 +145,7 @@ onMounted(load)
 						</template>
 						{{ t('appreciation', 'Edit group') }}
 					</NcActionButton>
-					<NcActionButton close-after-click @click="addFunction(group)">
+					<NcActionButton close-after-click @click="openFunction(group, null)">
 						<template #icon>
 							<NcIconSvgWrapper :path="mdiPlus" />
 						</template>
@@ -200,12 +187,19 @@ onMounted(load)
 					<ul class="functions">
 						<li v-for="fn in group.functions" :key="fn.id" class="function">
 							{{ fn.name }}
+							<NcIconSvgWrapper
+								v-if="fn.yearlyGift"
+								class="function__gift"
+								:path="mdiGift"
+								:size="16"
+								:name="t('appreciation', 'One gift per year')"
+								:title="t('appreciation', 'One gift per year')" />
 							<NcActions v-if="me.isManager" :aria-label="t('appreciation', 'Actions for {name}', { name: fn.name })">
-								<NcActionButton close-after-click @click="renameFunction(fn)">
+								<NcActionButton close-after-click @click="openFunction(group, fn)">
 									<template #icon>
 										<NcIconSvgWrapper :path="mdiPencil" />
 									</template>
-									{{ t('appreciation', 'Rename') }}
+									{{ t('appreciation', 'Edit') }}
 								</NcActionButton>
 								<NcActionButton close-after-click @click="deleteFunction(fn)">
 									<template #icon>
@@ -221,12 +215,12 @@ onMounted(load)
 		</section>
 
 		<GroupDialog v-model:open="groupDialogOpen" :group="editedGroup" @saved="load" />
-		<NameDialog
-			v-model:open="nameDialogOpen"
-			:title="nameDialog.title"
-			:label="t('appreciation', 'Name of the function')"
-			:initial-value="nameDialog.value"
-			@submit="(name) => run(() => nameDialog.save(name))" />
+		<FunctionDialog
+			v-if="functionGroup"
+			v-model:open="functionDialogOpen"
+			:group="functionGroup"
+			:org-function="editedFunction"
+			@saved="load" />
 	</div>
 </template>
 
@@ -284,5 +278,9 @@ onMounted(load)
 	display: flex;
 	align-items: center;
 	gap: var(--default-grid-baseline);
+}
+
+.function__gift {
+	color: var(--color-primary-element);
 }
 </style>

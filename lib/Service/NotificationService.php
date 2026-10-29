@@ -22,8 +22,9 @@ use OCP\Notification\IManager as INotificationManager;
 use Psr\Log\LoggerInterface;
 
 /**
- * Sends one reminder per event and recipient when the event enters the lead
- * time: a Nextcloud notification and, if the user opted in, an email.
+ * Sends one reminder per event and recipient when the event (for yearly gifts:
+ * the due date) enters the lead time: a Nextcloud notification and, if the
+ * user opted in, an email. Gifts that are already presented get no reminder.
  * Notifications of past events are removed.
  */
 class NotificationService {
@@ -55,6 +56,10 @@ class NotificationService {
 		$until = Dates::addDays($today, $this->settings->getLeadTimeDays());
 		$sent = 0;
 		foreach ($this->eventMapper->findBetween($today, $until) as $event) {
+			if ($event->getType() === Event::TYPE_GIFT && $event->getGreetedAt() !== null) {
+				// Presented before the reminder was due
+				continue;
+			}
 			$alreadyNotified = $this->notifiedMapper->findUserIdsByEvent($event->getId());
 			foreach ($this->recipients->recipients($event) as $userId => $role) {
 				if (in_array($userId, $alreadyNotified, true) || !$this->userManager->userExists($userId)) {
@@ -115,9 +120,16 @@ class NotificationService {
 		$template->setSubject($title);
 		$template->addHeader();
 		$template->addHeading($title);
-		$template->addBodyText($l->t('Date: %s', [$date]));
-		if ($role === RecipientService::ROLE_RESPONSIBLE) {
-			$template->addBodyText($l->t('Remember to congratulate in time.'));
+		if ($event->getType() === Event::TYPE_GIFT) {
+			$template->addBodyText($l->t('Due date: %s', [$date]));
+			if ($role === RecipientService::ROLE_RESPONSIBLE) {
+				$template->addBodyText($l->t('Remember to present the gift in time.'));
+			}
+		} else {
+			$template->addBodyText($l->t('Date: %s', [$date]));
+			if ($role === RecipientService::ROLE_RESPONSIBLE) {
+				$template->addBodyText($l->t('Remember to congratulate in time.'));
+			}
 		}
 		$template->addBodyButton($l->t('Open Appreciation'), $this->urlGenerator->linkToRouteAbsolute(Application::APP_ID . '.page.index'));
 		$template->addFooter();

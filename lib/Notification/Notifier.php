@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Appreciation\Notification;
 
 use OCA\Appreciation\AppInfo\Application;
+use OCA\Appreciation\Db\Event;
 use OCA\Appreciation\Db\EventMapper;
 use OCA\Appreciation\Service\NotificationService;
 use OCA\Appreciation\Service\RecipientService;
@@ -61,7 +62,9 @@ class Notifier implements INotifier {
 			throw new AlreadyProcessedException();
 		}
 		$role = $this->recipients->roleOf($event, $notification->getUser());
-		if ($role === null) {
+		$isGift = $event->getType() === Event::TYPE_GIFT;
+		// A presented gift needs no reminder any more
+		if ($role === null || ($isGift && $event->getGreetedAt() !== null)) {
 			throw new AlreadyProcessedException();
 		}
 
@@ -69,12 +72,18 @@ class Notifier implements INotifier {
 		$title = $this->titles->build($event, $role, $languageCode);
 		$date = $this->dateFormatter->formatDate($event->getEventDate()->getTimestamp(), 'long', new \DateTimeZone('UTC'), $l);
 
-		// TRANSLATORS: e.g. "40th Birthday of Anna Muster on November 3, 2026"
-		$notification->setParsedSubject($l->t('%1$s on %2$s', [$title, $date]))
+		$subject = $isGift
+			// TRANSLATORS: e.g. "Yearly gift for Anna Muster (Treasurer) due by December 31, 2026"
+			? $l->t('%1$s due by %2$s', [$title, $date])
+			// TRANSLATORS: e.g. "40th Birthday of Anna Muster on November 3, 2026"
+			: $l->t('%1$s on %2$s', [$title, $date]);
+		$notification->setParsedSubject($subject)
 			->setLink($this->urlGenerator->linkToRouteAbsolute(Application::APP_ID . '.page.index'))
 			->setIcon($this->urlGenerator->getAbsoluteURL($this->urlGenerator->imagePath(Application::APP_ID, 'app-dark.svg')));
 		if ($role === RecipientService::ROLE_RESPONSIBLE) {
-			$notification->setParsedMessage($l->t('Remember to congratulate in time.'));
+			$notification->setParsedMessage($isGift
+				? $l->t('Remember to present the gift in time.')
+				: $l->t('Remember to congratulate in time.'));
 		}
 		return $notification;
 	}

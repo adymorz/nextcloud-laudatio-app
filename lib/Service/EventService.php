@@ -27,9 +27,11 @@ use Psr\Log\LoggerInterface;
 /**
  * Keeps the stored events in line with the master data.
  *
- * Events are generated for [today, today + WINDOW_DAYS]. Synchronizing inserts
- * missing events, updates changed ones (keeping the greeted state) and removes
- * future events that are no longer valid. Past events are kept as history.
+ * Events are generated for [today, today + WINDOW_DAYS], yearly gifts for the
+ * whole calendar years in it. Synchronizing inserts missing events, updates
+ * changed ones (keeping the greeted state) and removes future events and gifts
+ * of the current year that are no longer valid. Other past events are kept as
+ * history.
  */
 class EventService {
 	public const WINDOW_DAYS = 400;
@@ -55,8 +57,9 @@ class EventService {
 	public function syncAll(): array {
 		$totals = ['inserted' => 0, 'updated' => 0, 'deleted' => 0];
 		$yearsByFunction = $this->jubileeYearsByFunction();
+		$giftFunctionIds = $this->giftFunctionIds();
 		foreach ($this->personMapper->findAll() as $person) {
-			$result = $this->syncPerson($person->getId(), $yearsByFunction);
+			$result = $this->syncPerson($person->getId(), $yearsByFunction, $giftFunctionIds);
 			foreach ($totals as $key => $value) {
 				$totals[$key] = $value + $result[$key];
 			}
@@ -66,9 +69,10 @@ class EventService {
 
 	/**
 	 * @param array<int, list<int>>|null $yearsByFunction precomputed jubilee years per function
+	 * @param list<int>|null $giftFunctionIds precomputed IDs of the functions with a yearly gift
 	 * @return array{inserted: int, updated: int, deleted: int}
 	 */
-	public function syncPerson(int $personId, ?array $yearsByFunction = null): array {
+	public function syncPerson(int $personId, ?array $yearsByFunction = null, ?array $giftFunctionIds = null): array {
 		$result = ['inserted' => 0, 'updated' => 0, 'deleted' => 0];
 		try {
 			$person = $this->personMapper->find($personId);
@@ -86,11 +90,15 @@ class EventService {
 			$to,
 			$this->settings->isBirthdayEventsEnabled(),
 			$this->settings->isJubileeEventsEnabled(),
+			$giftFunctionIds ?? $this->giftFunctionIds(),
 		);
 
 		$existing = [];
-		foreach ($this->eventMapper->findByPerson($personId, $from) as $event) {
-			$existing[$event->getUid()] = $event;
+		foreach ($this->eventMapper->findByPerson($personId, Dates::yearStart((int)$from->format('Y'))) as $event) {
+			// Gifts are open items of the whole year, other past events are history
+			if ($event->getType() === Event::TYPE_GIFT || Dates::compare($event->getEventDate(), $from) >= 0) {
+				$existing[$event->getUid()] = $event;
+			}
 		}
 
 		foreach ($planned as $plannedEvent) {
@@ -165,6 +173,19 @@ class EventService {
 			$result[$function->getId()] = $yearsByGroup[$function->getGroupId()] ?? $global;
 		}
 		return $result;
+	}
+
+	/**
+	 * @return list<int> IDs of the functions whose holders get a yearly gift
+	 */
+	public function giftFunctionIds(): array {
+		$ids = [];
+		foreach ($this->functionMapper->findAll() as $function) {
+			if ($function->isYearlyGift()) {
+				$ids[] = $function->getId();
+			}
+		}
+		return $ids;
 	}
 
 	/**

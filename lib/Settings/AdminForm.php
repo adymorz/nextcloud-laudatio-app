@@ -71,7 +71,7 @@ class AdminForm implements IDeclarativeSettingsFormWithHandlers {
 				[
 					'id' => SettingsService::LEAD_TIME_DAYS,
 					'title' => $this->l10n->t('Reminder lead time (days)'),
-					'description' => $this->l10n->t('How many days before a birthday or jubilee the reminder is sent.'),
+					'description' => $this->l10n->t('How many days before a birthday, a jubilee or the due date of a yearly gift the reminder is sent.'),
 					'type' => DeclarativeSettingsTypes::NUMBER,
 					'default' => SettingsService::DEFAULT_LEAD_TIME_DAYS,
 				],

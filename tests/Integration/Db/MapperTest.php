@@ -130,6 +130,19 @@ final class MapperTest extends IntegrationTestCase {
 		$this->assertContains($event->getId(), $ids($this->events->findBetween($from, Dates::parse('2026-11-05'))));
 		$this->assertNotContains($event->getId(), $ids($this->events->findBetween($from, Dates::parse('2026-11-04'))));
 		$this->assertSame([$event->getId()], $ids($this->events->findByPerson($person->getId())));
+
+		$this->assertContains($event->getId(), $ids($this->events->findBetween($from, null, [Event::TYPE_BIRTHDAY, Event::TYPE_JUBILEE])));
+		$this->assertNotContains($event->getId(), $ids($this->events->findBetween($from, null, [Event::TYPE_GIFT])));
+		$this->assertNotContains($event->getId(), $ids($this->events->findAll([Event::TYPE_GIFT])));
+	}
+
+	public function testYearlyGiftFlagRoundTrip(): void {
+		$function = $this->createFunction($this->createGroup('responsible'));
+		$this->assertFalse($this->functions->find($function->getId())->isYearlyGift());
+
+		$function->setYearlyGift(true);
+		$this->functions->update($function);
+		$this->assertTrue($this->functions->find($function->getId())->isYearlyGift());
 	}
 
 	private function createPerson(string $dateOfBirth): Person {

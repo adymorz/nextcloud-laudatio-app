@@ -43,13 +43,16 @@ class EventController extends BaseOCSController {
 	 * List the upcoming events of the current user
 	 *
 	 * Responsible and interested users get the events of their groups,
-	 * managers all events. Titles are in the language of the user.
+	 * managers all events. Titles are in the language of the user. Birthdays
+	 * and jubilees of the period come first, followed by the yearly gifts of
+	 * every calendar year the period touches, including overdue ones of this
+	 * year.
 	 *
 	 * @param int $days Number of days from today, 1 to 400
 	 * @return DataResponse<Http::STATUS_OK, list<AppreciationEvent>, array{}>
 	 * @throws OCSForbiddenException No access to the app
 	 *
-	 * 200: Events returned, ordered by date
+	 * 200: Events returned, each part ordered by date
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'GET', url: '/api/v1/events')]
@@ -69,8 +72,11 @@ class EventController extends BaseOCSController {
 	/**
 	 * Mark an event as greeted or not greeted
 	 *
+	 * For yearly gifts this marks the gift as presented, also when the
+	 * "greeted" checklist is disabled.
+	 *
 	 * @param int $id ID of the event
-	 * @param bool $greeted Whether the person has been greeted
+	 * @param bool $greeted Whether the person has been greeted (gifts: the gift was presented)
 	 * @return DataResponse<Http::STATUS_OK, AppreciationEvent, array{}>
 	 * @throws OCSForbiddenException Only the responsible person and managers may do this
 	 * @throws OCSNotFoundException Event not found or not visible

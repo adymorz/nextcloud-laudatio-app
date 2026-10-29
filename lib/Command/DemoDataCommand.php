@@ -67,7 +67,7 @@ class DemoDataCommand extends Command {
 		$volunteers = $this->groups->create(null, self::VOLUNTEERS, 'bob', ['alice'], '1, 3, 5, 10');
 		$president = $this->groups->createFunction(null, $board->getId(), 'President');
 		$treasurer = $this->groups->createFunction(null, $board->getId(), 'Treasurer');
-		$helper = $this->groups->createFunction(null, $volunteers->getId(), 'Event helper');
+		$helper = $this->groups->createFunction(null, $volunteers->getId(), 'Event helper', yearlyGift: true);
 
 		// 40th birthday in 3 days, 10th anniversary as president in 10 days
 		$anna = $this->persons->create(null, new PersonInput(

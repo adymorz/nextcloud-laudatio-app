@@ -38,6 +38,11 @@ export interface SliceInput {
 	endDate: string | null
 }
 
+export interface FunctionInput {
+	name: string
+	yearlyGift: boolean
+}
+
 export interface GroupInput {
 	name: string
 	responsible: string

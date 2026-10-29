@@ -14,8 +14,10 @@ use OCP\AppFramework\Db\Entity;
 use OCP\DB\Types;
 
 /**
- * A generated birthday or jubilee. The ordinal is the age (birthdays) or the
- * number of years of service (jubilees).
+ * A generated birthday, jubilee or yearly gift. The ordinal is the age
+ * (birthdays), the number of years of service (jubilees) or the calendar year
+ * (gifts). For gifts, the event date is the due date and "greeted" means
+ * presented.
  *
  * @method string getUid()
  * @method void setUid(string $uid)
@@ -39,6 +41,7 @@ use OCP\DB\Types;
 class Event extends Entity {
 	public const TYPE_BIRTHDAY = 'birthday';
 	public const TYPE_JUBILEE = 'jubilee';
+	public const TYPE_GIFT = 'gift';
 
 	protected string $uid = '';
 	protected string $type = '';

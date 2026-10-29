@@ -57,6 +57,7 @@ class Presenter {
 		private AccessService $access,
 		private SettingsService $settings,
 		private EventService $eventService,
+		private UpcomingService $upcoming,
 		private TitleBuilder $titles,
 		private Clock $clock,
 	) {
@@ -94,6 +95,7 @@ class Presenter {
 			'id' => $function->getId(),
 			'groupId' => $function->getGroupId(),
 			'name' => $function->getName(),
+			'yearlyGift' => $function->isYearlyGift(),
 		];
 	}
 
@@ -191,7 +193,11 @@ class Presenter {
 		$language = $this->l10nFactory->getUserLanguage($this->userManager->get($viewer));
 		$functionId = $event->getFunctionId();
 		$greetedBy = $event->getGreetedBy();
-		$type = $event->getType() === Event::TYPE_JUBILEE ? 'jubilee' : 'birthday';
+		$type = match ($event->getType()) {
+			Event::TYPE_JUBILEE => 'jubilee',
+			Event::TYPE_GIFT => 'gift',
+			default => 'birthday',
+		};
 		return [
 			'id' => $event->getId(),
 			'type' => $type,
@@ -206,16 +212,8 @@ class Presenter {
 			'greeted' => $event->getGreetedAt() !== null,
 			'greetedAt' => $event->getGreetedAt(),
 			'greetedBy' => $greetedBy === null ? null : $this->user($greetedBy),
-			'canGreet' => $this->canGreet($role, $viewer),
+			'canGreet' => $this->upcoming->canMark($event, $role, $viewer),
 		];
-	}
-
-	/**
-	 * @param RecipientService::ROLE_*|null $role
-	 */
-	public function canGreet(?string $role, string $viewer): bool {
-		return $this->settings->isGreetingReminderEnabled()
-			&& ($role === RecipientService::ROLE_RESPONSIBLE || $this->access->isManager($viewer));
 	}
 
 	/**

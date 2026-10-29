@@ -13,9 +13,10 @@ Requires Nextcloud 34 or 35 (PHP 8.2 or newer). Available in English and German.
 
 - **Persons** with date of birth, address, phone numbers and notes, and their **functions** over time (e.g. "Treasurer" from 2021 to 2024) in **groups** (e.g. "Board").
 - **Birthdays and jubilees** are generated automatically for the next 400 days, for every person who currently holds a function.
-- **Calendar**: everybody involved in a group gets a read-only calendar "Birthdays & anniversaries" in the Calendar app and on CalDAV devices, with a reminder before each event.
+- **Yearly gifts**: functions can be marked "One gift per year", so the responsible person is reminded to present one gift per calendar year to everybody holding them.
+- **Calendar**: everybody involved in a group gets a read-only calendar "Birthdays & anniversaries" in the Calendar app and on CalDAV devices, with a reminder before each event (yearly gifts have no fixed day and are not in the calendar).
 - **Reminders**: a Nextcloud notification when an event comes within the lead time (default 14 days), optionally also by email.
-- **Upcoming** view with a "greeted" checklist for the responsible persons.
+- **Upcoming** view with a "greeted" checklist for the responsible persons, and the yearly gifts of the year with a "presented" checklist.
 - **Data sheet** per person to print (or save as PDF) and hand over, so the person can check, correct and complete their data. Notes are never printed.
 - **Audit log** of who created, changed or deleted master data.
 
@@ -24,7 +25,7 @@ Requires Nextcloud 34 or 35 (PHP 8.2 or newer). Available in English and German.
 | Role | Who | Can |
 | --- | --- | --- |
 | Manager | Nextcloud admins and members of the manager group (admin settings) | See and edit everything, see the audit log |
-| Responsible person | Exactly one Nextcloud user per group | See the current members of the group including date of birth, contact data and notes, print their data sheets, get their events, mark events as greeted |
+| Responsible person | Exactly one Nextcloud user per group | See the current members of the group including date of birth, contact data and notes, print their data sheets, get their events, mark events as greeted and yearly gifts as presented |
 | Interested person | Any number of Nextcloud users per group | See the current members of the group (name and functions) and get their events "(for information)" |
 | Everybody else | | No access; the app is not shown in the navigation |
 
@@ -36,6 +37,13 @@ Access is checked on the server for every request. Persons themselves need no Ne
 - A **jubilee** is counted per function from the start of the continuous service period: time slices that follow each other without a gap (e.g. a re-election) count as one period. It is generated in the jubilee years (global list, can be overridden per group) while the period is open, or if it ended on or after the jubilee date.
 - Birthdays and period starts on February 29 fall on February 28 in other years.
 - Titles follow the language of each user, e.g. "5th Anniversary for Anna Muster as Treasurer" or "40. Geburtstag von Anna Muster (zur Information)".
+
+### Yearly gifts
+
+- For a function marked "One gift per year", every person holding it on at least one day of a calendar year gets one **yearly gift** for that year, an open item for the function's group, e.g. "Yearly gift for Anna Muster (Treasurer)". Holding the function twice in the same year still gives one gift.
+- It is due at the end of the year, or on the last day in the function if the person leaves it during the year. The reminder comes when the due date is within the lead time, unless the gift is already presented.
+- The Upcoming view lists the gifts of every year in the selected period, including overdue ones of the current year. The responsible person and managers mark them as presented, also when the "greeted" checklist is turned off.
+- Gifts are generated for the current and the next calendar year. Switching the function's yearly gift off removes the gifts of the current year, including presented ones; those of past years stay.
 
 ### Settings
 

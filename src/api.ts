@@ -6,6 +6,7 @@
 import type {
 	AppreciationEvent,
 	AuditPage,
+	FunctionInput,
 	Group,
 	GroupInput,
 	Me,
@@ -72,8 +73,8 @@ export const api = {
 	updateGroup: (id: number, input: GroupInput) => put<Group>(`/groups/${id}`, input),
 	deleteGroup: (id: number) => del(`/groups/${id}`),
 
-	createFunction: (groupId: number, name: string) => post<OrgFunction>(`/groups/${groupId}/functions`, { name }),
-	updateFunction: (id: number, name: string) => put<OrgFunction>(`/functions/${id}`, { name }),
+	createFunction: (groupId: number, input: FunctionInput) => post<OrgFunction>(`/groups/${groupId}/functions`, input),
+	updateFunction: (id: number, input: FunctionInput) => put<OrgFunction>(`/functions/${id}`, input),
 	deleteFunction: (id: number) => del(`/functions/${id}`),
 
 	events: (days: number) => get<AppreciationEvent[]>('/events', { days }),
