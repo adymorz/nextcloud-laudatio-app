@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Appreciation\Command;
 
 use DateTimeImmutable;
+use OCA\Appreciation\Model\PersonInput;
 use OCA\Appreciation\Service\Clock;
 use OCA\Appreciation\Service\Dates;
 use OCA\Appreciation\Service\GroupService;
@@ -69,25 +70,36 @@ class DemoDataCommand extends Command {
 		$helper = $this->groups->createFunction(null, $volunteers->getId(), 'Event helper');
 
 		// 40th birthday in 3 days, 10th anniversary as president in 10 days
-		$anna = $this->persons->create(null, 'Anna', 'Muster', $this->ago($today, 3, 40), 'Prefers flowers over chocolate.');
+		$anna = $this->persons->create(null, new PersonInput(
+			'Anna',
+			'Muster',
+			$this->ago($today, 3, 40),
+			notes: 'Prefers flowers over chocolate.',
+			street: 'Bahnhofstrasse',
+			streetNumber: '12a',
+			postalCode: '8001',
+			city: 'Zürich',
+			country: 'Switzerland',
+			mobilePhone: '+41 79 123 45 67',
+		));
 		$this->persons->addSlice(null, $anna->getId(), $president->getId(), $this->ago($today, 10, 10), null);
 
 		// Re-elected treasurer: two back-to-back slices count as one period, 5th anniversary in 20 days
-		$beat = $this->persons->create(null, 'Beat', 'Beispiel', $this->ago($today, 30, 55), null);
+		$beat = $this->persons->create(null, new PersonInput('Beat', 'Beispiel', $this->ago($today, 30, 55)));
 		$reElection = Dates::anniversary(Dates::addDays($today, 20), -3);
 		$this->persons->addSlice(null, $beat->getId(), $treasurer->getId(), $this->ago($today, 20, 5), Dates::format(Dates::addDays($reElection, -1)));
 		$this->persons->addSlice(null, $beat->getId(), $treasurer->getId(), Dates::format($reElection), null);
 
 		// 28th birthday in 5 days, volunteer for 3 years in 45 days
-		$claudia = $this->persons->create(null, 'Claudia', 'Test', $this->ago($today, 5, 28), null);
+		$claudia = $this->persons->create(null, new PersonInput('Claudia', 'Test', $this->ago($today, 5, 28)));
 		$this->persons->addSlice(null, $claudia->getId(), $helper->getId(), $this->ago($today, 45, 3), null);
 
 		// Former treasurer: no events, only visible to managers
-		$dario = $this->persons->create(null, 'Dario', 'Former', $this->ago($today, 8, 61), null);
+		$dario = $this->persons->create(null, new PersonInput('Dario', 'Former', $this->ago($today, 8, 61)));
 		$this->persons->addSlice(null, $dario->getId(), $treasurer->getId(), '2015-01-01', Dates::format(Dates::addDays($today, -400)));
 
 		// Birthday in two months, outside the default lead time
-		$eva = $this->persons->create(null, 'Eva', 'Zukunft', $this->ago($today, 60, 33), null);
+		$eva = $this->persons->create(null, new PersonInput('Eva', 'Zukunft', $this->ago($today, 60, 33)));
 		$this->persons->addSlice(null, $eva->getId(), $helper->getId(), $this->ago($today, 100, 1), null);
 
 		$output->writeln('Created 2 groups, 3 functions and 5 persons.');

@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Appreciation\Controller;
 
 use OCA\Appreciation\Exception\NotFoundException;
+use OCA\Appreciation\Model\PersonInput;
 use OCA\Appreciation\ResponseDefinitions;
 use OCA\Appreciation\Service\AccessService;
 use OCA\Appreciation\Service\PersonService;
@@ -45,8 +46,8 @@ class PersonController extends BaseOCSController {
 	 * List the persons visible to the current user
 	 *
 	 * Managers see all persons, responsible and interested users the current
-	 * members of their groups. Date of birth and notes are only included when
-	 * the user may see them.
+	 * members of their groups. Date of birth, contact data and notes are only
+	 * included when the user may see them.
 	 *
 	 * @return DataResponse<Http::STATUS_OK, list<AppreciationPerson>, array{}>
 	 * @throws OCSForbiddenException No access to the app
@@ -99,6 +100,13 @@ class PersonController extends BaseOCSController {
 	 * @param string $lastName Last name
 	 * @param string $dateOfBirth Date of birth (YYYY-MM-DD)
 	 * @param string|null $notes Free text notes
+	 * @param string|null $street Street
+	 * @param string|null $streetNumber House number
+	 * @param string|null $postalCode ZIP code
+	 * @param string|null $city City
+	 * @param string|null $country Country
+	 * @param string|null $mobilePhone Mobile phone number
+	 * @param string|null $otherPhone Additional phone number
 	 * @return DataResponse<Http::STATUS_CREATED, AppreciationPersonDetail, array{}>
 	 * @throws OCSBadRequestException Invalid input
 	 * @throws OCSForbiddenException Not a manager
@@ -107,11 +115,24 @@ class PersonController extends BaseOCSController {
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'POST', url: '/api/v1/persons')]
-	public function create(string $firstName, string $lastName, string $dateOfBirth, ?string $notes = null): DataResponse {
+	public function create(
+		string $firstName,
+		string $lastName,
+		string $dateOfBirth,
+		?string $notes = null,
+		?string $street = null,
+		?string $streetNumber = null,
+		?string $postalCode = null,
+		?string $city = null,
+		?string $country = null,
+		?string $mobilePhone = null,
+		?string $otherPhone = null,
+	): DataResponse {
 		$userId = $this->currentUserId();
-		$person = $this->call(function () use ($userId, $firstName, $lastName, $dateOfBirth, $notes) {
+		$input = new PersonInput($firstName, $lastName, $dateOfBirth, $notes, $street, $streetNumber, $postalCode, $city, $country, $mobilePhone, $otherPhone);
+		$person = $this->call(function () use ($userId, $input) {
 			$this->access->requireManager($userId);
-			return $this->persons->create($userId, $firstName, $lastName, $dateOfBirth, $notes);
+			return $this->persons->create($userId, $input);
 		});
 		return new DataResponse($this->presenter->personDetail($person, [], $userId), Http::STATUS_CREATED);
 	}
@@ -119,11 +140,20 @@ class PersonController extends BaseOCSController {
 	/**
 	 * Update a person
 	 *
+	 * All fields are replaced: optional fields that are left out are cleared.
+	 *
 	 * @param int $id ID of the person
 	 * @param string $firstName First name
 	 * @param string $lastName Last name
 	 * @param string $dateOfBirth Date of birth (YYYY-MM-DD)
 	 * @param string|null $notes Free text notes
+	 * @param string|null $street Street
+	 * @param string|null $streetNumber House number
+	 * @param string|null $postalCode ZIP code
+	 * @param string|null $city City
+	 * @param string|null $country Country
+	 * @param string|null $mobilePhone Mobile phone number
+	 * @param string|null $otherPhone Additional phone number
 	 * @return DataResponse<Http::STATUS_OK, AppreciationPersonDetail, array{}>
 	 * @throws OCSBadRequestException Invalid input
 	 * @throws OCSForbiddenException Not a manager
@@ -133,11 +163,25 @@ class PersonController extends BaseOCSController {
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'PUT', url: '/api/v1/persons/{id}', requirements: ['id' => '\d+'])]
-	public function update(int $id, string $firstName, string $lastName, string $dateOfBirth, ?string $notes = null): DataResponse {
+	public function update(
+		int $id,
+		string $firstName,
+		string $lastName,
+		string $dateOfBirth,
+		?string $notes = null,
+		?string $street = null,
+		?string $streetNumber = null,
+		?string $postalCode = null,
+		?string $city = null,
+		?string $country = null,
+		?string $mobilePhone = null,
+		?string $otherPhone = null,
+	): DataResponse {
 		$userId = $this->currentUserId();
-		$person = $this->call(function () use ($userId, $id, $firstName, $lastName, $dateOfBirth, $notes) {
+		$input = new PersonInput($firstName, $lastName, $dateOfBirth, $notes, $street, $streetNumber, $postalCode, $city, $country, $mobilePhone, $otherPhone);
+		$person = $this->call(function () use ($userId, $id, $input) {
 			$this->access->requireManager($userId);
-			return $this->persons->update($userId, $id, $firstName, $lastName, $dateOfBirth, $notes);
+			return $this->persons->update($userId, $id, $input);
 		});
 		return new DataResponse($this->presenter->personDetail($person, $this->persons->getSlices($id), $userId));
 	}

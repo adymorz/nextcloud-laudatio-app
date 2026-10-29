@@ -172,7 +172,7 @@ export interface paths {
         };
         /**
          * List the persons visible to the current user
-         * @description Managers see all persons, responsible and interested users the current members of their groups. Date of birth and notes are only included when the user may see them.
+         * @description Managers see all persons, responsible and interested users the current members of their groups. Date of birth, contact data and notes are only included when the user may see them.
          */
         get: operations["person-index"];
         put?: never;
@@ -193,7 +193,10 @@ export interface paths {
         };
         /** Get a person with the history of time slices */
         get: operations["person-show"];
-        /** Update a person */
+        /**
+         * Update a person
+         * @description All fields are replaced: optional fields that are left out are cleared.
+         */
         put: operations["person-update"];
         post?: never;
         /** Delete a person with all time slices and events */
@@ -330,6 +333,13 @@ export interface components {
             displayName: string;
             dateOfBirth: string | null;
             notes: string | null;
+            street: string | null;
+            streetNumber: string | null;
+            postalCode: string | null;
+            city: string | null;
+            country: string | null;
+            mobilePhone: string | null;
+            otherPhone: string | null;
             sensitiveVisible: boolean;
             currentFunctions: components["schemas"]["Slice"][];
         };
@@ -341,6 +351,13 @@ export interface components {
             displayName: string;
             dateOfBirth: string | null;
             notes: string | null;
+            street: string | null;
+            streetNumber: string | null;
+            postalCode: string | null;
+            city: string | null;
+            country: string | null;
+            mobilePhone: string | null;
+            otherPhone: string | null;
             sensitiveVisible: boolean;
             currentFunctions: components["schemas"]["Slice"][];
             slices: components["schemas"]["Slice"][];
@@ -1384,6 +1401,41 @@ export interface operations {
                      * @default null
                      */
                     notes?: string | null;
+                    /**
+                     * @description Street
+                     * @default null
+                     */
+                    street?: string | null;
+                    /**
+                     * @description House number
+                     * @default null
+                     */
+                    streetNumber?: string | null;
+                    /**
+                     * @description ZIP code
+                     * @default null
+                     */
+                    postalCode?: string | null;
+                    /**
+                     * @description City
+                     * @default null
+                     */
+                    city?: string | null;
+                    /**
+                     * @description Country
+                     * @default null
+                     */
+                    country?: string | null;
+                    /**
+                     * @description Mobile phone number
+                     * @default null
+                     */
+                    mobilePhone?: string | null;
+                    /**
+                     * @description Additional phone number
+                     * @default null
+                     */
+                    otherPhone?: string | null;
                 };
             };
         };
@@ -1546,6 +1598,41 @@ export interface operations {
                      * @default null
                      */
                     notes?: string | null;
+                    /**
+                     * @description Street
+                     * @default null
+                     */
+                    street?: string | null;
+                    /**
+                     * @description House number
+                     * @default null
+                     */
+                    streetNumber?: string | null;
+                    /**
+                     * @description ZIP code
+                     * @default null
+                     */
+                    postalCode?: string | null;
+                    /**
+                     * @description City
+                     * @default null
+                     */
+                    city?: string | null;
+                    /**
+                     * @description Country
+                     * @default null
+                     */
+                    country?: string | null;
+                    /**
+                     * @description Mobile phone number
+                     * @default null
+                     */
+                    mobilePhone?: string | null;
+                    /**
+                     * @description Additional phone number
+                     * @default null
+                     */
+                    otherPhone?: string | null;
                 };
             };
         };

@@ -340,6 +340,13 @@
                     "displayName",
                     "dateOfBirth",
                     "notes",
+                    "street",
+                    "streetNumber",
+                    "postalCode",
+                    "city",
+                    "country",
+                    "mobilePhone",
+                    "otherPhone",
                     "sensitiveVisible",
                     "currentFunctions"
                 ],
@@ -365,6 +372,34 @@
                         "type": "string",
                         "nullable": true
                     },
+                    "street": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "streetNumber": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "postalCode": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "city": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "country": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "mobilePhone": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "otherPhone": {
+                        "type": "string",
+                        "nullable": true
+                    },
                     "sensitiveVisible": {
                         "type": "boolean"
                     },
@@ -385,6 +420,13 @@
                     "displayName",
                     "dateOfBirth",
                     "notes",
+                    "street",
+                    "streetNumber",
+                    "postalCode",
+                    "city",
+                    "country",
+                    "mobilePhone",
+                    "otherPhone",
                     "sensitiveVisible",
                     "currentFunctions",
                     "slices"
@@ -408,6 +450,34 @@
                         "nullable": true
                     },
                     "notes": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "street": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "streetNumber": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "postalCode": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "city": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "country": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "mobilePhone": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "otherPhone": {
                         "type": "string",
                         "nullable": true
                     },
@@ -2477,7 +2547,7 @@
             "get": {
                 "operationId": "person-index",
                 "summary": "List the persons visible to the current user",
-                "description": "Managers see all persons, responsible and interested users the current members of their groups. Date of birth and notes are only included when the user may see them.",
+                "description": "Managers see all persons, responsible and interested users the current members of their groups. Date of birth, contact data and notes are only included when the user may see them.",
                 "tags": [
                     "person"
                 ],
@@ -2636,6 +2706,48 @@
                                         "nullable": true,
                                         "default": null,
                                         "description": "Free text notes"
+                                    },
+                                    "street": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Street"
+                                    },
+                                    "streetNumber": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "House number"
+                                    },
+                                    "postalCode": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "ZIP code"
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "City"
+                                    },
+                                    "country": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Country"
+                                    },
+                                    "mobilePhone": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Mobile phone number"
+                                    },
+                                    "otherPhone": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Additional phone number"
                                     }
                                 }
                             }
@@ -2929,6 +3041,7 @@
             "put": {
                 "operationId": "person-update",
                 "summary": "Update a person",
+                "description": "All fields are replaced: optional fields that are left out are cleared.",
                 "tags": [
                     "person"
                 ],
@@ -2969,6 +3082,48 @@
                                         "nullable": true,
                                         "default": null,
                                         "description": "Free text notes"
+                                    },
+                                    "street": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Street"
+                                    },
+                                    "streetNumber": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "House number"
+                                    },
+                                    "postalCode": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "ZIP code"
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "City"
+                                    },
+                                    "country": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Country"
+                                    },
+                                    "mobilePhone": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Mobile phone number"
+                                    },
+                                    "otherPhone": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Additional phone number"
                                     }
                                 }
                             }

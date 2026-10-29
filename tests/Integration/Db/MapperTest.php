@@ -56,6 +56,21 @@ final class MapperTest extends IntegrationTestCase {
 		$this->assertNull($loadedSlice->getEndDate());
 	}
 
+	public function testContactDataRoundTrip(): void {
+		$person = $this->createPerson('1980-01-01');
+		$this->assertNull($this->persons->find($person->getId())->getStreet());
+
+		$person->setStreet('Bahnhofstrasse');
+		$person->setPostalCode('8001');
+		$person->setMobilePhone('+41 79 123 45 67');
+		$this->persons->update($person);
+		$loaded = $this->persons->find($person->getId());
+		$this->assertSame('Bahnhofstrasse', $loaded->getStreet());
+		$this->assertSame('8001', $loaded->getPostalCode());
+		$this->assertSame('+41 79 123 45 67', $loaded->getMobilePhone());
+		$this->assertNull($loaded->getOtherPhone());
+	}
+
 	public function testCurrentMembersOfGroups(): void {
 		$responsible = $this->uniqueName('resp');
 		$group = $this->createGroup($responsible);

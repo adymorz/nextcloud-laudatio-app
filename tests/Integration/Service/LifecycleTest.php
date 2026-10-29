@@ -15,6 +15,7 @@ use OCA\Appreciation\Db\Event;
 use OCA\Appreciation\Db\EventMapper;
 use OCA\Appreciation\Exception\ConflictException;
 use OCA\Appreciation\Exception\ValidationException;
+use OCA\Appreciation\Model\PersonInput;
 use OCA\Appreciation\Service\Clock;
 use OCA\Appreciation\Service\Dates;
 use OCA\Appreciation\Service\GroupService;
@@ -48,9 +49,11 @@ final class LifecycleTest extends IntegrationTestCase {
 		$function = $this->groups->createFunction('admin', $group->getId(), 'Tester');
 		$this->onTearDown(fn () => $this->groups->deleteFunction('admin', $function->getId()));
 
-		$person = $this->persons->create('admin', 'Test', $this->uniqueName('Person'), $in(10, 30), ' notes ');
+		$person = $this->persons->create('admin', new PersonInput('Test', $this->uniqueName('Person'), $in(10, 30), ' notes ', street: ' Main street ', mobilePhone: ''));
 		$this->onTearDown(fn () => $this->persons->delete('admin', $person->getId()));
 		$this->assertSame('notes', $person->getNotes());
+		$this->assertSame('Main street', $person->getStreet());
+		$this->assertNull($person->getMobilePhone());
 
 		// No slice yet: not a member, so no birthday
 		$this->assertSame([], $this->events->findByPerson($person->getId()));
@@ -71,7 +74,7 @@ final class LifecycleTest extends IntegrationTestCase {
 		}
 
 		// Moving the birthday updates the existing events
-		$this->persons->update('admin', $person->getId(), 'Test', $person->getLastName(), $in(12, 30), null);
+		$this->persons->update('admin', $person->getId(), new PersonInput('Test', $person->getLastName(), $in(12, 30), street: 'Main street', city: 'Bern'));
 		$this->assertSame([
 			['birthday', $in(12), 30],
 			['jubilee', $in(20), 2],
@@ -93,7 +96,7 @@ final class LifecycleTest extends IntegrationTestCase {
 		);
 		$this->assertSame(['delete', 'update', 'create'], array_values(array_map(static fn (AuditEntry $e): string => $e->getAction(), $audit)));
 		$update = array_values($audit)[1];
-		$this->assertSame(['date_of_birth', 'notes'], $update->getChangedFieldList());
+		$this->assertSame(['date_of_birth', 'notes', 'city'], $update->getChangedFieldList());
 	}
 
 	public function testValidation(): void {

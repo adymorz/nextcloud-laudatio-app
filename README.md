@@ -11,7 +11,7 @@ Requires Nextcloud 34 or 35 (PHP 8.2 or newer). Available in English and German.
 
 ## Features
 
-- **Persons** with date of birth and notes, and their **functions** over time (e.g. "Treasurer" from 2021 to 2024) in **groups** (e.g. "Board").
+- **Persons** with date of birth, address, phone numbers and notes, and their **functions** over time (e.g. "Treasurer" from 2021 to 2024) in **groups** (e.g. "Board").
 - **Birthdays and jubilees** are generated automatically for the next 400 days, for every person who currently holds a function.
 - **Calendar**: everybody involved in a group gets a read-only calendar "Birthdays & anniversaries" in the Calendar app and on CalDAV devices, with a reminder before each event.
 - **Reminders**: a Nextcloud notification when an event comes within the lead time (default 14 days), optionally also by email.
@@ -23,7 +23,7 @@ Requires Nextcloud 34 or 35 (PHP 8.2 or newer). Available in English and German.
 | Role | Who | Can |
 | --- | --- | --- |
 | Manager | Nextcloud admins and members of the manager group (admin settings) | See and edit everything, see the audit log |
-| Responsible person | Exactly one Nextcloud user per group | See the current members of the group including date of birth and notes, get their events, mark events as greeted |
+| Responsible person | Exactly one Nextcloud user per group | See the current members of the group including date of birth, contact data and notes, get their events, mark events as greeted |
 | Interested person | Any number of Nextcloud users per group | See the current members of the group (name and functions) and get their events "(for information)" |
 | Everybody else | | No access; the app is not shown in the navigation |
 

@@ -26,8 +26,8 @@ use OCP\L10N\IFactory;
 
 /**
  * Turns entities into API payloads and applies the visibility rules: date of
- * birth and notes only for viewers allowed to see them, and only slices of
- * groups the viewer can see.
+ * birth, contact data and notes only for viewers allowed to see them, and only
+ * slices of groups the viewer can see.
  *
  * @psalm-import-type AppreciationUser from ResponseDefinitions
  * @psalm-import-type AppreciationMe from ResponseDefinitions
@@ -160,6 +160,13 @@ class Presenter {
 			'displayName' => $person->getDisplayName(),
 			'dateOfBirth' => $sensitive ? Dates::format($person->getDateOfBirth()) : null,
 			'notes' => $sensitive ? $person->getNotes() : null,
+			'street' => $sensitive ? $person->getStreet() : null,
+			'streetNumber' => $sensitive ? $person->getStreetNumber() : null,
+			'postalCode' => $sensitive ? $person->getPostalCode() : null,
+			'city' => $sensitive ? $person->getCity() : null,
+			'country' => $sensitive ? $person->getCountry() : null,
+			'mobilePhone' => $sensitive ? $person->getMobilePhone() : null,
+			'otherPhone' => $sensitive ? $person->getOtherPhone() : null,
 			'sensitiveVisible' => $sensitive,
 			'currentFunctions' => array_map($this->slice(...), array_values($current)),
 		];

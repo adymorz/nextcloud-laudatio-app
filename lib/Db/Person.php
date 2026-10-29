@@ -22,6 +22,20 @@ use OCP\DB\Types;
  * @method void setDateOfBirth(DateTimeImmutable $dateOfBirth)
  * @method string|null getNotes()
  * @method void setNotes(?string $notes)
+ * @method string|null getStreet()
+ * @method void setStreet(?string $street)
+ * @method string|null getStreetNumber()
+ * @method void setStreetNumber(?string $streetNumber)
+ * @method string|null getPostalCode()
+ * @method void setPostalCode(?string $postalCode)
+ * @method string|null getCity()
+ * @method void setCity(?string $city)
+ * @method string|null getCountry()
+ * @method void setCountry(?string $country)
+ * @method string|null getMobilePhone()
+ * @method void setMobilePhone(?string $mobilePhone)
+ * @method string|null getOtherPhone()
+ * @method void setOtherPhone(?string $otherPhone)
  * @method int getCreatedAt()
  * @method void setCreatedAt(int $createdAt)
  * @method int getUpdatedAt()
@@ -32,6 +46,13 @@ class Person extends Entity {
 	protected string $lastName = '';
 	protected ?DateTimeImmutable $dateOfBirth = null;
 	protected ?string $notes = null;
+	protected ?string $street = null;
+	protected ?string $streetNumber = null;
+	protected ?string $postalCode = null;
+	protected ?string $city = null;
+	protected ?string $country = null;
+	protected ?string $mobilePhone = null;
+	protected ?string $otherPhone = null;
 	protected int $createdAt = 0;
 	protected int $updatedAt = 0;
 
@@ -40,6 +61,13 @@ class Person extends Entity {
 		$this->addType('lastName', Types::STRING);
 		$this->addType('dateOfBirth', Types::DATE_IMMUTABLE);
 		$this->addType('notes', Types::TEXT);
+		$this->addType('street', Types::STRING);
+		$this->addType('streetNumber', Types::STRING);
+		$this->addType('postalCode', Types::STRING);
+		$this->addType('city', Types::STRING);
+		$this->addType('country', Types::STRING);
+		$this->addType('mobilePhone', Types::STRING);
+		$this->addType('otherPhone', Types::STRING);
 		$this->addType('createdAt', Types::BIGINT);
 		$this->addType('updatedAt', Types::BIGINT);
 	}

@@ -38,6 +38,28 @@ const editedSlice = ref<Slice | null>(null)
 
 const slices = computed(() => [...(person.value?.slices ?? [])].sort((a, b) => b.startDate.localeCompare(a.startDate)))
 
+const addressLines = computed(() => {
+	const p = person.value
+	if (p === null) {
+		return []
+	}
+	return [[p.street, p.streetNumber], [p.postalCode, p.city], [p.country]]
+		.map((parts) => parts.filter((part) => part).join(' '))
+		.filter((line) => line !== '')
+})
+
+const phones = computed(() => [
+	{ label: t('appreciation', 'Mobile phone'), number: person.value?.mobilePhone },
+	{ label: t('appreciation', 'Additional phone number'), number: person.value?.otherPhone },
+].filter((phone): phone is { label: string, number: string } => !!phone.number))
+
+/**
+ * @param number Phone number as entered
+ */
+function telLink(number: string): string {
+	return 'tel:' + number.replace(/[^0-9+]/g, '')
+}
+
 /**
  * Loads the person (and, for managers, the groups for the slice dialog).
  */
@@ -158,6 +180,18 @@ watch(() => props.id, load, { immediate: true })
 					{{ formatDate(person.dateOfBirth) }}
 					<span class="muted">({{ n('appreciation', '%n year old', '%n years old', age(person.dateOfBirth)) }})</span>
 				</dd>
+				<template v-if="addressLines.length > 0">
+					<dt>{{ t('appreciation', 'Address') }}</dt>
+					<dd class="profile__address">
+						{{ addressLines.join('\n') }}
+					</dd>
+				</template>
+				<template v-for="phone in phones" :key="phone.label">
+					<dt>{{ phone.label }}</dt>
+					<dd>
+						<a class="profile__link" :href="telLink(phone.number)">{{ phone.number }}</a>
+					</dd>
+				</template>
 				<dt>{{ t('appreciation', 'Notes') }}</dt>
 				<dd class="profile__notes">
 					{{ person.notes ?? t('appreciation', 'No notes') }}
@@ -255,6 +289,14 @@ watch(() => props.id, load, { immediate: true })
 
 .profile__notes {
 	white-space: pre-wrap;
+}
+
+.profile__address {
+	white-space: pre-line;
+}
+
+.profile__link {
+	text-decoration: underline;
 }
 
 .timeline {
