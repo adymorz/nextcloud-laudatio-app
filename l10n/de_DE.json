@@ -124,6 +124,7 @@
 		"Responsible": "Verantwortlich",
 		"Responsible person": "Verantwortliche Person",
 		"Save": "Speichern",
+		"Saving removes this year's and future yearly gifts of everybody holding this function, including gifts already marked as presented. Gifts of past years are kept.": "Beim Speichern werden die Jahresgeschenke dieses und der folgenden Jahre aller Personen mit dieser Funktion entfernt, auch bereits als überreicht markierte. Geschenke vergangener Jahre bleiben erhalten.",
 		"Search by name, function or group": "Nach Name, Funktion oder Gruppe suchen",
 		"Send reminder emails by default (users can change this in the settings of the app)": "Erinnerungen standardmäßig per E-Mail senden (Benutzer können dies in den Einstellungen der App ändern)",
 		"Settings": "Einstellungen",

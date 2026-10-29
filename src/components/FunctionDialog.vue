@@ -11,6 +11,7 @@ import { t } from '@nextcloud/l10n'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
+import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
 import { computed, ref, watch } from 'vue'
 import { api, errorMessage } from '../api'
@@ -33,6 +34,8 @@ const yearlyGift = ref(false)
 const saving = ref(false)
 
 const valid = computed(() => name.value.trim() !== '')
+// Switching off deletes the gifts of the current and later years (see EventService)
+const switchingOff = computed(() => props.orgFunction?.yearlyGift === true && !yearlyGift.value)
 
 watch(open, (isOpen) => {
 	if (isOpen) {
@@ -77,6 +80,10 @@ async function save() {
 			<p class="form__hint">
 				{{ t('appreciation', 'The responsible person is reminded to present one gift per calendar year to everybody holding this function.') }}
 			</p>
+			<NcNoteCard
+				v-if="switchingOff"
+				type="warning"
+				:text="t('appreciation', 'Saving removes this year\'s and future yearly gifts of everybody holding this function, including gifts already marked as presented. Gifts of past years are kept.')" />
 			<button type="submit" hidden />
 		</form>
 		<template #actions>
