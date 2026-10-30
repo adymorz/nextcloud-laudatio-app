@@ -12,10 +12,11 @@
  *   ddev npm install --no-save puppeteer-core
  *
  * Scene: `ddev occ laudatio:demo-data` on an empty app, then rename the groups
- * without the "Demo: " prefix, set the display names "Alice Keller" and "Bob
- * Meier", create the Nextcloud group "Office" and choose it as manager group,
- * set a gift regulations link and a data sheet note in the admin settings, and
- * install the Calendar app. Build the frontend first (`ddev npm run build`).
+ * without the "Demo: " prefix, give Beat Beispiel an address, a mobile phone
+ * and notes, set the display names "Alice Keller" and "Bob Meier", create the
+ * Nextcloud group "Office" and choose it as manager group, set a gift
+ * regulations link and a data sheet note in the admin settings, and install the
+ * Calendar app. Build the frontend first (`ddev npm run build`).
  *
  * Usage: ddev exec node scripts/screenshots.mjs [base URL]
  */
@@ -81,7 +82,8 @@ const beat = persons.find((person) => person.lastName === 'Beispiel') ?? persons
 
 await shot(admin, '/apps/laudatio/persons', 'persons')
 await shot(admin, `/apps/laudatio/persons/${beat.id}`, 'person')
-await shot(admin, `/apps/laudatio/persons/${beat.id}/sheet`, 'sheet')
+// Tall enough for the function history below the personal data
+await shot(admin, `/apps/laudatio/persons/${beat.id}/sheet`, 'sheet', { height: 1200 })
 await shot(admin, '/apps/laudatio/groups', 'groups')
 // Only the Laudatio section: the other sections of the page are removed, so it starts at the top
 await shot(admin, '/settings/admin/groupware', 'settings', {
