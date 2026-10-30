@@ -25,6 +25,12 @@ use OCP\DB\Types;
  * @method void setStartDate(DateTimeImmutable $startDate)
  * @method DateTimeImmutable|null getEndDate()
  * @method void setEndDate(?DateTimeImmutable $endDate)
+ * @method string|null getStartDateSource()
+ * @method void setStartDateSource(?string $startDateSource)
+ * @method string|null getEndDateSource()
+ * @method void setEndDateSource(?string $endDateSource)
+ * @method string|null getNotes()
+ * @method void setNotes(?string $notes)
  * @method int getCreatedAt()
  * @method void setCreatedAt(int $createdAt)
  * @method int getUpdatedAt()
@@ -35,6 +41,9 @@ class Slice extends Entity {
 	protected int $functionId = 0;
 	protected ?DateTimeImmutable $startDate = null;
 	protected ?DateTimeImmutable $endDate = null;
+	protected ?string $startDateSource = null;
+	protected ?string $endDateSource = null;
+	protected ?string $notes = null;
 	protected int $createdAt = 0;
 	protected int $updatedAt = 0;
 
@@ -43,6 +52,9 @@ class Slice extends Entity {
 		$this->addType('functionId', Types::BIGINT);
 		$this->addType('startDate', Types::DATE_IMMUTABLE);
 		$this->addType('endDate', Types::DATE_IMMUTABLE);
+		$this->addType('startDateSource', Types::STRING);
+		$this->addType('endDateSource', Types::STRING);
+		$this->addType('notes', Types::TEXT);
 		$this->addType('createdAt', Types::BIGINT);
 		$this->addType('updatedAt', Types::BIGINT);
 	}

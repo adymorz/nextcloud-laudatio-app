@@ -16,6 +16,7 @@ import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { api, errorMessage, isNotFound } from '../api'
 import LoadError from '../components/LoadError.vue'
+import SliceDetails from '../components/SliceDetails.vue'
 import { formatDate, toIsoDate } from '../dates'
 import { me } from '../store'
 
@@ -29,7 +30,8 @@ const notFound = ref(false)
 const loadError = ref<string | null>(null)
 const printedOn = formatDate(toIsoDate(new Date()))
 
-// The sheet is handed to the person: the internal notes are deliberately left out
+// The sheet is handed to the person: the internal notes of the person are
+// deliberately left out, the notes of the terms are not
 const rows = computed(() => {
 	const p = person.value
 	if (p === null) {
@@ -49,8 +51,7 @@ const rows = computed(() => {
 	]
 })
 
-const functions = computed(() => [...(person.value?.currentFunctions ?? [])]
-	.sort((a, b) => a.groupName.localeCompare(b.groupName) || a.functionName.localeCompare(b.functionName)))
+const slices = computed(() => [...(person.value?.slices ?? [])].sort((a, b) => b.startDate.localeCompare(a.startDate)))
 
 /**
  * Loads the person.
@@ -145,25 +146,32 @@ watch(() => props.id, load, { immediate: true })
 				</tbody>
 			</table>
 
-			<h3>{{ t('laudatio', 'Current functions') }}</h3>
-			<table v-if="functions.length > 0" class="sheet__table">
+			<h3>{{ t('laudatio', 'Function history') }}</h3>
+			<table v-if="slices.length > 0" class="sheet__table">
 				<thead>
 					<tr>
 						<th>{{ t('laudatio', 'Function') }}</th>
 						<th>{{ t('laudatio', 'Group') }}</th>
-						<th>{{ t('laudatio', 'Start of current term') }}</th>
+						<th>{{ t('laudatio', 'Start date') }}</th>
+						<th>{{ t('laudatio', 'End date') }}</th>
 					</tr>
 				</thead>
-				<tbody>
-					<tr v-for="slice in functions" :key="slice.id">
+				<tbody v-for="slice in slices" :key="slice.id">
+					<tr>
 						<td>{{ slice.functionName }}</td>
 						<td>{{ slice.groupName }}</td>
 						<td>{{ formatDate(slice.startDate) }}</td>
+						<td>{{ slice.endDate ? formatDate(slice.endDate) : '' }}</td>
+					</tr>
+					<tr v-if="slice.startDateSource || slice.endDateSource || slice.notes">
+						<td colspan="4">
+							<SliceDetails :slice="slice" />
+						</td>
 					</tr>
 				</tbody>
 			</table>
 			<p v-else>
-				{{ t('laudatio', 'No current functions.') }}
+				{{ t('laudatio', 'No functions yet.') }}
 			</p>
 
 			<h3>{{ t('laudatio', 'Remarks') }}</h3>
@@ -229,6 +237,7 @@ watch(() => props.id, load, { immediate: true })
 	border-collapse: collapse;
 }
 
+.sheet__table tbody,
 .sheet__table tr {
 	break-inside: avoid;
 }

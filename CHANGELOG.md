@@ -15,8 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Persons, groups with responsible and interested users, functions and terms
+- Source of the start and end date and notes per term, visible like the notes of a person and printed on the data sheet
 - Address, mobile and additional phone number of persons, visible like date of birth and notes
-- Printable data sheet per person to check and complete their data, without notes, with an optional note of the organization (admin setting)
+- Printable data sheet per person to check and complete their data, with the function history, without the notes of the person, with an optional note of the organization (admin setting)
 - Access control for managers, responsible and interested users; interested users get birthdays without the age
 - Birthday and anniversary events with continuous service periods and per-group anniversary years
 - Read-only calendar per user in the Calendar app and via CalDAV

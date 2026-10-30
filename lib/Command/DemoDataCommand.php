@@ -11,6 +11,7 @@ namespace OCA\Laudatio\Command;
 
 use DateTimeImmutable;
 use OCA\Laudatio\Model\PersonInput;
+use OCA\Laudatio\Model\SliceInput;
 use OCA\Laudatio\Service\Clock;
 use OCA\Laudatio\Service\Dates;
 use OCA\Laudatio\Service\GroupService;
@@ -81,25 +82,30 @@ class DemoDataCommand extends Command {
 			country: 'Switzerland',
 			mobilePhone: '+41 79 123 45 67',
 		));
-		$this->persons->addSlice(null, $anna->getId(), $president->getId(), $this->ago($today, 10, 10), null);
+		$this->persons->addSlice(null, $anna->getId(), new SliceInput($president->getId(), $this->ago($today, 10, 10)));
 
 		// Re-elected treasurer: two back-to-back slices count as one period, 5th anniversary in 20 days
 		$beat = $this->persons->create(null, new PersonInput('Beat', 'Beispiel', $this->ago($today, 30, 55)));
 		$reElection = Dates::anniversary(Dates::addDays($today, 20), -3);
-		$this->persons->addSlice(null, $beat->getId(), $treasurer->getId(), $this->ago($today, 20, 5), Dates::format(Dates::addDays($reElection, -1)));
-		$this->persons->addSlice(null, $beat->getId(), $treasurer->getId(), Dates::format($reElection), null);
+		$this->persons->addSlice(null, $beat->getId(), new SliceInput($treasurer->getId(), $this->ago($today, 20, 5), Dates::format(Dates::addDays($reElection, -1))));
+		$this->persons->addSlice(null, $beat->getId(), new SliceInput(
+			$treasurer->getId(),
+			Dates::format($reElection),
+			startDateSource: 'Minutes of the general meeting',
+			notes: 'Re-elected unanimously.',
+		));
 
 		// 28th birthday in 5 days, volunteer for 3 years in 45 days
 		$claudia = $this->persons->create(null, new PersonInput('Claudia', 'Test', $this->ago($today, 5, 28)));
-		$this->persons->addSlice(null, $claudia->getId(), $helper->getId(), $this->ago($today, 45, 3), null);
+		$this->persons->addSlice(null, $claudia->getId(), new SliceInput($helper->getId(), $this->ago($today, 45, 3)));
 
 		// Former treasurer: no events, only visible to managers
 		$dario = $this->persons->create(null, new PersonInput('Dario', 'Former', $this->ago($today, 8, 61)));
-		$this->persons->addSlice(null, $dario->getId(), $treasurer->getId(), '2015-01-01', Dates::format(Dates::addDays($today, -400)));
+		$this->persons->addSlice(null, $dario->getId(), new SliceInput($treasurer->getId(), '2015-01-01', Dates::format(Dates::addDays($today, -400))));
 
 		// Birthday in two months, outside the default lead time
 		$eva = $this->persons->create(null, new PersonInput('Eva', 'Zukunft', $this->ago($today, 60, 33)));
-		$this->persons->addSlice(null, $eva->getId(), $helper->getId(), $this->ago($today, 100, 1), null);
+		$this->persons->addSlice(null, $eva->getId(), new SliceInput($helper->getId(), $this->ago($today, 100, 1)));
 
 		$output->writeln('Created 2 groups, 3 functions and 5 persons.');
 		return self::SUCCESS;

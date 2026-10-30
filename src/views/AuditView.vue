@@ -54,6 +54,8 @@ const fieldLabels: Record<string, string> = {
 	function_id: t('laudatio', 'Function'),
 	start_date: t('laudatio', 'Start date'),
 	end_date: t('laudatio', 'End date'),
+	start_date_source: t('laudatio', 'Source of start date'),
+	end_date_source: t('laudatio', 'Source of end date'),
 	name: t('laudatio', 'Name'),
 	responsible_uid: t('laudatio', 'Responsible person'),
 	interested: t('laudatio', 'Interested persons'),

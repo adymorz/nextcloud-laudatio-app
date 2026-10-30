@@ -26,8 +26,8 @@ use OCP\L10N\IFactory;
 
 /**
  * Turns entities into API payloads and applies the visibility rules: date of
- * birth, contact data and notes only for viewers allowed to see them, and only
- * slices of groups the viewer can see.
+ * birth, contact data, notes and the sources of term dates only for viewers
+ * allowed to see them, and only slices of groups the viewer can see.
  *
  * @psalm-import-type LaudatioUser from ResponseDefinitions
  * @psalm-import-type LaudatioMe from ResponseDefinitions
@@ -129,7 +129,8 @@ class Presenter {
 	/**
 	 * @return LaudatioSlice
 	 */
-	public function slice(Slice $slice): array {
+	public function slice(Slice $slice, string $viewer): array {
+		$sensitive = $this->access->canSeeSensitive($viewer, $slice->getPersonId());
 		$function = $this->functions()[$slice->getFunctionId()] ?? null;
 		$group = $function === null ? null : ($this->groups()[$function->getGroupId()] ?? null);
 		$end = $slice->getEndDate();
@@ -142,6 +143,9 @@ class Presenter {
 			'groupName' => $group?->getName() ?? '',
 			'startDate' => Dates::format($slice->getStartDate()),
 			'endDate' => $end === null ? null : Dates::format($end),
+			'startDateSource' => $sensitive ? $slice->getStartDateSource() : null,
+			'endDateSource' => $sensitive ? $slice->getEndDateSource() : null,
+			'notes' => $sensitive ? $slice->getNotes() : null,
 		];
 	}
 
@@ -174,7 +178,7 @@ class Presenter {
 			'mobilePhone' => $sensitive ? $person->getMobilePhone() : null,
 			'otherPhone' => $sensitive ? $person->getOtherPhone() : null,
 			'sensitiveVisible' => $sensitive,
-			'currentFunctions' => array_map($this->slice(...), array_values($current)),
+			'currentFunctions' => array_map(fn (Slice $slice): array => $this->slice($slice, $viewer), array_values($current)),
 		];
 	}
 
@@ -184,7 +188,7 @@ class Presenter {
 	 */
 	public function personDetail(Person $person, array $slices, string $viewer): array {
 		$detail = $this->person($person, $slices, $viewer);
-		$detail['slices'] = array_map($this->slice(...), $this->visibleSlices($slices, $viewer));
+		$detail['slices'] = array_map(fn (Slice $slice): array => $this->slice($slice, $viewer), $this->visibleSlices($slices, $viewer));
 		return $detail;
 	}
 

@@ -19,6 +19,7 @@ use OCA\Laudatio\Exception\ConflictException;
 use OCA\Laudatio\Exception\NotFoundException;
 use OCA\Laudatio\Exception\ValidationException;
 use OCA\Laudatio\Model\PersonInput;
+use OCA\Laudatio\Model\SliceInput;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\TTransactional;
 use OCP\IDBConnection;
@@ -173,25 +174,39 @@ class PersonService {
 	}
 
 	/**
-	 * @throws NotFoundException|ValidationException|ConflictException
+	 * Validates the input, except for the rules that need the database, and
+	 * returns a new, unsaved slice.
+	 *
+	 * @throws ValidationException
 	 */
-	public function addSlice(?string $actor, int $personId, int $functionId, string $startDate, ?string $endDate): Slice {
-		$this->get($personId);
-		[$start, $end] = $this->parseRange($startDate, $endDate);
-		$this->sliceValidator->validate($personId, $functionId, $start, $end);
+	public function buildSlice(SliceInput $input): Slice {
+		[$start, $end] = $this->parseRange($input->startDate, $input->endDate);
+		$this->sliceValidator->validateRange($start, $end);
 
 		$slice = new Slice();
-		$slice->setPersonId($personId);
-		$slice->setFunctionId($functionId);
+		$slice->setFunctionId($input->functionId);
 		$slice->setStartDate($start);
 		$slice->setEndDate($end);
+		$this->applySliceTexts($slice, $input);
+		return $slice;
+	}
+
+	/**
+	 * @throws NotFoundException|ValidationException|ConflictException
+	 */
+	public function addSlice(?string $actor, int $personId, SliceInput $input): Slice {
+		$this->get($personId);
+		$slice = $this->buildSlice($input);
+		$this->sliceValidator->validate($personId, $input->functionId, $slice->getStartDate(), $slice->getEndDate());
+
+		$slice->setPersonId($personId);
 		$now = $this->clock->time();
 		$slice->setCreatedAt($now);
 		$slice->setUpdatedAt($now);
 
 		$this->atomic(function () use ($actor, $slice): void {
 			$this->sliceMapper->insert($slice);
-			$this->audit->log($actor, AuditEntry::ACTION_CREATE, AuditService::ENTITY_SLICE, $slice->getId(), ['person_id', 'function_id', 'start_date', 'end_date']);
+			$this->audit->log($actor, AuditEntry::ACTION_CREATE, AuditService::ENTITY_SLICE, $slice->getId(), $this->sliceFieldNames($slice));
 		}, $this->db);
 		$this->afterChange($personId);
 		return $slice;
@@ -200,25 +215,22 @@ class PersonService {
 	/**
 	 * @throws NotFoundException|ValidationException|ConflictException
 	 */
-	public function updateSlice(?string $actor, int $sliceId, int $functionId, string $startDate, ?string $endDate): Slice {
+	public function updateSlice(?string $actor, int $sliceId, SliceInput $input): Slice {
 		$slice = $this->getSlice($sliceId);
-		[$start, $end] = $this->parseRange($startDate, $endDate);
-		$this->sliceValidator->validate($slice->getPersonId(), $functionId, $start, $end, $slice->getId());
+		[$start, $end] = $this->parseRange($input->startDate, $input->endDate);
+		$this->sliceValidator->validate($slice->getPersonId(), $input->functionId, $start, $end, $slice->getId());
 
-		$changed = [];
-		if ($slice->getFunctionId() !== $functionId) {
-			$slice->setFunctionId($functionId);
-			$changed[] = 'function_id';
-		}
+		// Entity setters ignore unchanged values, dates are objects and need a comparison
+		$slice->setFunctionId($input->functionId);
 		if (Dates::compare($slice->getStartDate(), $start) !== 0) {
 			$slice->setStartDate($start);
-			$changed[] = 'start_date';
 		}
 		$oldEnd = $slice->getEndDate();
 		if (($oldEnd === null) !== ($end === null) || ($oldEnd !== null && $end !== null && Dates::compare($oldEnd, $end) !== 0)) {
 			$slice->setEndDate($end);
-			$changed[] = 'end_date';
 		}
+		$this->applySliceTexts($slice, $input);
+		$changed = $this->sliceFieldNames($slice);
 		if ($changed === []) {
 			return $slice;
 		}
@@ -267,14 +279,7 @@ class PersonService {
 			throw new ValidationException($this->l10n->t('The date of birth must be between 1900 and today.'));
 		}
 
-		$notes = $input->notes === null ? null : trim($input->notes);
-		if ($notes === '') {
-			$notes = null;
-		}
-		if ($notes !== null && mb_strlen($notes) > self::MAX_NOTES_LENGTH) {
-			throw new ValidationException($this->l10n->t('Notes must not be longer than %d characters.', [self::MAX_NOTES_LENGTH]));
-		}
-
+		$notes = $this->notes($input->notes);
 		$street = $this->optionalText($input->street, self::MAX_TEXT_LENGTH, $this->l10n->t('Street'));
 		$streetNumber = $this->optionalText($input->streetNumber, self::MAX_SHORT_LENGTH, $this->l10n->t('House number'));
 		$postalCode = $this->optionalText($input->postalCode, self::MAX_SHORT_LENGTH, $this->l10n->t('ZIP code'));
@@ -297,6 +302,37 @@ class PersonService {
 		$person->setCountry($country);
 		$person->setMobilePhone($mobilePhone);
 		$person->setOtherPhone($otherPhone);
+	}
+
+	/**
+	 * Validates the optional texts and sets them on the slice.
+	 *
+	 * @throws ValidationException
+	 */
+	private function applySliceTexts(Slice $slice, SliceInput $input): void {
+		$startDateSource = $this->optionalText($input->startDateSource, self::MAX_TEXT_LENGTH, $this->l10n->t('Source of start date'));
+		$endDateSource = $this->optionalText($input->endDateSource, self::MAX_TEXT_LENGTH, $this->l10n->t('Source of end date'));
+		$notes = $this->notes($input->notes);
+
+		$slice->setStartDateSource($startDateSource);
+		$slice->setEndDateSource($endDateSource);
+		$slice->setNotes($notes);
+	}
+
+	/**
+	 * Trims notes, empty becomes null.
+	 *
+	 * @throws ValidationException when the notes are too long
+	 */
+	private function notes(?string $value): ?string {
+		$value = $value === null ? '' : trim($value);
+		if ($value === '') {
+			return null;
+		}
+		if (mb_strlen($value) > self::MAX_NOTES_LENGTH) {
+			throw new ValidationException($this->l10n->t('Notes must not be longer than %d characters.', [self::MAX_NOTES_LENGTH]));
+		}
+		return $value;
 	}
 
 	/**
@@ -355,10 +391,28 @@ class PersonService {
 	}
 
 	/**
+	 * Names of the updated fields in database notation.
+	 *
+	 * @return list<string>
+	 */
+	public function sliceFieldNames(Slice $slice): array {
+		$map = [
+			'personId' => 'person_id',
+			'functionId' => 'function_id',
+			'startDate' => 'start_date',
+			'endDate' => 'end_date',
+			'startDateSource' => 'start_date_source',
+			'endDateSource' => 'end_date_source',
+			'notes' => 'notes',
+		];
+		return array_values(array_intersect_key($map, $slice->getUpdatedFields()));
+	}
+
+	/**
 	 * @return array{DateTimeImmutable, ?DateTimeImmutable}
 	 * @throws ValidationException
 	 */
-	public function parseRange(string $startDate, ?string $endDate): array {
+	private function parseRange(string $startDate, ?string $endDate): array {
 		$start = Dates::parse($startDate);
 		$end = $endDate === null || $endDate === '' ? null : Dates::parse($endDate);
 		if ($start === null || ($endDate !== null && $endDate !== '' && $end === null)) {

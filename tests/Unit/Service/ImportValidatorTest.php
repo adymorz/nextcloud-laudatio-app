@@ -39,13 +39,14 @@ use PHPUnit\Framework\TestCase;
  */
 final class ImportValidatorTest extends TestCase {
 	/**
-	 * A file of format version 1 as it was written by the app. Don't change it
-	 * when the format changes: old backups must stay readable.
+	 * A file of format version 2 as it was written by the app, except for the
+	 * last term, which leaves out optional keys. Don't change it when the format
+	 * changes: old backups must stay readable.
 	 */
-	private const VERSION_1 = <<<'JSON'
+	private const VERSION_2 = <<<'JSON'
 		{
 			"format": "laudatio-export",
-			"version": 1,
+			"version": 2,
 			"exportedAt": "2026-10-30",
 			"groups": [
 				{
@@ -72,9 +73,23 @@ final class ImportValidatorTest extends TestCase {
 					"mobilePhone": "+41 79 123 45 67",
 					"otherPhone": null,
 					"terms": [
-						{ "functionId": 3, "startDate": "2015-01-01", "endDate": "2018-12-31" },
-						{ "functionId": 3, "startDate": "2019-01-01", "endDate": null },
-						{ "functionId": 4, "startDate": "2019-01-01", "endDate": null }
+						{
+							"functionId": 3,
+							"startDate": "2015-01-01",
+							"endDate": "2018-12-31",
+							"startDateSource": "Minutes 2014",
+							"endDateSource": "Resignation letter",
+							"notes": "Interim at first\nThen elected"
+						},
+						{
+							"functionId": 3,
+							"startDate": "2019-01-01",
+							"endDate": null,
+							"startDateSource": null,
+							"endDateSource": null,
+							"notes": null
+						},
+						{ "functionId": 4, "startDate": "2019-01-01" }
 					]
 				},
 				{
@@ -144,10 +159,10 @@ final class ImportValidatorTest extends TestCase {
 			$this->createMock(IDBConnection::class),
 			$l10n,
 		);
-		$this->validator = new ImportValidator($groups, $persons, $sliceValidator, $l10n);
+		$this->validator = new ImportValidator($groups, $persons, $l10n);
 	}
 
-	public function testReadsVersion1(): void {
+	public function testReadsVersion2(): void {
 		$data = $this->validator->validate(self::sample());
 
 		$this->assertCount(2, $data->groups);
@@ -179,7 +194,13 @@ final class ImportValidatorTest extends TestCase {
 		$this->assertSame(3, $terms[0]->getFunctionId());
 		$this->assertSame('2015-01-01', Dates::format($terms[0]->getStartDate()));
 		$this->assertSame('2018-12-31', Dates::format($terms[0]->getEndDate() ?? throw new \LogicException()));
+		$this->assertSame('Minutes 2014', $terms[0]->getStartDateSource());
+		$this->assertSame('Resignation letter', $terms[0]->getEndDateSource());
+		$this->assertSame("Interim at first\nThen elected", $terms[0]->getNotes());
 		$this->assertNull($terms[1]->getEndDate());
+		$this->assertNull($terms[1]->getStartDateSource());
+		$this->assertNull($terms[2]->getEndDateSource());
+		$this->assertNull($terms[2]->getNotes());
 		$this->assertSame([], $data->persons[1]['terms']);
 	}
 
@@ -197,9 +218,17 @@ final class ImportValidatorTest extends TestCase {
 
 	public function testRefusesNewerVersionsWithAHint(): void {
 		$sample = self::sample();
-		$sample['version'] = 2;
+		$sample['version'] = 3;
 		$this->expectException(ValidationException::class);
-		$this->expectExceptionMessage('format version 2, but this version of Laudatio only reads up to version 1');
+		$this->expectExceptionMessage('format version 3, but this version of Laudatio only reads up to version 2');
+		$this->validator->validate($sample);
+	}
+
+	public function testRefusesVersion1WithAHint(): void {
+		$sample = self::sample();
+		$sample['version'] = 1;
+		$this->expectException(ValidationException::class);
+		$this->expectExceptionMessage('This file has the old format version 1. This version of Laudatio only reads version 2 and newer.');
 		$this->validator->validate($sample);
 	}
 
@@ -258,6 +287,10 @@ final class ImportValidatorTest extends TestCase {
 			'term dates' => [$set(['persons', 0, 'terms', 0, 'startDate'], '01.01.2015'), $person . 'Start and end date must be valid dates (YYYY-MM-DD).'],
 			'end before start' => [$set(['persons', 0, 'terms', 0, 'endDate'], '2014-12-31'), $person . 'The end date must not be before the start date.'],
 			'overlapping terms' => [$set(['persons', 0, 'terms', 1, 'startDate'], '2018-12-31'), $person . 'The term overlaps another term of this person in the same function.'],
+			'source too long' => [$set(['persons', 0, 'terms', 0, 'startDateSource'], str_repeat('x', 256)), $person . 'Source of start date must not be longer than 255 characters.'],
+			'source no text' => [$set(['persons', 0, 'terms', 0, 'endDateSource'], 5), $person . 'The value of "endDateSource" is missing or invalid.'],
+			'term notes too long' => [$set(['persons', 0, 'terms', 0, 'notes'], str_repeat('x', 10001)), $person . 'Notes must not be longer than 10000 characters.'],
+			'term notes no text' => [$set(['persons', 0, 'terms', 0, 'notes'], 5), $person . 'The value of "notes" is missing or invalid.'],
 		];
 	}
 
@@ -266,6 +299,6 @@ final class ImportValidatorTest extends TestCase {
 	 */
 	private static function sample(): array {
 		/** @var array<array-key, mixed> */
-		return json_decode(self::VERSION_1, true, 512, JSON_THROW_ON_ERROR);
+		return json_decode(self::VERSION_2, true, 512, JSON_THROW_ON_ERROR);
 	}
 }

@@ -58,6 +58,9 @@ namespace OCA\Laudatio;
  *     groupName: string,
  *     startDate: string,
  *     endDate: ?string,
+ *     startDateSource: ?string,
+ *     endDateSource: ?string,
+ *     notes: ?string,
  * }
  *
  * @psalm-type LaudatioPerson = array{
@@ -146,6 +149,9 @@ namespace OCA\Laudatio;
  *     functionId: int,
  *     startDate: string,
  *     endDate: ?string,
+ *     startDateSource: ?string,
+ *     endDateSource: ?string,
+ *     notes: ?string,
  * }
  *
  * @psalm-type LaudatioExportPerson = array{

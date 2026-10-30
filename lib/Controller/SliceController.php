@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Laudatio\Controller;
 
 use OCA\Laudatio\Exception\ConflictException;
+use OCA\Laudatio\Model\SliceInput;
 use OCA\Laudatio\ResponseDefinitions;
 use OCA\Laudatio\Service\AccessService;
 use OCA\Laudatio\Service\PersonService;
@@ -48,8 +49,11 @@ class SliceController extends BaseOCSController {
 	 * @param int $functionId ID of the function
 	 * @param string $startDate First day (YYYY-MM-DD)
 	 * @param string|null $endDate Last day (YYYY-MM-DD), null while active
+	 * @param string|null $startDateSource Source of the start date
+	 * @param string|null $endDateSource Source of the end date
+	 * @param string|null $notes Free text notes
 	 * @return DataResponse<Http::STATUS_CREATED, LaudatioSlice, array{}>|DataResponse<Http::STATUS_CONFLICT, LaudatioError, array{}>
-	 * @throws OCSBadRequestException Invalid dates or function
+	 * @throws OCSBadRequestException Invalid input
 	 * @throws OCSForbiddenException Not a manager
 	 * @throws OCSNotFoundException Person not found
 	 *
@@ -58,28 +62,42 @@ class SliceController extends BaseOCSController {
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'POST', url: '/api/v1/persons/{personId}/slices', requirements: ['personId' => '\d+'])]
-	public function create(int $personId, int $functionId, string $startDate, ?string $endDate = null): DataResponse {
+	public function create(
+		int $personId,
+		int $functionId,
+		string $startDate,
+		?string $endDate = null,
+		?string $startDateSource = null,
+		?string $endDateSource = null,
+		?string $notes = null,
+	): DataResponse {
 		$userId = $this->currentUserId();
+		$input = new SliceInput($functionId, $startDate, $endDate, $startDateSource, $endDateSource, $notes);
 		try {
-			$slice = $this->call(function () use ($userId, $personId, $functionId, $startDate, $endDate) {
+			$slice = $this->call(function () use ($userId, $personId, $input) {
 				$this->access->requireManager($userId);
-				return $this->persons->addSlice($userId, $personId, $functionId, $startDate, $endDate);
+				return $this->persons->addSlice($userId, $personId, $input);
 			});
 		} catch (ConflictException $e) {
 			return $this->conflict($e);
 		}
-		return new DataResponse($this->presenter->slice($slice), Http::STATUS_CREATED);
+		return new DataResponse($this->presenter->slice($slice, $userId), Http::STATUS_CREATED);
 	}
 
 	/**
 	 * Update a time slice
 	 *
+	 * All fields are replaced: optional fields that are left out are cleared.
+	 *
 	 * @param int $id ID of the time slice
 	 * @param int $functionId ID of the function
 	 * @param string $startDate First day (YYYY-MM-DD)
 	 * @param string|null $endDate Last day (YYYY-MM-DD), null while active
+	 * @param string|null $startDateSource Source of the start date
+	 * @param string|null $endDateSource Source of the end date
+	 * @param string|null $notes Free text notes
 	 * @return DataResponse<Http::STATUS_OK, LaudatioSlice, array{}>|DataResponse<Http::STATUS_CONFLICT, LaudatioError, array{}>
-	 * @throws OCSBadRequestException Invalid dates or function
+	 * @throws OCSBadRequestException Invalid input
 	 * @throws OCSForbiddenException Not a manager
 	 * @throws OCSNotFoundException Time slice not found
 	 *
@@ -88,17 +106,26 @@ class SliceController extends BaseOCSController {
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'PUT', url: '/api/v1/slices/{id}', requirements: ['id' => '\d+'])]
-	public function update(int $id, int $functionId, string $startDate, ?string $endDate = null): DataResponse {
+	public function update(
+		int $id,
+		int $functionId,
+		string $startDate,
+		?string $endDate = null,
+		?string $startDateSource = null,
+		?string $endDateSource = null,
+		?string $notes = null,
+	): DataResponse {
 		$userId = $this->currentUserId();
+		$input = new SliceInput($functionId, $startDate, $endDate, $startDateSource, $endDateSource, $notes);
 		try {
-			$slice = $this->call(function () use ($userId, $id, $functionId, $startDate, $endDate) {
+			$slice = $this->call(function () use ($userId, $id, $input) {
 				$this->access->requireManager($userId);
-				return $this->persons->updateSlice($userId, $id, $functionId, $startDate, $endDate);
+				return $this->persons->updateSlice($userId, $id, $input);
 			});
 		} catch (ConflictException $e) {
 			return $this->conflict($e);
 		}
-		return new DataResponse($this->presenter->slice($slice));
+		return new DataResponse($this->presenter->slice($slice, $userId));
 	}
 
 	/**
