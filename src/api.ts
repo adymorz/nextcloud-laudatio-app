@@ -6,9 +6,11 @@
 import type {
 	LaudatioEvent,
 	AuditPage,
+	ExportFile,
 	FunctionInput,
 	Group,
 	GroupInput,
+	ImportResult,
 	Me,
 	OrgFunction,
 	Person,
@@ -81,6 +83,9 @@ export const api = {
 	setGreeted: (id: number, greeted: boolean) => put<LaudatioEvent>(`/events/${id}/greeted`, { greeted }),
 
 	audit: (limit: number, offset: number) => get<AuditPage>('/audit', { limit, offset }),
+
+	exportData: () => get<ExportFile>('/export'),
+	importData: (data: unknown) => post<ImportResult>('/import', { data }),
 }
 
 /**

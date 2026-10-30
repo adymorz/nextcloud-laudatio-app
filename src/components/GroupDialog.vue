@@ -37,7 +37,7 @@ const valid = computed(() => name.value.trim() !== '' && responsible.value.lengt
 watch(open, (isOpen) => {
 	if (isOpen) {
 		name.value = props.group?.name ?? ''
-		// No responsible user after the former one was deleted
+		// No responsible user after the former one was deleted or the group was imported
 		responsible.value = props.group?.responsible ? [props.group.responsible] : []
 		interested.value = props.group?.interested ?? []
 		jubileeYears.value = props.group?.jubileeYears ?? ''

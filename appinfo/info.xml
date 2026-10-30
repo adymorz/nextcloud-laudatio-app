@@ -19,8 +19,9 @@
 - **Upcoming** view with a "congratulated" checklist, and the yearly gifts with a "presented" checklist.
 - **Data sheet** per person to print or save as PDF, so the person can check and complete their data, with an optional note of your organization on who stores the data and why.
 - **Roles**: managers see and edit everything. Each group has one responsible person, who sees its members with date of birth, contact data and notes, and any number of interested persons, who only see names and functions and get the birthdays (without the age) and anniversaries for information. Everybody else does not see the app.
-- **Audit log** of all changes to persons, groups and functions.
-- **Privacy**: all data stays in the database of your Nextcloud, nothing is sent anywhere else. Deleting a person removes all their data, `occ laudatio:purge` removes everything.
+- **Audit log** of all changes to persons, groups and functions, and of all exports.
+- **Import and export**: managers download all groups, functions and persons as a file, as a backup or to move them to another Nextcloud. The file holds no references to Nextcloud users.
+- **Privacy**: all data stays in the database of your Nextcloud unless a manager exports it, nothing is sent anywhere else. Deleting a person removes all their data from the app, `occ laudatio:purge` removes everything.
 
 Persons don't need a Nextcloud account. Available in English and German.]]></description>
 	<description lang="de"><![CDATA[Laudatio hilft Vereinen, Verbänden, Pfarreien und Firmen, die Menschen wertzuschätzen, die sich bei ihnen engagieren: Mitglieder, Mitarbeitende, Gewählte und Freiwillige. Erfasse, wer welche Funktion seit wann innehat, und die App erinnert die richtigen Personen an jeden Geburtstag, jedes Jubiläum und jedes Jahresgeschenk.
@@ -33,8 +34,9 @@ Persons don't need a Nextcloud account. Available in English and German.]]></des
 - Ansicht **Demnächst** mit einer „Gratuliert“-Checkliste sowie den Jahresgeschenken mit einer „Überreicht“-Checkliste.
 - **Datenblatt** pro Person zum Drucken oder Speichern als PDF, damit die Person ihre Angaben prüfen und ergänzen kann, auf Wunsch mit einem Hinweis deiner Organisation, wer die Daten wozu speichert.
 - **Rollen**: Die Verwaltung sieht und bearbeitet alles. Jede Gruppe hat eine verantwortliche Person, die deren Mitglieder mit Geburtsdatum, Kontaktdaten und Notizen sieht, und beliebig viele interessierte Personen, die nur Namen und Funktionen sehen und die Geburtstage (ohne Alter) und Jubiläen zur Information erhalten. Alle anderen sehen die App nicht.
-- **Änderungsprotokoll** aller Änderungen an Personen, Gruppen und Funktionen.
-- **Datenschutz**: Alle Daten bleiben in der Datenbank deiner Nextcloud, nichts wird woandershin gesendet. Das Löschen einer Person entfernt alle ihre Daten, `occ laudatio:purge` entfernt alles.
+- **Änderungsprotokoll** aller Änderungen an Personen, Gruppen und Funktionen sowie aller Exporte.
+- **Import und Export**: Die Verwaltung lädt alle Gruppen, Funktionen und Personen als Datei herunter, als Sicherung oder um sie in eine andere Nextcloud zu übertragen. Die Datei enthält keine Verweise auf Nextcloud-Benutzer.
+- **Datenschutz**: Alle Daten bleiben in der Datenbank deiner Nextcloud, außer die Verwaltung exportiert sie, und nichts wird woandershin gesendet. Das Löschen einer Person entfernt alle ihre Daten aus der App, `occ laudatio:purge` entfernt alles.
 
 Die Personen brauchen kein Nextcloud-Konto. Verfügbar auf Englisch und Deutsch.]]></description>
 	<version>0.3.0</version>

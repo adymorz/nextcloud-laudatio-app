@@ -88,7 +88,7 @@ class AccessService {
 	 */
 	public function getResponsibleGroupIds(string $userId): array {
 		if ($userId === '') {
-			// Groups whose responsible user was deleted have an empty UID
+			// Groups without a responsible user have an empty UID
 			return [];
 		}
 		return $this->responsibleCache[$userId] ??= $this->groupMapper->findIdsByResponsible($userId);

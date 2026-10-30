@@ -15,15 +15,17 @@ use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Log\Audit\CriticalActionPerformedEvent;
 
 /**
- * Records who created, changed or deleted master data. Entries hold IDs and
- * field names only. Each entry is also dispatched as a critical action, so the
- * admin_audit app writes it to the Nextcloud audit log when it is enabled.
+ * Records who created, changed, deleted or exported master data. Entries hold
+ * IDs and field names only. Each entry is also dispatched as a critical action,
+ * so the admin_audit app writes it to the Nextcloud audit log when it is enabled.
  */
 class AuditService {
 	public const ENTITY_PERSON = 'person';
 	public const ENTITY_SLICE = 'slice';
 	public const ENTITY_GROUP = 'group';
 	public const ENTITY_FUNCTION = 'function';
+	/** All master data at once, with entity ID 0 */
+	public const ENTITY_DATA = 'data';
 
 	public function __construct(
 		private AuditMapper $mapper,

@@ -8,6 +8,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { me } from './store'
 import AuditView from './views/AuditView.vue'
 import GroupsView from './views/GroupsView.vue'
+import ImportExportView from './views/ImportExportView.vue'
 import PersonDetailView from './views/PersonDetailView.vue'
 import PersonSheetView from './views/PersonSheetView.vue'
 import PersonsView from './views/PersonsView.vue'
@@ -24,6 +25,7 @@ export const router = createRouter({
 		{ path: '/persons/:id(\\d+)/sheet', name: 'person-sheet', component: PersonSheetView, props: (route) => ({ id: Number(route.params.id) }) },
 		{ path: '/groups', name: 'groups', component: GroupsView },
 		{ path: '/audit', name: 'audit', component: AuditView, beforeEnter: () => me.isManager || { name: 'upcoming' } },
+		{ path: '/import-export', name: 'import-export', component: ImportExportView, beforeEnter: () => me.isManager || { name: 'upcoming' } },
 		{ path: '/:pathMatch(.*)*', redirect: { name: 'upcoming' } },
 	],
 })

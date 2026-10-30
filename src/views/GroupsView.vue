@@ -180,7 +180,7 @@ onMounted(load)
 					<span v-else class="group__warning">
 						<NcIconSvgWrapper :path="mdiAlert" :size="20" inline />
 						{{ me.isManager
-							? t('laudatio', 'No responsible person: the account was deleted. Edit the group to assign a new one.')
+							? t('laudatio', 'No responsible person. Edit the group to assign one.')
 							: t('laudatio', 'No responsible person at the moment.') }}
 					</span>
 				</dd>

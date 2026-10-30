@@ -33,11 +33,13 @@ class AuditEntry extends Entity {
 	public const ACTION_CREATE = 'create';
 	public const ACTION_UPDATE = 'update';
 	public const ACTION_DELETE = 'delete';
+	public const ACTION_EXPORT = 'export';
 
 	protected ?string $actorUid = null;
 	protected string $action = '';
 	protected string $entityType = '';
-	protected int $entityId = 0;
+	/** Null until set, so that the ID 0 of AuditService::ENTITY_DATA counts as a change for the insert */
+	protected ?int $entityId = null;
 	/** JSON encoded list of field names */
 	protected ?string $changedFields = null;
 	protected int $createdAt = 0;

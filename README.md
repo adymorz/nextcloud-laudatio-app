@@ -20,13 +20,14 @@ Requires Nextcloud 34 or 35 (PHP 8.2 or newer). Available in English and German.
 - **Reminders**: a Nextcloud notification when an event comes within the lead time (default 14 days), optionally also by email. Every email says why you receive it and how to turn it off.
 - **Upcoming** view with a "congratulated" checklist for the responsible persons, and the yearly gifts of the year with a "presented" checklist.
 - **Data sheet** per person to print (or save as PDF) and hand over, so the person can check, correct and complete their data. Notes are never printed; an optional note of your organization on who stores the data and why is.
-- **Audit log** of who created, changed or deleted persons, groups, functions and terms.
+- **Audit log** of who created, changed or deleted persons, groups, functions and terms, and who exported them.
+- **Import and export**: managers download all groups, functions, persons and terms as a versioned file, as a backup or to move them to another Nextcloud.
 
 ### Roles
 
 | Role | Who | Can |
 | --- | --- | --- |
-| Manager | Nextcloud admins and members of the manager group (admin settings) | See and edit everything, see the audit log |
+| Manager | Nextcloud admins and members of the manager group (admin settings) | See and edit everything, see the audit log, import and export |
 | Responsible person | Exactly one Nextcloud user per group | See the current members of the group including date of birth, contact data and notes, print their data sheets, get their events, mark events as congratulated and yearly gifts as presented |
 | Interested person | Any number of Nextcloud users per group | See the current members of the group (name and functions) and get their events "(for information)": birthdays without the age, anniversaries with the years of service |
 | Everybody else | | No access; the app is not shown in the navigation |
@@ -47,6 +48,24 @@ Access is checked on the server for every request. Persons themselves need no Ne
 - The Upcoming view lists the gifts of every year in the selected period, including overdue ones of the current year. The responsible person and managers mark them as presented, also when the "congratulated" checklist is turned off.
 - Gifts are generated for the current and the next calendar year. Switching the function's yearly gift off removes the gifts of the current year, including presented ones; those of past years stay.
 
+### Import and export
+
+Managers find both under **Import & export** in the app navigation.
+
+- The **export** is a JSON file with all groups, functions, persons and terms, including dates of birth, contact data and notes. It holds no references to Nextcloud users, so it fits any Nextcloud. See [Privacy and data protection](#privacy-and-data-protection) before you store or pass on the file.
+- **Not exported**: responsible and interested users, events with their "congratulated" and "presented" marks, the audit log and the settings. The events are generated again from the terms.
+- The **import** only works while the app contains no groups and no persons. The whole file is checked first, then it is imported completely or not at all. Every created group, function, person and term appears in the audit log.
+- **After an import**, assign a responsible person to every group, because nobody gets reminders until then. Check the admin settings too: groups without their own anniversary years use the global list of this Nextcloud. Yearly gifts of the current year appear as open again.
+
+To restore a backup over existing data, an administrator first empties the app. This also deletes the audit log and all settings, including the manager group:
+
+```sh
+occ laudatio:purge
+occ app:enable laudatio
+```
+
+Then the administrator imports the file in the app and sets the admin settings again.
+
 ### Settings
 
 - **Admin** (Administration settings → Groupware → Laudatio): manager group, anniversary years, reminder lead time, which events are generated, the "congratulated" checklist, whether reminder emails are on by default, the link to the gift regulations (an external page or the internal link of a file in Nextcloud) shown to all users in the app navigation, and the note printed on every data sheet.
@@ -59,9 +78,9 @@ Laudatio stores personal data of people who usually have no Nextcloud account. W
 - **What is stored**: first and last name, date of birth, address, phone numbers and free-text notes per person; their terms (function, group, start and end date); the generated events with their "congratulated" marks; who was already notified about which event; and the audit log (IDs and field names only).
 - **Where**: only in the app's own tables of your Nextcloud database (`laudatio_*`). Nothing is sent to any other server.
 - **Who sees what**: see [Roles](#roles). Date of birth, contact data and notes are shown to managers and the responsible persons only, in the app and in its API.
-- **Where data leaves the database**: Nextcloud notifications hold only the event ID and render the title when shown. Reminder emails carry the title (name, age or years of service, function) and the date. The CalDAV calendar carries the title and the date to the devices of the responsible and interested users. The printed data sheet carries everything but the notes. Interested users never get the age.
-- **Logging**: the audit log records who created, changed or deleted what and which fields, never the values. The same entries go to the Nextcloud audit log (admin_audit app) as critical actions. The Nextcloud log contains no personal data of persons.
-- **Deletion**: deleting a person removes their terms, events, notifications and reminders; the audit log keeps the person's ID only. Deleting a function or group requires removing its terms first. Persons stay until a manager deletes them, there is no automatic retention.
+- **Where data leaves the database**: Nextcloud notifications hold only the event ID and render the title when shown. Reminder emails carry the title (name, age or years of service, function) and the date. The CalDAV calendar carries the title and the date to the devices of the responsible and interested users. The printed data sheet carries everything but the notes. Interested users never get the age. An export carries all persons with their dates of birth, contact data and notes as an unencrypted file to the device of the manager who downloads it; storing that file safely is up to you.
+- **Logging**: the audit log records who created, changed or deleted what and which fields, never the values, and who exported the data. The same entries go to the Nextcloud audit log (admin_audit app) as critical actions. The Nextcloud log contains no personal data of persons.
+- **Deletion**: deleting a person removes their terms, events, notifications and reminders; the audit log keeps the person's ID only. Deleting a function or group requires removing its terms first. Persons stay until a manager deletes them, there is no automatic retention. Export files are outside the app: a deleted person stays in earlier exports until you delete those files.
 - **Everything at once**: `occ laudatio:purge` deletes all tables, settings, notifications and the background job of the app, see [Uninstalling](#uninstalling).
 
 ## Installation
@@ -185,6 +204,52 @@ Source strings are English: `$l->t('…')` in PHP and `t('laudatio', '…')` in 
 - `lib/Calendar`: the calendar provider (public `ICalendarProvider` API).
 - `lib/Notification`, `lib/BackgroundJob`, `lib/Command`, `lib/Settings`, `lib/Listener`: notifier, hourly job, occ commands, admin settings form, cleanup when a user is deleted.
 - `src`: Vue 3 frontend with `@nextcloud/vue`.
+
+### Export file format
+
+The export is a JSON file, written by `ExportService` and read by `ImportValidator` and `ImportService`:
+
+```json
+{
+	"format": "laudatio-export",
+	"version": 1,
+	"exportedAt": "2026-10-30",
+	"groups": [
+		{
+			"name": "Board",
+			"jubileeYears": "5, 10",
+			"functions": [
+				{ "id": 3, "name": "Treasurer", "yearlyGift": true }
+			]
+		}
+	],
+	"persons": [
+		{
+			"firstName": "Anna",
+			"lastName": "Muster",
+			"dateOfBirth": "1986-11-01",
+			"notes": null,
+			"street": null,
+			"streetNumber": null,
+			"postalCode": null,
+			"city": null,
+			"country": null,
+			"mobilePhone": null,
+			"otherPhone": null,
+			"terms": [
+				{ "functionId": 3, "startDate": "2021-01-01", "endDate": null }
+			]
+		}
+	]
+}
+```
+
+- `format` identifies the file, `version` is the version of this format. `exportedAt` is informational.
+- A function's `id` only links terms to it within the file; the import assigns new IDs. `functionId` must refer to a function in the file.
+- `jubileeYears: null` means the group uses the global list. Dates are `YYYY-MM-DD`, `endDate: null` means the term is still open.
+- Values must pass the same rules as the regular input. Keys whose value may be `null` can be left out, all others are required. Unknown keys are ignored.
+
+When the format changes, increase `ExportService::VERSION` and keep reading the older versions in `ImportValidator`, because backups live on. Leave the version 1 sample in `ImportValidatorTest` as it is. Files with a newer version than the app knows are refused.
 
 ### Releasing
 

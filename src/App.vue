@@ -4,7 +4,7 @@
 -->
 
 <script setup lang="ts">
-import { mdiAccountGroup, mdiAccountMultiple, mdiCakeVariant, mdiCog, mdiHistory, mdiScaleBalance } from '@mdi/js'
+import { mdiAccountGroup, mdiAccountMultiple, mdiCakeVariant, mdiCog, mdiHistory, mdiScaleBalance, mdiSwapVertical } from '@mdi/js'
 import { t } from '@nextcloud/l10n'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
 import NcAppNavigation from '@nextcloud/vue/components/NcAppNavigation'
@@ -40,6 +40,11 @@ const settingsOpen = ref(false)
 				<NcAppNavigationItem v-if="me.isManager" :name="t('laudatio', 'Audit log')" :to="{ name: 'audit' }">
 					<template #icon>
 						<NcIconSvgWrapper :path="mdiHistory" />
+					</template>
+				</NcAppNavigationItem>
+				<NcAppNavigationItem v-if="me.isManager" :name="t('laudatio', 'Import & export')" :to="{ name: 'import-export' }">
+					<template #icon>
+						<NcIconSvgWrapper :path="mdiSwapVertical" />
 					</template>
 				</NcAppNavigationItem>
 			</template>

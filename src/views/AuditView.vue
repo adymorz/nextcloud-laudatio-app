@@ -26,6 +26,7 @@ const actions: Record<string, string> = {
 	create: t('laudatio', 'created'),
 	update: t('laudatio', 'changed'),
 	delete: t('laudatio', 'deleted'),
+	export: t('laudatio', 'exported'),
 }
 
 const entityTypes: Record<string, string> = {
@@ -33,6 +34,7 @@ const entityTypes: Record<string, string> = {
 	slice: t('laudatio', 'Term'),
 	group: t('laudatio', 'Group'),
 	function: t('laudatio', 'Function'),
+	data: t('laudatio', 'All data'),
 }
 
 // The server records the database names of the changed fields
@@ -92,7 +94,7 @@ onMounted(loadMore)
 	<div class="view">
 		<h2>{{ t('laudatio', 'Audit log') }}</h2>
 		<p class="muted">
-			{{ t('laudatio', 'Who created, changed or deleted persons, groups, functions and terms. Only the names of changed fields are recorded, not their values.') }}
+			{{ t('laudatio', 'Who created, changed or deleted persons, groups, functions and terms, and who exported them. Only the names of changed fields are recorded, not their values.') }}
 		</p>
 
 		<table v-if="entries.length > 0" class="audit">
@@ -113,7 +115,7 @@ onMounted(loadMore)
 					<td>
 						{{ entityTypes[entry.entityType] ?? entry.entityType }}
 						<span v-if="entry.entityLabel">{{ entry.entityLabel }}</span>
-						<span v-else class="muted">{{ t('laudatio', '(deleted, ID {id})', { id: entry.entityId }) }}</span>
+						<span v-else-if="entry.entityType !== 'data'" class="muted">{{ t('laudatio', '(deleted, ID {id})', { id: entry.entityId }) }}</span>
 					</td>
 					<td class="muted">
 						{{ fieldList(entry.changedFields) }}

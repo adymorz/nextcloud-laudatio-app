@@ -294,20 +294,24 @@ class GroupService {
 			}
 		}
 
-		if ($jubileeYears !== null && trim($jubileeYears) === '') {
-			$jubileeYears = null;
-		}
-		if ($jubileeYears !== null) {
-			$jubileeYears = SettingsService::formatJubileeYears($this->settings->parseJubileeYears($jubileeYears));
-		}
+		return [$name, $interested, $this->normalizeJubileeYears($jubileeYears)];
+	}
 
-		return [$name, $interested, $jubileeYears];
+	/**
+	 * @return string|null the normalized list, null to use the global setting
+	 * @throws ValidationException
+	 */
+	public function normalizeJubileeYears(?string $jubileeYears): ?string {
+		if ($jubileeYears === null || trim($jubileeYears) === '') {
+			return null;
+		}
+		return SettingsService::formatJubileeYears($this->settings->parseJubileeYears($jubileeYears));
 	}
 
 	/**
 	 * @throws ValidationException
 	 */
-	private function validateName(string $name): string {
+	public function validateName(string $name): string {
 		$name = trim($name);
 		if ($name === '') {
 			throw new ValidationException($this->l10n->t('The name is required.'));
