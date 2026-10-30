@@ -1,7 +1,13 @@
 {
 	"name": "dymorz/laudatio",
-	"description": "Laudatio app for Nextcloud",
+	"description": "Nextcloud app: never miss the birthdays, anniversaries and yearly gifts of the people engaged in your organization",
 	"license": "AGPL-3.0-or-later",
+	"homepage": "https://github.com/adymorz/nextcloud-laudatio-app",
+	"support": {
+		"issues": "https://github.com/adymorz/nextcloud-laudatio-app/issues",
+		"source": "https://github.com/adymorz/nextcloud-laudatio-app",
+		"security": "https://github.com/adymorz/nextcloud-laudatio-app/blob/main/SECURITY.md"
+	},
 	"authors": [
 		{
 			"name": "Adrian Dymorz",
@@ -29,15 +35,17 @@
 		"cs:check": "php-cs-fixer fix --dry-run --diff",
 		"cs:fix": "php-cs-fixer fix",
 		"psalm": "psalm --threads=1 --no-cache",
-		"test:unit": "phpunit tests -c tests/phpunit.xml --colors=always --fail-on-warning --fail-on-risky",
+		"test": "phpunit -c tests/phpunit.xml --colors=always --fail-on-warning --fail-on-risky",
+		"test:unit": "@test --testsuite unit",
+		"test:integration": "@test --testsuite integration",
 		"openapi": "generate-spec",
 		"rector": "rector && composer cs:fix"
 	},
 	"require": {
-		"bamarni/composer-bin-plugin": "^1.8",
 		"php": "^8.2"
 	},
 	"require-dev": {
+		"bamarni/composer-bin-plugin": "^1.8",
 		"nextcloud/ocp": "dev-stable34",
 		"sabre/vobject": "4.5.6",
 		"symfony/console": "^6.4"

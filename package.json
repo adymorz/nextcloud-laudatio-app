@@ -1,14 +1,25 @@
 {
   "name": "laudatio",
   "version": "0.3.0",
+  "description": "Nextcloud app: never miss the birthdays, anniversaries and yearly gifts of the people engaged in your organization",
   "license": "AGPL-3.0-or-later",
+  "private": true,
+  "author": "Adrian Dymorz <dev@adrian.dymorz.ch>",
+  "homepage": "https://github.com/adymorz/nextcloud-laudatio-app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/adymorz/nextcloud-laudatio-app.git"
+  },
+  "bugs": {
+    "url": "https://github.com/adymorz/nextcloud-laudatio-app/issues"
+  },
   "type": "module",
   "scripts": {
     "build": "vite build",
     "dev": "vite --mode development build",
     "l10n": "node scripts/l10n.mjs",
     "lint": "eslint src",
-    "stylelint": "stylelint src/**/*.vue src/**/*.scss src/**/*.css",
+    "stylelint": "stylelint 'src/**/*.vue' 'src/**/*.scss' 'src/**/*.css'",
     "typecheck": "vue-tsc --noEmit",
     "typescript:generate": "openapi-typescript openapi.json -o src/types/openapi.ts",
     "watch": "vite --mode development build --watch"
