@@ -24,7 +24,7 @@ class SyncCommand extends Command {
 	#[\Override]
 	protected function configure(): void {
 		$this->setName('laudatio:sync')
-			->setDescription('Generate upcoming birthday and jubilee events and send due notifications now')
+			->setDescription('Generate upcoming birthday and anniversary events and send due notifications now')
 			->setHelp('Does the same as the hourly background job.');
 	}
 

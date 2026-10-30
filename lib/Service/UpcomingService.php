@@ -54,13 +54,18 @@ class UpcomingService {
 
 	/**
 	 * All stored birthdays and jubilees, past and upcoming, the user receives
-	 * (for the calendar). Yearly gifts have no fixed day and are left out.
+	 * (for the calendar). Yearly gifts have no fixed day and are left out, and
+	 * so are past events of persons the user may no longer see.
 	 *
 	 * @return list<array{Event, RecipientService::ROLE_*}>
 	 */
 	public function allAsRecipient(string $userId): array {
+		$visiblePersonIds = $this->access->getVisiblePersonIds($userId);
 		$result = [];
 		foreach ($this->eventMapper->findAll(self::DATED_TYPES) as $event) {
+			if ($visiblePersonIds !== null && !in_array($event->getPersonId(), $visiblePersonIds, true)) {
+				continue;
+			}
 			$role = $this->recipients->roleOf($event, $userId);
 			if ($role !== null) {
 				$result[] = [$event, $role];
@@ -86,9 +91,9 @@ class UpcomingService {
 	}
 
 	/**
-	 * Whether the user may mark the event as greeted, or a gift as presented:
-	 * the responsible person and managers. Birthdays and jubilees only when
-	 * the "greeted" checklist is enabled.
+	 * Whether the user may mark the event as congratulated, or a gift as
+	 * presented: the responsible person and managers. Birthdays and jubilees
+	 * only when the "congratulated" checklist is enabled.
 	 *
 	 * @param RecipientService::ROLE_*|null $role role of the user for the event
 	 */
@@ -100,7 +105,8 @@ class UpcomingService {
 	}
 
 	/**
-	 * Marks an event as greeted, or a gift as presented (or not) by the user.
+	 * Marks an event as congratulated, or a gift as presented (or not) by the
+	 * user.
 	 *
 	 * @return array{Event, RecipientService::ROLE_*|null}
 	 * @throws NotFoundException when the event does not exist or is not visible to the user
@@ -118,8 +124,8 @@ class UpcomingService {
 		}
 		if (!$this->canMark($event, $role, $userId)) {
 			throw new ForbiddenException($event->getType() === Event::TYPE_GIFT
-				? $this->l10n->t('Only the responsible person can mark a gift as presented.')
-				: $this->l10n->t('Only the responsible person can mark an event as greeted.'));
+				? $this->l10n->t('Only managers and the responsible person can mark a gift as presented.')
+				: $this->l10n->t('Only managers and the responsible person can mark an event as congratulated.'));
 		}
 
 		if ($greeted && $event->getGreetedAt() === null) {

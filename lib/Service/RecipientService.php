@@ -64,7 +64,11 @@ class RecipientService {
 			foreach ($this->interested()[$groupId] ?? [] as $userId) {
 				$recipients[$userId] ??= self::ROLE_INTERESTED;
 			}
-			$recipients[$group->getResponsibleUid()] = self::ROLE_RESPONSIBLE;
+			$responsible = $group->getResponsibleUid();
+			if ($responsible !== '') {
+				// Empty after the responsible user was deleted
+				$recipients[$responsible] = self::ROLE_RESPONSIBLE;
+			}
 		}
 		return $recipients;
 	}
@@ -74,6 +78,30 @@ class RecipientService {
 	 */
 	public function roleOf(Event $event, string $userId): ?string {
 		return $this->recipients($event)[$userId] ?? null;
+	}
+
+	/**
+	 * Names of the groups that give the user their role for the event, e.g.
+	 * for the reason line of a reminder email.
+	 *
+	 * @return list<string>
+	 */
+	public function groupNamesFor(Event $event, string $userId): array {
+		$role = $this->roleOf($event, $userId);
+		$names = [];
+		foreach ($this->groupIdsFor($event) as $groupId) {
+			$group = $this->groups()[$groupId] ?? null;
+			if ($group === null) {
+				continue;
+			}
+			$matches = $role === self::ROLE_RESPONSIBLE
+				? $group->getResponsibleUid() === $userId
+				: ($role === self::ROLE_INTERESTED && in_array($userId, $this->interested()[$groupId] ?? [], true));
+			if ($matches) {
+				$names[] = $group->getName();
+			}
+		}
+		return $names;
 	}
 
 	/**

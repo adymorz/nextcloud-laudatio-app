@@ -27,11 +27,12 @@ final class RecipientServiceTest extends TestCase {
 	#[\Override]
 	protected function setUp(): void {
 		$groupMapper = $this->createMock(GroupMapper::class);
-		$groupMapper->method('findAll')->willReturn([$this->group(1, 'alice'), $this->group(2, 'bob')]);
+		// Group 3 lost its responsible user
+		$groupMapper->method('findAll')->willReturn([$this->group(1, 'alice', 'Group 1'), $this->group(2, 'bob', 'Group 2'), $this->group(3, '', 'Group 3')]);
 		$functionMapper = $this->createMock(OrgFunctionMapper::class);
-		$functionMapper->method('findAll')->willReturn([$this->function(10, 1), $this->function(20, 2)]);
+		$functionMapper->method('findAll')->willReturn([$this->function(10, 1), $this->function(20, 2), $this->function(30, 3)]);
 		$interestedMapper = $this->createMock(InterestedMapper::class);
-		$interestedMapper->method('findUserIdsByGroups')->willReturn([1 => ['bob', 'carol'], 2 => ['alice']]);
+		$interestedMapper->method('findUserIdsByGroups')->willReturn([1 => ['bob', 'carol'], 2 => ['alice'], 3 => ['dave']]);
 		$sliceMapper = $this->createMock(SliceMapper::class);
 		$sliceMapper->method('findByPerson')->willReturn([
 			$this->slice(10, '2020-01-01', null),
@@ -65,9 +66,24 @@ final class RecipientServiceTest extends TestCase {
 		$this->assertNull($this->service->roleOf($this->event(Event::TYPE_BIRTHDAY, null, '2026-08-01'), 'dave'));
 	}
 
-	private function group(int $id, string $responsible): Group {
+	public function testGroupWithoutResponsibleUserHasOnlyInterestedRecipients(): void {
+		$recipients = $this->service->recipients($this->event(Event::TYPE_JUBILEE, 30, '2026-11-05'));
+		$this->assertSame(['dave' => 'interested'], $recipients);
+	}
+
+	public function testGroupNamesFollowTheRole(): void {
+		$birthday = $this->event(Event::TYPE_BIRTHDAY, null, '2026-03-01');
+		// alice is responsible in group 1 and only interested in group 2
+		$this->assertSame(['Group 1'], $this->service->groupNamesFor($birthday, 'alice'));
+		$this->assertSame(['Group 2'], $this->service->groupNamesFor($birthday, 'bob'));
+		$this->assertSame(['Group 1'], $this->service->groupNamesFor($birthday, 'carol'));
+		$this->assertSame([], $this->service->groupNamesFor($birthday, 'dave'));
+	}
+
+	private function group(int $id, string $responsible, string $name): Group {
 		$group = new Group();
 		$group->setId($id);
+		$group->setName($name);
 		$group->setResponsibleUid($responsible);
 		return $group;
 	}

@@ -52,11 +52,13 @@ final class TitleBuilderTest extends TestCase {
 		$birthday = $this->event(Event::TYPE_BIRTHDAY, null, 32);
 		$jubilee = $this->event(Event::TYPE_JUBILEE, 9, 5);
 
-		$this->assertSame('32nd Birthday of Anna Muster', $builder->build($birthday, RecipientService::ROLE_RESPONSIBLE, 'en'));
-		$this->assertSame('32nd Birthday of Anna Muster (for information)', $builder->build($birthday, RecipientService::ROLE_INTERESTED, 'en'));
-		$this->assertSame('5th Anniversary for Anna Muster as Treasurer', $builder->build($jubilee, RecipientService::ROLE_RESPONSIBLE, 'en'));
-		$this->assertSame('5th Anniversary for Anna Muster as Treasurer (for information)', $builder->build($jubilee, RecipientService::ROLE_INTERESTED, 'en'));
-		$this->assertSame('5th Anniversary for Anna Muster as Treasurer', $builder->build($jubilee, null, 'en'));
+		$this->assertSame('32nd birthday of Anna Muster', $builder->build($birthday, RecipientService::ROLE_RESPONSIBLE, 'en'));
+		$this->assertSame('32nd birthday of Anna Muster', $builder->build($birthday, null, 'en'));
+		// Interested users may not see the date of birth, so they get no age
+		$this->assertSame('Birthday of Anna Muster (for information)', $builder->build($birthday, RecipientService::ROLE_INTERESTED, 'en'));
+		$this->assertSame('5th anniversary of Anna Muster as Treasurer', $builder->build($jubilee, RecipientService::ROLE_RESPONSIBLE, 'en'));
+		$this->assertSame('5th anniversary of Anna Muster as Treasurer (for information)', $builder->build($jubilee, RecipientService::ROLE_INTERESTED, 'en'));
+		$this->assertSame('5th anniversary of Anna Muster as Treasurer', $builder->build($jubilee, null, 'en'));
 	}
 
 	public function testYearlyGiftTitle(): void {
@@ -69,11 +71,13 @@ final class TitleBuilderTest extends TestCase {
 
 	public function testGermanTitlesUseGermanOrdinals(): void {
 		$translations = [
-			'%1$s Birthday of %2$s' => '%1$s Geburtstag von %2$s',
+			'%1$s birthday of %2$s' => '%1$s Geburtstag von %2$s',
+			'Birthday of %s' => 'Geburtstag von %s',
 			'%s (for information)' => '%s (zur Information)',
 		];
 		$builder = $this->builder('de', $translations);
-		$this->assertSame('32. Geburtstag von Anna Muster (zur Information)', $builder->build($this->event(Event::TYPE_BIRTHDAY, null, 32), RecipientService::ROLE_INTERESTED, 'de'));
+		$this->assertSame('32. Geburtstag von Anna Muster', $builder->build($this->event(Event::TYPE_BIRTHDAY, null, 32), RecipientService::ROLE_RESPONSIBLE, 'de'));
+		$this->assertSame('Geburtstag von Anna Muster (zur Information)', $builder->build($this->event(Event::TYPE_BIRTHDAY, null, 32), RecipientService::ROLE_INTERESTED, 'de'));
 	}
 
 	/**

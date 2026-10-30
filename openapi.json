@@ -137,7 +137,8 @@
                     },
                     "ordinal": {
                         "type": "integer",
-                        "format": "int64"
+                        "format": "int64",
+                        "nullable": true
                     },
                     "title": {
                         "type": "string"
@@ -233,7 +234,12 @@
                         "type": "string"
                     },
                     "responsible": {
-                        "$ref": "#/components/schemas/User"
+                        "nullable": true,
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/User"
+                            }
+                        ]
                     },
                     "interested": {
                         "type": "array",
@@ -278,7 +284,9 @@
                     "greetingReminder",
                     "leadTimeDays",
                     "emailNotifications",
-                    "regulationsUrl"
+                    "hasEmail",
+                    "regulationsUrl",
+                    "sheetNote"
                 ],
                 "properties": {
                     "userId": {
@@ -311,7 +319,14 @@
                     "emailNotifications": {
                         "type": "boolean"
                     },
+                    "hasEmail": {
+                        "type": "boolean"
+                    },
                     "regulationsUrl": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "sheetNote": {
                         "type": "string",
                         "nullable": true
                     }
@@ -2371,7 +2386,7 @@
                         }
                     },
                     "403": {
-                        "description": "Not logged in",
+                        "description": "No access to the app",
                         "content": {
                             "application/json": {
                                 "schema": {

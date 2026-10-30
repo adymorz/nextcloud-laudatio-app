@@ -17,7 +17,8 @@ import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { api, errorMessage } from '../api'
+import { api, errorMessage, isNotFound } from '../api'
+import LoadError from '../components/LoadError.vue'
 import PersonDialog from '../components/PersonDialog.vue'
 import SliceDialog from '../components/SliceDialog.vue'
 import { age, daysUntil, formatDate } from '../dates'
@@ -32,6 +33,7 @@ const person = ref<PersonDetail | null>(null)
 const groups = ref<Group[]>([])
 const loading = ref(true)
 const notFound = ref(false)
+const loadError = ref<string | null>(null)
 const personDialogOpen = ref(false)
 const sliceDialogOpen = ref(false)
 const editedSlice = ref<Slice | null>(null)
@@ -61,33 +63,43 @@ function telLink(number: string): string {
 }
 
 /**
- * Loads the person (and, for managers, the groups for the slice dialog).
+ * Loads the person (and, for managers, the groups for the term dialog).
  */
 async function load() {
 	loading.value = true
 	notFound.value = false
+	loadError.value = null
 	try {
 		person.value = await api.person(props.id)
-		if (me.isManager) {
-			groups.value = await api.groups()
-		}
 	} catch (error) {
-		notFound.value = true
+		// 404 also covers persons the user may not see
+		if (isNotFound(error)) {
+			notFound.value = true
+		} else {
+			loadError.value = errorMessage(error)
+		}
 		showError(errorMessage(error))
 	} finally {
 		loading.value = false
 	}
+	if (me.isManager && person.value !== null) {
+		try {
+			groups.value = await api.groups()
+		} catch (error) {
+			showError(errorMessage(error))
+		}
+	}
 }
 
 /**
- * @param slice Time slice
+ * @param slice Term
  */
 function isActive(slice: Slice): boolean {
 	return slice.endDate === null || daysUntil(slice.endDate) >= 0
 }
 
 /**
- * @param slice Time slice, null to add one
+ * @param slice Term, null to add one
  */
 function openSlice(slice: Slice | null) {
 	editedSlice.value = slice
@@ -103,7 +115,7 @@ async function deletePerson() {
 	}
 	const confirmed = await showConfirmation({
 		name: t('laudatio', 'Delete person'),
-		text: t('laudatio', 'Delete {name} with all functions and events? This cannot be undone.', { name: person.value.displayName }),
+		text: t('laudatio', 'Delete {name} with their function history and events? This cannot be undone.', { name: person.value.displayName }),
 		labelConfirm: t('laudatio', 'Delete'),
 		labelReject: t('laudatio', 'Cancel'),
 		severity: 'warning',
@@ -120,12 +132,12 @@ async function deletePerson() {
 }
 
 /**
- * @param slice Time slice to delete
+ * @param slice Term to delete
  */
 async function deleteSlice(slice: Slice) {
 	const confirmed = await showConfirmation({
-		name: t('laudatio', 'Delete time slice'),
-		text: t('laudatio', 'Delete the time slice "{function}" from {start}?', { function: slice.functionName, start: formatDate(slice.startDate) }),
+		name: t('laudatio', 'Delete term'),
+		text: t('laudatio', 'Delete the term as "{function}" from {start}?', { function: slice.functionName, start: formatDate(slice.startDate) }),
 		labelConfirm: t('laudatio', 'Delete'),
 		labelReject: t('laudatio', 'Cancel'),
 		severity: 'warning',
@@ -154,6 +166,7 @@ watch(() => props.id, load, { immediate: true })
 		</NcButton>
 
 		<NcLoadingIcon v-if="loading && person === null" :size="32" />
+		<LoadError v-else-if="loadError !== null && person === null" :message="loadError" @retry="load" />
 		<NcEmptyContent v-else-if="notFound || person === null" :name="t('laudatio', 'Person not found')" />
 		<template v-else>
 			<div class="view__header">
@@ -212,11 +225,11 @@ watch(() => props.id, load, { immediate: true })
 					<template #icon>
 						<NcIconSvgWrapper :path="mdiPlus" />
 					</template>
-					{{ t('laudatio', 'Add function') }}
+					{{ t('laudatio', 'Assign function') }}
 				</NcButton>
 			</div>
 			<p v-if="slices.length === 0" class="muted">
-				{{ t('laudatio', 'No functions yet.') }}
+				{{ t('laudatio', 'No functions yet. Birthdays and anniversaries are only generated while the person holds a function.') }}
 			</p>
 			<ol v-else class="timeline">
 				<li v-for="slice in slices"
@@ -234,7 +247,7 @@ watch(() => props.id, load, { immediate: true })
 							</template>
 						</span>
 					</div>
-					<NcActions v-if="me.isManager">
+					<NcActions v-if="me.isManager" :aria-label="t('laudatio', 'Actions for {name}', { name: slice.functionName })">
 						<NcActionButton close-after-click @click="openSlice(slice)">
 							<template #icon>
 								<NcIconSvgWrapper :path="mdiPencil" />

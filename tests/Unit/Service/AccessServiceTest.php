@@ -17,8 +17,10 @@ use OCA\Laudatio\Service\AccessService;
 use OCA\Laudatio\Service\Clock;
 use OCA\Laudatio\Service\Dates;
 use OCA\Laudatio\Service\SettingsService;
+use OCP\IGroup;
 use OCP\IGroupManager;
 use OCP\IL10N;
+use OCP\IUser;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -44,6 +46,11 @@ final class AccessServiceTest extends TestCase {
 
 		$this->groupManager->method('isAdmin')->willReturnCallback(static fn (string $uid): bool => $uid === 'admin');
 		$this->groupManager->method('isInGroup')->willReturnCallback(static fn (string $uid, string $gid): bool => $uid === 'manager' && $gid === 'hr');
+		$this->groupManager->method('get')->willReturnCallback(fn (string $gid): ?IGroup => match ($gid) {
+			'admin' => $this->group([['admin', true], ['locked', false]]),
+			'hr' => $this->group([['manager', true], ['admin', true]]),
+			default => null,
+		});
 		$this->settings->method('getManagerGroup')->willReturn('hr');
 		$this->groupMapper->method('findIdsByResponsible')->willReturnMap([['alice', [1]], ['bob', []], ['carol', []], ['admin', []], ['manager', []]]);
 		$this->interestedMapper->method('findGroupIdsByUser')->willReturnMap([['alice', [2]], ['bob', [1]], ['carol', []], ['admin', []], ['manager', []]]);
@@ -98,5 +105,29 @@ final class AccessServiceTest extends TestCase {
 		$this->access->requireManager('manager');
 		$this->expectException(ForbiddenException::class);
 		$this->access->requireManager('alice');
+	}
+
+	public function testManagerUserIdsAreTheEnabledAdminsAndManagerGroupMembers(): void {
+		$this->assertSame(['admin', 'manager'], $this->access->getManagerUserIds());
+	}
+
+	public function testEmptyUserIdMatchesNoGroup(): void {
+		// Groups whose responsible user was deleted store an empty UID
+		$this->groupMapper->expects($this->never())->method('findIdsByResponsible');
+		$this->assertSame([], $this->access->getResponsibleGroupIds(''));
+	}
+
+	/**
+	 * @param list<array{string, bool}> $users UID and whether the account is enabled
+	 */
+	private function group(array $users): IGroup {
+		$group = $this->createMock(IGroup::class);
+		$group->method('getUsers')->willReturn(array_map(function (array $user): IUser {
+			$mock = $this->createMock(IUser::class);
+			$mock->method('getUID')->willReturn($user[0]);
+			$mock->method('isEnabled')->willReturn($user[1]);
+			return $mock;
+		}, $users));
+		return $group;
 	}
 }

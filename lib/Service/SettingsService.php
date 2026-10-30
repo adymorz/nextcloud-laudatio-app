@@ -27,6 +27,7 @@ class SettingsService {
 	public const GREETING_REMINDER = 'greeting_reminder';
 	public const EMAIL_DEFAULT = 'email_default';
 	public const REGULATIONS_URL = 'regulations_url';
+	public const SHEET_NOTE = 'sheet_note';
 	/** Per-user setting */
 	public const EMAIL_NOTIFICATIONS = 'email_notifications';
 
@@ -36,6 +37,7 @@ class SettingsService {
 	public const MAX_LEAD_TIME_DAYS = 365;
 	public const MAX_JUBILEE_YEAR = 100;
 	public const MAX_URL_LENGTH = 2000;
+	public const MAX_SHEET_NOTE_LENGTH = 2000;
 
 	public function __construct(
 		private IAppConfig $appConfig,
@@ -136,6 +138,26 @@ class SettingsService {
 	}
 
 	/**
+	 * Text of the organization printed on every personal data sheet, e.g. who
+	 * stores the data and why. Null when not set.
+	 */
+	public function getSheetNote(): ?string {
+		$note = $this->appConfig->getValueString(Application::APP_ID, self::SHEET_NOTE);
+		return $note === '' ? null : $note;
+	}
+
+	/**
+	 * @throws ValidationException
+	 */
+	public function setSheetNote(string $note): void {
+		$note = trim($note);
+		if (mb_strlen($note) > self::MAX_SHEET_NOTE_LENGTH) {
+			throw new ValidationException($this->l10n->t('The note must not be longer than %d characters.', [self::MAX_SHEET_NOTE_LENGTH]));
+		}
+		$this->appConfig->setValueString(Application::APP_ID, self::SHEET_NOTE, $note);
+	}
+
+	/**
 	 * @param self::BIRTHDAY_EVENTS|self::JUBILEE_EVENTS|self::GREETING_REMINDER|self::EMAIL_DEFAULT $key
 	 */
 	public function setFlag(string $key, bool $value): void {
@@ -162,7 +184,7 @@ class SettingsService {
 		$tokens = preg_split('/[\s,;]+/', trim($value), -1, PREG_SPLIT_NO_EMPTY);
 		foreach ($tokens === false ? [] : $tokens as $token) {
 			if (!ctype_digit($token) || (int)$token < 1 || (int)$token > self::MAX_JUBILEE_YEAR) {
-				throw new ValidationException($this->l10n->t('Jubilee years must be whole numbers between 1 and %d, separated by commas.', [self::MAX_JUBILEE_YEAR]));
+				throw new ValidationException($this->l10n->t('Anniversary years must be whole numbers between 1 and %d, separated by commas.', [self::MAX_JUBILEE_YEAR]));
 			}
 			$years[] = (int)$token;
 		}

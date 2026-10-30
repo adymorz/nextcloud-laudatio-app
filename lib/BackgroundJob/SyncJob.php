@@ -16,7 +16,9 @@ use OCP\BackgroundJob\TimedJob;
 /**
  * Hourly: generates upcoming events and sends due notifications. Running
  * hourly instead of daily lets notifications follow changes quickly; every
- * step is idempotent.
+ * step is idempotent. The job is time sensitive because the reminders are
+ * user-facing: a time insensitive job would only run in the nightly
+ * maintenance window when one is configured.
  */
 class SyncJob extends TimedJob {
 	public function __construct(
@@ -25,7 +27,7 @@ class SyncJob extends TimedJob {
 	) {
 		parent::__construct($time);
 		$this->setInterval(3600);
-		$this->setTimeSensitivity(self::TIME_INSENSITIVE);
+		$this->setTimeSensitivity(self::TIME_SENSITIVE);
 	}
 
 	#[\Override]

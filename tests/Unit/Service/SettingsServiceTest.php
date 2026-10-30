@@ -120,6 +120,22 @@ final class SettingsServiceTest extends TestCase {
 		$this->assertNull($this->settings->getRegulationsUrl());
 	}
 
+	public function testSheetNoteIsTrimmedAndStored(): void {
+		$this->appConfig->expects($this->once())->method('setValueString')->with('laudatio', SettingsService::SHEET_NOTE, 'Stored by the Example Club.');
+		$this->settings->setSheetNote("  Stored by the Example Club. \n");
+	}
+
+	public function testTooLongSheetNoteIsRejected(): void {
+		$this->appConfig->expects($this->never())->method('setValueString');
+		$this->expectException(ValidationException::class);
+		$this->settings->setSheetNote(str_repeat('a', 2001));
+	}
+
+	public function testEmptySheetNoteIsNull(): void {
+		$this->appConfig->method('getValueString')->willReturn('');
+		$this->assertNull($this->settings->getSheetNote());
+	}
+
 	public function testUserEmailSettingDefaultsToAdminDefault(): void {
 		$this->appConfig->method('getValueBool')->willReturnMap([
 			['laudatio', SettingsService::EMAIL_DEFAULT, false, false, true],

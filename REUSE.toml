@@ -1,0 +1,35 @@
+# SPDX-FileCopyrightText: 2026 Adrian Dymorz <dev@adrian.dymorz.ch>
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# License information for files that cannot carry a header themselves,
+# see https://reuse.software. Check with `reuse lint`.
+
+version = 1
+
+[[annotations]]
+path = [
+	"composer.json",
+	"composer.lock",
+	"package.json",
+	"package-lock.json",
+	"openapi.json",
+	"tsconfig.json",
+	".nvmrc",
+	".gitignore",
+	".gitattributes",
+	"l10n/**",
+	"screenshots/**",
+	".ddev/**",
+	"vendor-bin/**",
+	"src/types/openapi.ts",
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Adrian Dymorz <dev@adrian.dymorz.ch>"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+# App icon: "gift-outline" from Material Design Icons
+[[annotations]]
+path = ["img/app.svg", "img/app-dark.svg"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Pictogrammers and contributors (Material Design Icons)"
+SPDX-License-Identifier = "Apache-2.0"

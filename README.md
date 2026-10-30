@@ -5,58 +5,81 @@
 
 # Laudatio
 
-Manage the people engaged in your organization (members, employees, elected officials, volunteers) and never miss their birthdays and work anniversaries (jubilees).
+Manage the people engaged in your organization (members, employees, elected officials, volunteers) and never miss their birthdays, anniversaries and yearly gifts.
 
-Requires Nextcloud 34 or 35 (PHP 8.2 or newer). Available in English and German. Report bugs and ideas in the [issue tracker](https://github.com/adymorz/nextcloud-laudatio-app/issues).
+Requires Nextcloud 34 or 35 (PHP 8.2 or newer). Available in English and German. Report bugs and ideas in the [issue tracker](https://github.com/adymorz/nextcloud-laudatio-app/issues), see [Contributing and support](#contributing-and-support).
 
 ![Upcoming birthdays and anniversaries](screenshots/upcoming.png)
 
 ## Features
 
-- **Persons** with date of birth, address, phone numbers and notes, and their **functions** over time (e.g. "Treasurer" from 2021 to 2024) in **groups** (e.g. "Board").
-- **Birthdays and jubilees** are generated automatically for the next 400 days, for every person who currently holds a function.
+- **Persons** with date of birth, address, phone numbers and notes, and their **functions** over time (e.g. "Treasurer" from 2021 to 2024, a *term*) in **groups** (e.g. "Board").
+- **Birthdays and anniversaries** are generated automatically for the next 400 days, for every person who currently holds a function.
 - **Yearly gifts**: functions can be marked "One gift per year", so the responsible person is reminded to present one gift per calendar year to everybody holding them.
 - **Calendar**: everybody involved in a group gets a read-only calendar "Birthdays & anniversaries" in the Calendar app and on CalDAV devices, with a reminder before each event (yearly gifts have no fixed day and are not in the calendar).
-- **Reminders**: a Nextcloud notification when an event comes within the lead time (default 14 days), optionally also by email.
-- **Upcoming** view with a "greeted" checklist for the responsible persons, and the yearly gifts of the year with a "presented" checklist.
-- **Data sheet** per person to print (or save as PDF) and hand over, so the person can check, correct and complete their data. Notes are never printed.
-- **Audit log** of who created, changed or deleted master data.
+- **Reminders**: a Nextcloud notification when an event comes within the lead time (default 14 days), optionally also by email. Every email says why you receive it and how to turn it off.
+- **Upcoming** view with a "congratulated" checklist for the responsible persons, and the yearly gifts of the year with a "presented" checklist.
+- **Data sheet** per person to print (or save as PDF) and hand over, so the person can check, correct and complete their data. Notes are never printed; an optional note of your organization on who stores the data and why is.
+- **Audit log** of who created, changed or deleted persons, groups, functions and terms.
 
 ### Roles
 
 | Role | Who | Can |
 | --- | --- | --- |
 | Manager | Nextcloud admins and members of the manager group (admin settings) | See and edit everything, see the audit log |
-| Responsible person | Exactly one Nextcloud user per group | See the current members of the group including date of birth, contact data and notes, print their data sheets, get their events, mark events as greeted and yearly gifts as presented |
-| Interested person | Any number of Nextcloud users per group | See the current members of the group (name and functions) and get their events "(for information)" |
+| Responsible person | Exactly one Nextcloud user per group | See the current members of the group including date of birth, contact data and notes, print their data sheets, get their events, mark events as congratulated and yearly gifts as presented |
+| Interested person | Any number of Nextcloud users per group | See the current members of the group (name and functions) and get their events "(for information)": birthdays without the age, anniversaries with the years of service |
 | Everybody else | | No access; the app is not shown in the navigation |
 
-Access is checked on the server for every request. Persons themselves need no Nextcloud account.
+Access is checked on the server for every request. Persons themselves need no Nextcloud account. When a Nextcloud account is deleted, it is removed from all interested lists; groups it was responsible for are left without a responsible person and the managers are notified to assign a new one. Disabled accounts get no reminders.
 
-### Birthdays and jubilees
+### Birthdays and anniversaries
 
 - A **birthday** is generated when the person holds an active function on that day. It goes to all groups of those functions.
-- A **jubilee** is counted per function from the start of the continuous service period: time slices that follow each other without a gap (e.g. a re-election) count as one period. It is generated in the jubilee years (global list, can be overridden per group) while the period is open, or if it ended on or after the jubilee date.
+- An **anniversary** is counted per function from the start of the continuous service period: terms that follow each other without a gap (e.g. a re-election) count as one period. It is generated in the anniversary years (global list, can be overridden per group) while the period is open, or if it ended on or after the anniversary date.
 - Birthdays and period starts on February 29 fall on February 28 in other years.
-- Titles follow the language of each user, e.g. "5th Anniversary for Anna Muster as Treasurer" or "40. Geburtstag von Anna Muster (zur Information)".
+- Titles follow the language and role of each user, e.g. "5th anniversary of Anna Muster as Treasurer", "40th birthday of Anna Muster" or, for interested persons, "Geburtstag von Anna Muster (zur Information)".
 
 ### Yearly gifts
 
 - For a function marked "One gift per year", every person holding it on at least one day of a calendar year gets one **yearly gift** for that year, an open item for the function's group, e.g. "Yearly gift for Anna Muster (Treasurer)". Holding the function twice in the same year still gives one gift.
 - It is due at the end of the year, or on the last day in the function if the person leaves it during the year. The reminder comes when the due date is within the lead time, unless the gift is already presented.
-- The Upcoming view lists the gifts of every year in the selected period, including overdue ones of the current year. The responsible person and managers mark them as presented, also when the "greeted" checklist is turned off.
+- The Upcoming view lists the gifts of every year in the selected period, including overdue ones of the current year. The responsible person and managers mark them as presented, also when the "congratulated" checklist is turned off.
 - Gifts are generated for the current and the next calendar year. Switching the function's yearly gift off removes the gifts of the current year, including presented ones; those of past years stay.
 
 ### Settings
 
-- **Admin** (Administration settings → Groupware → Laudatio): manager group, jubilee years, reminder lead time, which events are generated, the "greeted" checklist, whether reminder emails are on by default, and the link to the gift regulations (an external page or the internal link of a file in Nextcloud), shown to all users in the app navigation.
+- **Admin** (Administration settings → Groupware → Laudatio): manager group, anniversary years, reminder lead time, which events are generated, the "congratulated" checklist, whether reminder emails are on by default, the link to the gift regulations (an external page or the internal link of a file in Nextcloud) shown to all users in the app navigation, and the note printed on every data sheet.
 - **Personal** (Settings at the bottom of the app navigation): reminder emails on or off.
+
+## Privacy and data protection
+
+Laudatio stores personal data of people who usually have no Nextcloud account. What you should know as the organization responsible for that data:
+
+- **What is stored**: first and last name, date of birth, address, phone numbers and free-text notes per person; their terms (function, group, start and end date); the generated events with their "congratulated" marks; who was already notified about which event; and the audit log (IDs and field names only).
+- **Where**: only in the app's own tables of your Nextcloud database (`laudatio_*`). Nothing is sent to any other server.
+- **Who sees what**: see [Roles](#roles). Date of birth, contact data and notes are shown to managers and the responsible persons only, in the app and in its API.
+- **Where data leaves the database**: Nextcloud notifications hold only the event ID and render the title when shown. Reminder emails carry the title (name, age or years of service, function) and the date. The CalDAV calendar carries the title and the date to the devices of the responsible and interested users. The printed data sheet carries everything but the notes. Interested users never get the age.
+- **Logging**: the audit log records who created, changed or deleted what and which fields, never the values. The same entries go to the Nextcloud audit log (admin_audit app) as critical actions. The Nextcloud log contains no personal data of persons.
+- **Deletion**: deleting a person removes their terms, events, notifications and reminders; the audit log keeps the person's ID only. Deleting a function or group requires removing its terms first. Persons stay until a manager deletes them, there is no automatic retention.
+- **Everything at once**: `occ laudatio:purge` deletes all tables, settings, notifications and the background job of the app, see [Uninstalling](#uninstalling).
 
 ## Installation
 
 As an administrator, open **Apps**, search for "Laudatio" (category "Organization") and click **Download and enable**, or run `occ app:install laudatio`.
 
-Then choose the manager group and adjust the jubilee years and reminders in Administration settings → Groupware → Laudatio. Background jobs (cron) must run, they generate the events and send the reminders hourly. Install the Calendar app to see the birthdays and anniversaries in a calendar.
+Then choose the manager group and adjust the anniversary years and reminders in Administration settings → Groupware → Laudatio. Background jobs (cron) must run: the job of the app generates the events and sends the reminders hourly. Install the Calendar app to see the birthdays and anniversaries in a calendar.
+
+### Uninstalling
+
+Disabling the app (`occ app:disable laudatio`) keeps all data. This is also what happens automatically during a server upgrade when the app does not support the new version yet. Nextcloud never deletes the tables of an app, so removing the app alone leaves the personal data in your database. To delete it:
+
+```sh
+occ laudatio:purge        # asks for confirmation, --force skips the question
+occ app:remove laudatio
+```
+
+`occ laudatio:purge` drops the tables of the app and deletes its settings, the personal settings of all users, its notifications and its background job. Afterwards, `occ app:enable laudatio` starts over with an empty app.
 
 ## Development
 
@@ -76,11 +99,11 @@ ddev launch
 
 Log in as `admin` / `admin`. The users `alice` / `alice` and `bob` / `bob` are created as well.
 
-To get some data to work with, run `ddev occ laudatio:demo-data`. It creates two groups, where alice is responsible for "Demo: Board" and interested in "Demo: Volunteers" and bob the other way round, with persons whose birthdays and jubilees fall in the next weeks. Install the Calendar app (`ddev occ app:install calendar`) to see their calendars.
+To get some data to work with, run `ddev occ laudatio:demo-data`. It creates two groups, where alice is responsible for "Demo: Board" and interested in "Demo: Volunteers" and bob the other way round, with persons whose birthdays and anniversaries fall in the next weeks. Install the Calendar app (`ddev occ app:install calendar`) to see their calendars.
 
 ### How it works
 
-- Nextcloud (release tarball, version set by `NEXTCLOUD_VERSION` in [.ddev/config.yaml](.ddev/config.yaml)) lives in a Docker volume at `/var/www/nextcloud` in the web container. Your working copy is at `/var/www/html` and is symlinked to `/var/www/nextcloud/apps-extra/laudatio`, so changes are live immediately.
+- Nextcloud (release tarball, version set by `NEXTCLOUD_VERSION` in [.ddev/config.yaml](.ddev/config.yaml)) lives in a Docker volume at `/var/www/nextcloud` in the web container. Your working copy is at `/var/www/html` and is symlinked to `/var/www/nextcloud/apps-extra/laudatio`, so changes are live immediately. Never run `occ app:remove laudatio` there, it would follow the symlink and delete the working copy.
 - [.ddev/nextcloud/setup.sh](.ddev/nextcloud/setup.sh) runs on every `ddev start`. It downloads and installs Nextcloud on the first run, and afterwards only re-links the app, applies pending upgrades and enables the app.
 - Development settings (debug mode, trusted domains, app paths, mail) are in [.ddev/nextcloud/ddev.config.php](.ddev/nextcloud/ddev.config.php).
 - Background jobs run every 5 minutes (`nextcloud-cron` daemon in the web container).
@@ -97,18 +120,24 @@ To get some data to work with, run `ddev occ laudatio:demo-data`. It creates two
 | `ddev composer cs:check` / `ddev composer cs:fix` | Check / fix the PHP coding style |
 | `ddev composer psalm` | Static analysis |
 | `ddev composer rector` | Automated refactoring (then runs `cs:fix`) |
-| `ddev composer test:unit` | PHPUnit tests: unit tests and integration tests against the instance database (they only remove the rows they created) |
+| `ddev composer test` | PHPUnit, see [Testing](#testing); `test:unit` and `test:integration` run one suite |
 | `ddev composer openapi` | Regenerate [openapi.json](openapi.json) after API changes, then `ddev npm run typescript:generate` for the frontend types |
 | `ddev npm run l10n` | Check translations and compile `l10n/*.js`, see below |
 | `ddev occ laudatio:sync` | Generate events and send due reminders now (otherwise hourly) |
-| `ddev occ laudatio:demo-data` | Create demo data |
-| `ddev exec scripts/appstore-package.sh` | Build the unsigned App Store archive in `build/appstore/` (after `ddev npm run build`), see [Releasing](#releasing) |
+| `ddev occ laudatio:demo-data` | Create demo data on an empty app (`--force` adds it to existing data) |
+| `ddev occ laudatio:purge` | Delete all data of the app, then `ddev occ app:enable laudatio` starts over |
+| `ddev exec scripts/appstore-package.sh` | Build the unsigned App Store archive in `build/appstore/` (after `ddev npm run build`), see [RELEASING.md](RELEASING.md) |
+| `ddev exec node scripts/screenshots.mjs` | Retake the App Store screenshots with headless Chromium, see the preparation in [scripts/screenshots.mjs](scripts/screenshots.mjs) |
 | `ddev occ <command>` | Run Nextcloud's `occ`, e.g. `ddev occ app:list` |
 | `ddev occ log:watch` | Follow the Nextcloud log |
 | `ddev mailpit` | Open Mailpit to see sent mails |
 | `ddev xdebug on` / `ddev xdebug off` | Toggle Xdebug |
 | `ddev nextcloud-reset` | Reinstall Nextcloud from scratch (database, users and files are lost) |
 | `ddev nextcloud-reset --full` | Same, and download the server code again |
+
+### Testing
+
+All tests boot Nextcloud ([tests/bootstrap.php](tests/bootstrap.php)), so they run inside DDEV or in CI. The `unit` suite uses mocks only. The `integration` suite writes to the database of the instance and removes the rows it created afterwards; run it on a development instance only. CI runs both suites on Nextcloud 34 and 35 with SQLite.
 
 ### Debugging with Xdebug
 
@@ -141,47 +170,29 @@ Change `NEXTCLOUD_VERSION` in [.ddev/config.yaml](.ddev/config.yaml) and run `dd
 
 The app supports Nextcloud 34 and 35 and PHP 8.2 to 8.5. The development instance runs Nextcloud 35.
 
-- `composer.json` pins `nextcloud/ocp` to the **lowest** supported version (`dev-stable34`), so autocompletion and psalm only offer API that exists in both. CI also runs psalm against `dev-stable35` and the PHP unit and integration tests in Nextcloud 34 and 35.
+- `composer.json` pins `nextcloud/ocp` to the **lowest** supported version (`dev-stable34`), so autocompletion and psalm only offer API that exists in both. CI also runs psalm against `dev-stable35` and the PHP tests in Nextcloud 34 and 35.
 - Avoid PHP 8.3 syntax (e.g. typed class constants); CI lints on PHP 8.2.
 - To try the app on Nextcloud 34 locally, run `ddev exec 'NEXTCLOUD_VERSION=34.0.5 bash /mnt/ddev_config/commands/web/nextcloud-reset --full'`. A later `ddev restart` upgrades the instance back to the configured Nextcloud 35, which also tests the upgrade path.
 
 ### Translations
 
-Source strings are English: `$l->t('…')` in PHP and `t('laudatio', '…')` in the frontend. Translations live in [l10n/de.json](l10n/de.json) (German, informal) and [l10n/de_DE.json](l10n/de_DE.json) (German, formal). After adding or changing strings, add them to both files and run `ddev npm run l10n`: it lists missing and unused strings and writes the `l10n/*.js` files the frontend loads. CI fails if a translation is missing.
+Source strings are English: `$l->t('…')` in PHP and `t('laudatio', '…')` in the frontend. Translations live in [l10n/de.json](l10n/de.json) (German, informal) and [l10n/de_DE.json](l10n/de_DE.json) (German, formal). After adding or changing strings, add them to both files and run `ddev npm run l10n`: it lists missing and unused strings and writes the `l10n/*.js` files the frontend loads. CI fails if a translation is missing. See [CONTRIBUTING.md](CONTRIBUTING.md) for adding a language.
 
 ### Architecture
 
 - `lib/Service`: domain logic. `EventCalculator` and `PeriodCalculator` compute the events, `EventService` keeps the `laudatio_events` table in sync, `AccessService` holds all permission rules, `Presenter` applies them to API responses.
 - `lib/Controller`: OCS API (`/ocs/v2.php/apps/laudatio/api/v1/…`, documented in [openapi.json](openapi.json)) and the page.
 - `lib/Calendar`: the calendar provider (public `ICalendarProvider` API).
-- `lib/Notification`, `lib/BackgroundJob`, `lib/Command`, `lib/Settings`: notifier, hourly job, occ commands, admin settings form.
+- `lib/Notification`, `lib/BackgroundJob`, `lib/Command`, `lib/Settings`, `lib/Listener`: notifier, hourly job, occ commands, admin settings form, cleanup when a user is deleted.
 - `src`: Vue 3 frontend with `@nextcloud/vue`.
 
 ### Releasing
 
-Releases go to the [Nextcloud App Store](https://apps.nextcloud.com/apps/laudatio) through the GitLab CI pipeline of a version tag. The release archives are attached to the GitHub releases of the mirror, from where the App Store and every Nextcloud server download them.
+Releases go to the Nextcloud App Store through the GitLab CI pipeline of a version tag, see [RELEASING.md](RELEASING.md).
 
-For each release:
+## Contributing and support
 
-1. Set the new version in [appinfo/info.xml](appinfo/info.xml) and `package.json`.
-2. In [CHANGELOG.md](CHANGELOG.md), rename `## [Unreleased]` to `## X.Y.Z – YYYY-MM-DD` and add a new empty `## [Unreleased]` above it. The App Store only finds headings that start with the plain version (no brackets). Pre-releases (`X.Y.Z-beta.1`) take their notes from `## [Unreleased]`.
-3. Merge to `main`, then tag and push: `git tag vX.Y.Z && git push origin vX.Y.Z`.
-
-After all checks pass, `release:package` builds the archive and signs both the code (`appinfo/signature.json`) and the archive ([scripts/appstore-package.sh](scripts/appstore-package.sh)). `release:publish` then attaches it to the GitHub release and registers it in the App Store ([scripts/appstore-publish.sh](scripts/appstore-publish.sh)). The pipeline fails if the tag, the version in info.xml and the changelog heading don't match.
-
-One-time setup:
-
-1. **GitHub mirror**: a public repository `adymorz/nextcloud-laudatio-app` with issues enabled, created empty (no README or license) so the mirror can push to it. In GitLab, Settings → Repository → Mirroring repositories, push to `https://github.com/adymorz/nextcloud-laudatio-app.git` with a fine-grained GitHub token (Contents: read and write), including tags.
-2. **Certificate**: the private key `laudatio.key` and the signing request `laudatio.csr` are in `~/.nextcloud/certificates/`. Never commit or share the key. The GitHub profile must show its email address, then submit the request as `laudatio/laudatio.csr` in a pull request to [nextcloud/app-certificate-requests](https://github.com/nextcloud/app-certificate-requests) and save the signed certificate as `~/.nextcloud/certificates/laudatio.crt`.
-3. **App Store**: log in at [apps.nextcloud.com](https://apps.nextcloud.com) and [register the app](https://apps.nextcloud.com/developer/apps/new) with the certificate and the signature of the app ID: `echo -n laudatio | openssl dgst -sha512 -sign ~/.nextcloud/certificates/laudatio.key | openssl base64`.
-4. **GitLab CI/CD**: protect the tags `v*` (Settings → Repository → Protected tags) and add these protected variables (Settings → CI/CD → Variables):
-
-| Variable | Type | Value |
-| --- | --- | --- |
-| `APP_PRIVATE_KEY` | File | Contents of `laudatio.key` |
-| `APP_CERTIFICATE` | File | Contents of `laudatio.crt` |
-| `GITHUB_TOKEN` | Variable, masked | Fine-grained GitHub token for the mirror repository with "Contents: read and write" |
-| `APPSTORE_TOKEN` | Variable, masked | API token from [apps.nextcloud.com/account/token](https://apps.nextcloud.com/account/token) |
+Issues and pull requests on GitHub are welcome, see [CONTRIBUTING.md](CONTRIBUTING.md). Please report security issues privately as described in [SECURITY.md](SECURITY.md).
 
 ## Known issues
 

@@ -50,7 +50,7 @@ class AdminForm implements IDeclarativeSettingsFormWithHandlers {
 			'section_id' => 'groupware',
 			'storage_type' => DeclarativeSettingsTypes::STORAGE_TYPE_EXTERNAL,
 			'title' => $this->l10n->t('Laudatio'),
-			'description' => $this->l10n->t('Birthdays and work anniversaries of the persons engaged in your organization.'),
+			'description' => $this->l10n->t('Birthdays, anniversaries and yearly gifts of the persons engaged in your organization.'),
 			'fields' => [
 				[
 					'id' => SettingsService::MANAGER_GROUP,
@@ -62,7 +62,7 @@ class AdminForm implements IDeclarativeSettingsFormWithHandlers {
 				],
 				[
 					'id' => SettingsService::JUBILEE_YEARS,
-					'title' => $this->l10n->t('Jubilee years'),
+					'title' => $this->l10n->t('Anniversary years'),
 					'description' => $this->l10n->t('Years of service that are celebrated, separated by commas. Groups can override this list.'),
 					'type' => DeclarativeSettingsTypes::TEXT,
 					'placeholder' => SettingsService::formatJubileeYears(SettingsService::DEFAULT_JUBILEE_YEARS),
@@ -71,7 +71,7 @@ class AdminForm implements IDeclarativeSettingsFormWithHandlers {
 				[
 					'id' => SettingsService::LEAD_TIME_DAYS,
 					'title' => $this->l10n->t('Reminder lead time (days)'),
-					'description' => $this->l10n->t('How many days before a birthday, a jubilee or the due date of a yearly gift the reminder is sent.'),
+					'description' => $this->l10n->t('How many days before a birthday, an anniversary or the due date of a yearly gift the reminder is sent.'),
 					'type' => DeclarativeSettingsTypes::NUMBER,
 					'default' => SettingsService::DEFAULT_LEAD_TIME_DAYS,
 				],
@@ -79,20 +79,22 @@ class AdminForm implements IDeclarativeSettingsFormWithHandlers {
 					'id' => SettingsService::BIRTHDAY_EVENTS,
 					'title' => $this->l10n->t('Events'),
 					'label' => $this->l10n->t('Generate birthday events'),
+					'description' => $this->l10n->t('Turning this off deletes the upcoming birthday events, including their congratulated marks.'),
 					'type' => DeclarativeSettingsTypes::CHECKBOX,
 					'default' => true,
 				],
 				[
 					'id' => SettingsService::JUBILEE_EVENTS,
 					'title' => '',
-					'label' => $this->l10n->t('Generate jubilee events'),
+					'label' => $this->l10n->t('Generate anniversary events'),
+					'description' => $this->l10n->t('Turning this off deletes the upcoming anniversary events, including their congratulated marks.'),
 					'type' => DeclarativeSettingsTypes::CHECKBOX,
 					'default' => true,
 				],
 				[
 					'id' => SettingsService::GREETING_REMINDER,
 					'title' => '',
-					'label' => $this->l10n->t('Let responsible persons mark events as greeted'),
+					'label' => $this->l10n->t('Let responsible persons mark events as congratulated'),
 					'type' => DeclarativeSettingsTypes::CHECKBOX,
 					'default' => true,
 				],
@@ -111,6 +113,13 @@ class AdminForm implements IDeclarativeSettingsFormWithHandlers {
 					'placeholder' => 'https://',
 					'default' => '',
 				],
+				[
+					'id' => SettingsService::SHEET_NOTE,
+					'title' => $this->l10n->t('Note on the data sheet'),
+					'description' => $this->l10n->t('Printed under the heading of every personal data sheet, e.g. who stores the data and why, who can see it and whom to contact.'),
+					'type' => DeclarativeSettingsTypes::TEXT,
+					'default' => '',
+				],
 			],
 		];
 	}
@@ -126,6 +135,7 @@ class AdminForm implements IDeclarativeSettingsFormWithHandlers {
 			SettingsService::GREETING_REMINDER => $this->settings->isGreetingReminderEnabled(),
 			SettingsService::EMAIL_DEFAULT => $this->settings->isEmailDefaultEnabled(),
 			SettingsService::REGULATIONS_URL => $this->settings->getRegulationsUrl() ?? '',
+			SettingsService::SHEET_NOTE => $this->settings->getSheetNote() ?? '',
 			default => null,
 		};
 	}
@@ -164,6 +174,9 @@ class AdminForm implements IDeclarativeSettingsFormWithHandlers {
 				return;
 			case SettingsService::REGULATIONS_URL:
 				$this->settings->setRegulationsUrl(is_string($value) ? $value : '');
+				return;
+			case SettingsService::SHEET_NOTE:
+				$this->settings->setSheetNote(is_string($value) ? $value : '');
 				return;
 		}
 	}

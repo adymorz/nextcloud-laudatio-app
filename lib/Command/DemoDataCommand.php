@@ -22,9 +22,10 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Seeds demo data for development: two groups with the DDEV test users as
+ * Seeds demo data on a test instance: two groups with the DDEV test users as
  * responsible and interested persons, and persons whose birthdays and
- * jubilees fall within the next weeks (relative to today).
+ * anniversaries fall within the next weeks (relative to today). Refuses to mix
+ * the demo data into existing data unless forced.
  */
 class DemoDataCommand extends Command {
 	private const BOARD = 'Demo: Board';
@@ -42,9 +43,9 @@ class DemoDataCommand extends Command {
 	#[\Override]
 	protected function configure(): void {
 		$this->setName('laudatio:demo-data')
-			->setDescription('Create demo groups, functions and persons (for development)')
+			->setDescription('Create demo groups, functions and persons on a test instance')
 			->setHelp('Requires the users "alice" and "bob". Alice is responsible for "Demo: Board" and interested in "Demo: Volunteers", Bob the other way round.')
-			->addOption('force', null, InputOption::VALUE_NONE, 'Create the demo data even if demo groups already exist');
+			->addOption('force', null, InputOption::VALUE_NONE, 'Add the demo data even if Laudatio already contains data');
 	}
 
 	#[\Override]
@@ -55,11 +56,9 @@ class DemoDataCommand extends Command {
 				return self::FAILURE;
 			}
 		}
-		foreach ($this->groups->findAll() as $group) {
-			if (in_array($group->getName(), [self::BOARD, self::VOLUNTEERS], true) && $input->getOption('force') !== true) {
-				$output->writeln('<comment>Demo data already exists, use --force to add it again.</comment>');
-				return self::SUCCESS;
-			}
+		if (($this->groups->findAll() !== [] || $this->persons->findAll() !== []) && $input->getOption('force') !== true) {
+			$output->writeln('<error>Laudatio already contains data. The demo data is meant for an empty test instance, use --force to add it anyway.</error>');
+			return self::FAILURE;
 		}
 
 		$today = $this->clock->today();

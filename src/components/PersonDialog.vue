@@ -114,13 +114,14 @@ async function save() {
 				v-model="dateOfBirth"
 				type="date"
 				:max="new Date()"
-				:label="t('laudatio', 'Date of birth')" />
+				:label="t('laudatio', 'Date of birth')"
+				required />
 			<div class="form__row form__row--street">
 				<NcTextField v-model="contact.street" :label="t('laudatio', 'Street')" autocomplete="off" />
 				<NcTextField v-model="contact.streetNumber" :label="t('laudatio', 'House number')" autocomplete="off" />
 			</div>
 			<div class="form__row form__row--city">
-				<NcTextField v-model="contact.postalCode" :label="t('laudatio', 'ZIP code')" autocomplete="off" />
+				<NcTextField v-model="contact.postalCode" :label="t('laudatio', 'Postal code')" autocomplete="off" />
 				<NcTextField v-model="contact.city" :label="t('laudatio', 'City')" autocomplete="off" />
 			</div>
 			<NcTextField v-model="contact.country" :label="t('laudatio', 'Country')" autocomplete="off" />
@@ -137,7 +138,7 @@ async function save() {
 			<NcTextArea
 				v-model="notes"
 				:label="t('laudatio', 'Notes')"
-				:helper-text="t('laudatio', 'Date of birth, contact data and notes are only visible to managers and the responsible person of the person\'s groups.')"
+				:helper-text="t('laudatio', 'Date of birth, address, phone numbers and notes are only visible to managers and the responsible persons of the person\'s groups. Interested persons see the name, the functions and the day of the birthday.')"
 				resize="vertical" />
 			<button type="submit" hidden />
 		</form>

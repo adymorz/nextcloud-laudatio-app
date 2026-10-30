@@ -97,6 +97,16 @@ export async function searchUsers(search: string): Promise<User[]> {
 }
 
 /**
+ * Whether the server answered a request with 404, e.g. for a person the user
+ * may not see.
+ *
+ * @param error Error thrown by an API call
+ */
+export function isNotFound(error: unknown): boolean {
+	return isAxiosError(error) && error.response?.status === 404
+}
+
+/**
  * The message to show for a failed request: the (translated) message of the
  * server if there is one.
  *

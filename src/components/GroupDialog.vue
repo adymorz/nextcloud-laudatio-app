@@ -37,7 +37,8 @@ const valid = computed(() => name.value.trim() !== '' && responsible.value.lengt
 watch(open, (isOpen) => {
 	if (isOpen) {
 		name.value = props.group?.name ?? ''
-		responsible.value = props.group ? [props.group.responsible] : []
+		// No responsible user after the former one was deleted
+		responsible.value = props.group?.responsible ? [props.group.responsible] : []
 		interested.value = props.group?.interested ?? []
 		jubileeYears.value = props.group?.jubileeYears ?? ''
 	}
@@ -82,7 +83,8 @@ async function save() {
 			<UserSelect
 				id="laudatio-group-responsible"
 				v-model="responsible"
-				:input-label="t('laudatio', 'Responsible person')" />
+				:input-label="t('laudatio', 'Responsible person')"
+				required />
 			<UserSelect
 				id="laudatio-group-interested"
 				v-model="interested"
@@ -90,8 +92,8 @@ async function save() {
 				multiple />
 			<NcTextField
 				v-model="jubileeYears"
-				:label="t('laudatio', 'Jubilee years')"
-				:helper-text="t('laudatio', 'Comma separated, e.g. 5, 10, 25. Leave empty to use the global setting.')" />
+				:label="t('laudatio', 'Anniversary years')"
+				:helper-text="t('laudatio', 'Comma-separated years of service, e.g. 5, 10, 25. Leave empty to use the global setting.')" />
 			<button type="submit" hidden />
 		</form>
 		<template #actions>

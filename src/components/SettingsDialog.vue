@@ -9,6 +9,7 @@ import { n, t } from '@nextcloud/l10n'
 import NcAppSettingsDialog from '@nextcloud/vue/components/NcAppSettingsDialog'
 import NcAppSettingsSection from '@nextcloud/vue/components/NcAppSettingsSection'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
+import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import { ref } from 'vue'
 import { api, errorMessage } from '../api'
 import { me } from '../store'
@@ -35,7 +36,12 @@ async function setEmail(enabled: boolean) {
 	<NcAppSettingsDialog v-model:open="open" :name="t('laudatio', 'Laudatio settings')">
 		<NcAppSettingsSection id="laudatio-reminders" :name="t('laudatio', 'Reminders')">
 			<p class="hint">
-				{{ n('laudatio', 'You get a notification %n day before a birthday or jubilee of your groups.', 'You get a notification %n days before a birthday or jubilee of your groups.', me.leadTimeDays) }}
+				<template v-if="me.leadTimeDays === 0">
+					{{ t('laudatio', 'You get a notification on the day of a birthday, an anniversary or the due date of a yearly gift in your groups.') }}
+				</template>
+				<template v-else>
+					{{ n('laudatio', 'You get a notification %n day before a birthday, an anniversary or the due date of a yearly gift in your groups.', 'You get a notification %n days before a birthday, an anniversary or the due date of a yearly gift in your groups.', me.leadTimeDays) }}
+				</template>
 			</p>
 			<NcCheckboxRadioSwitch
 				:model-value="me.emailNotifications"
@@ -44,6 +50,9 @@ async function setEmail(enabled: boolean) {
 				@update:model-value="setEmail">
 				{{ t('laudatio', 'Also send reminders by email') }}
 			</NcCheckboxRadioSwitch>
+			<NcNoteCard v-if="!me.hasEmail" type="warning">
+				{{ t('laudatio', 'Your account has no email address, so no emails can be sent to you.') }}
+			</NcNoteCard>
 		</NcAppSettingsSection>
 	</NcAppSettingsDialog>
 </template>

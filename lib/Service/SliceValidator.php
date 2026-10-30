@@ -45,7 +45,7 @@ class SliceValidator {
 				continue;
 			}
 			if (self::overlaps($start, $end, $other->getStartDate(), $other->getEndDate())) {
-				throw new ConflictException($this->l10n->t('The time slice overlaps another time slice of this person in the same function.'));
+				throw new ConflictException($this->l10n->t('The term overlaps another term of this person in the same function.'));
 			}
 		}
 	}

@@ -6,7 +6,7 @@
 <script setup lang="ts">
 import type { Group, OrgFunction } from '../types'
 
-import { mdiAccountGroup, mdiDelete, mdiGift, mdiPencil, mdiPlus } from '@mdi/js'
+import { mdiAccountGroup, mdiAlert, mdiDelete, mdiGift, mdiPencil, mdiPlus } from '@mdi/js'
 import { showConfirmation, showError } from '@nextcloud/dialogs'
 import { t } from '@nextcloud/l10n'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
@@ -20,10 +20,12 @@ import { onMounted, ref } from 'vue'
 import { api, errorMessage } from '../api'
 import FunctionDialog from '../components/FunctionDialog.vue'
 import GroupDialog from '../components/GroupDialog.vue'
+import LoadError from '../components/LoadError.vue'
 import { me } from '../store'
 
 const groups = ref<Group[]>([])
 const loading = ref(true)
+const loadError = ref<string | null>(null)
 const groupDialogOpen = ref(false)
 const editedGroup = ref<Group | null>(null)
 const functionDialogOpen = ref(false)
@@ -33,17 +35,24 @@ const editedFunction = ref<OrgFunction | null>(null)
 const roleLabels: Record<Group['role'], string> = {
 	manager: t('laudatio', 'Manager'),
 	responsible: t('laudatio', 'Responsible'),
-	interested: t('laudatio', 'For information'),
+	interested: t('laudatio', 'Interested'),
 }
+
+// First steps for a manager of an empty app
+const emptyHint = me.isManager
+	? t('laudatio', 'Create a group, e.g. "Board", with its functions, e.g. "President" and "Treasurer", and choose the responsible person who gets the reminders.')
+	: ''
 
 /**
  * Loads all visible groups.
  */
 async function load() {
+	loadError.value = null
 	try {
 		groups.value = await api.groups()
 	} catch (error) {
-		showError(errorMessage(error))
+		loadError.value = errorMessage(error)
+		showError(loadError.value)
 	} finally {
 		loading.value = false
 	}
@@ -129,7 +138,11 @@ onMounted(load)
 		</div>
 
 		<NcLoadingIcon v-if="loading" :size="32" />
-		<NcEmptyContent v-else-if="groups.length === 0" :name="t('laudatio', 'No groups yet')">
+		<LoadError v-else-if="loadError !== null" :message="loadError" @retry="load" />
+		<NcEmptyContent
+			v-else-if="groups.length === 0"
+			:name="t('laudatio', 'No groups yet')"
+			:description="emptyHint">
 			<template #icon>
 				<NcIconSvgWrapper :path="mdiAccountGroup" />
 			</template>
@@ -138,7 +151,7 @@ onMounted(load)
 			<div class="group__header">
 				<h3>{{ group.name }}</h3>
 				<span class="group__role">{{ roleLabels[group.role] }}</span>
-				<NcActions v-if="me.isManager">
+				<NcActions v-if="me.isManager" :aria-label="t('laudatio', 'Actions for {name}', { name: group.name })">
 					<NcActionButton close-after-click @click="openGroup(group)">
 						<template #icon>
 							<NcIconSvgWrapper :path="mdiPencil" />
@@ -163,7 +176,13 @@ onMounted(load)
 			<dl class="group__details">
 				<dt>{{ t('laudatio', 'Responsible person') }}</dt>
 				<dd>
-					<NcUserBubble :user="group.responsible.id" :display-name="group.responsible.displayName" />
+					<NcUserBubble v-if="group.responsible" :user="group.responsible.id" :display-name="group.responsible.displayName" />
+					<span v-else class="group__warning">
+						<NcIconSvgWrapper :path="mdiAlert" :size="20" inline />
+						{{ me.isManager
+							? t('laudatio', 'No responsible person: the account was deleted. Edit the group to assign a new one.')
+							: t('laudatio', 'No responsible person at the moment.') }}
+					</span>
 				</dd>
 				<dt>{{ t('laudatio', 'Interested persons') }}</dt>
 				<dd>
@@ -174,7 +193,7 @@ onMounted(load)
 						:user="user.id"
 						:display-name="user.displayName" />
 				</dd>
-				<dt>{{ t('laudatio', 'Jubilee years') }}</dt>
+				<dt>{{ t('laudatio', 'Anniversary years') }}</dt>
 				<dd>
 					{{ group.effectiveJubileeYears.join(', ') || t('laudatio', 'none') }}
 					<span class="muted">
@@ -260,6 +279,13 @@ onMounted(load)
 .group__role,
 .muted {
 	color: var(--color-text-maxcontrast);
+}
+
+.group__warning {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--default-grid-baseline);
+	color: var(--color-warning-text);
 }
 
 .group__details {
