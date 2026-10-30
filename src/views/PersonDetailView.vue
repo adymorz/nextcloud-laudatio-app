@@ -249,7 +249,7 @@ watch(() => props.id, load, { immediate: true })
 						</span>
 						<SliceDetails :slice="slice" />
 					</div>
-					<NcActions v-if="me.isManager" :aria-label="t('laudatio', 'Actions for {name}', { name: slice.functionName })">
+					<NcActions v-if="me.isManager" class="timeline__actions" :aria-label="t('laudatio', 'Actions for {name}', { name: slice.functionName })">
 						<NcActionButton close-after-click @click="openSlice(slice)">
 							<template #icon>
 								<NcIconSvgWrapper :path="mdiPencil" />
@@ -352,6 +352,12 @@ watch(() => props.id, load, { immediate: true })
 .timeline__text {
 	display: flex;
 	flex-direction: column;
+}
+
+/* Centered on the line of the title, however tall the term is */
+.timeline__actions {
+	align-self: flex-start;
+	margin-block-start: calc((1lh - var(--default-clickable-area)) / 2);
 }
 
 .timeline__dates,
