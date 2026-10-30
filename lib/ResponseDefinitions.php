@@ -26,7 +26,9 @@ namespace OCA\Laudatio;
  *     greetingReminder: bool,
  *     leadTimeDays: int,
  *     emailNotifications: bool,
+ *     hasEmail: bool,
  *     regulationsUrl: ?string,
+ *     sheetNote: ?string,
  * }
  *
  * @psalm-type LaudatioFunction = array{
@@ -39,7 +41,7 @@ namespace OCA\Laudatio;
  * @psalm-type LaudatioGroup = array{
  *     id: int,
  *     name: string,
- *     responsible: LaudatioUser,
+ *     responsible: ?LaudatioUser,
  *     interested: list<LaudatioUser>,
  *     jubileeYears: ?string,
  *     effectiveJubileeYears: list<int>,
@@ -99,7 +101,7 @@ namespace OCA\Laudatio;
  *     id: int,
  *     type: 'birthday'|'jubilee'|'gift',
  *     date: string,
- *     ordinal: int,
+ *     ordinal: ?int,
  *     title: string,
  *     role: 'responsible'|'interested'|null,
  *     personId: int,

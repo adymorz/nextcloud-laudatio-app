@@ -11,6 +11,8 @@ namespace OCA\Laudatio\Tests\Unit\Notification;
 
 use OCA\Laudatio\Db\Event;
 use OCA\Laudatio\Db\EventMapper;
+use OCA\Laudatio\Db\Group;
+use OCA\Laudatio\Db\GroupMapper;
 use OCA\Laudatio\Notification\Notifier;
 use OCA\Laudatio\Service\Dates;
 use OCA\Laudatio\Service\NotificationService;
@@ -29,6 +31,7 @@ use PHPUnit\Framework\TestCase;
 
 final class NotifierTest extends TestCase {
 	private EventMapper&MockObject $eventMapper;
+	private GroupMapper&MockObject $groupMapper;
 	private RecipientService&MockObject $recipients;
 	private Notifier $notifier;
 
@@ -39,16 +42,17 @@ final class NotifierTest extends TestCase {
 		$factory = $this->createMock(IFactory::class);
 		$factory->method('get')->willReturn($l10n);
 		$this->eventMapper = $this->createMock(EventMapper::class);
+		$this->groupMapper = $this->createMock(GroupMapper::class);
 		$this->recipients = $this->createMock(RecipientService::class);
 		$titles = $this->createMock(TitleBuilder::class);
-		$titles->method('build')->willReturnCallback(static fn (Event $e, ?string $role): string => ($e->getType() === Event::TYPE_GIFT ? 'Yearly gift for Anna Muster (Treasurer)' : '40th Birthday of Anna Muster') . ($role === 'interested' ? ' (for information)' : ''));
+		$titles->method('build')->willReturnCallback(static fn (Event $e, ?string $role): string => ($e->getType() === Event::TYPE_GIFT ? 'Yearly gift for Anna Muster (Treasurer)' : '40th birthday of Anna Muster') . ($role === 'interested' ? ' (for information)' : ''));
 		$formatter = $this->createMock(IDateTimeFormatter::class);
 		$formatter->method('formatDate')->willReturn('October 30, 2026');
 		$urls = $this->createMock(IURLGenerator::class);
 		$urls->method('linkToRouteAbsolute')->willReturn('https://cloud.example/apps/laudatio/');
 		$urls->method('getAbsoluteURL')->willReturnArgument(0);
 
-		$this->notifier = new Notifier($factory, $this->eventMapper, $this->recipients, $titles, $formatter, $urls);
+		$this->notifier = new Notifier($factory, $this->eventMapper, $this->groupMapper, $this->recipients, $titles, $formatter, $urls);
 	}
 
 	public function testRendersTitleAndDateForTheRole(): void {
@@ -56,7 +60,7 @@ final class NotifierTest extends TestCase {
 		$this->recipients->method('roleOf')->willReturn(RecipientService::ROLE_INTERESTED);
 
 		$notification = $this->notification('laudatio', NotificationService::SUBJECT_UPCOMING);
-		$notification->expects($this->once())->method('setParsedSubject')->with('40th Birthday of Anna Muster (for information) on October 30, 2026')->willReturnSelf();
+		$notification->expects($this->once())->method('setParsedSubject')->with('40th birthday of Anna Muster (for information) on October 30, 2026')->willReturnSelf();
 		$notification->expects($this->never())->method('setParsedMessage');
 		$this->notifier->prepare($notification, 'en');
 	}
@@ -114,11 +118,45 @@ final class NotifierTest extends TestCase {
 		$this->notifier->prepare($this->notification('laudatio', NotificationService::SUBJECT_UPCOMING), 'en');
 	}
 
-	private function notification(string $app, string $subject): INotification&MockObject {
+	public function testUnknownSubjectsAreRejected(): void {
+		$this->expectException(UnknownNotificationException::class);
+		$this->notifier->prepare($this->notification('laudatio', 'whatever'), 'en');
+	}
+
+	public function testMissingResponsiblePersonNamesTheGroup(): void {
+		$this->groupMapper->method('find')->with(3)->willReturn($this->group(''));
+
+		$notification = $this->notification('laudatio', NotificationService::SUBJECT_RESPONSIBLE_DELETED, '3');
+		$notification->expects($this->once())->method('setParsedSubject')->with('The responsible person of the group "Board" was deleted. Please assign a new one.')->willReturnSelf();
+		$notification->expects($this->once())->method('setLink')->with('https://cloud.example/apps/laudatio/')->willReturnSelf();
+		$this->notifier->prepare($notification, 'en');
+	}
+
+	public function testHintDisappearsOnceTheGroupHasAResponsiblePersonAgain(): void {
+		$this->groupMapper->method('find')->willReturn($this->group('dave'));
+		$this->expectException(AlreadyProcessedException::class);
+		$this->notifier->prepare($this->notification('laudatio', NotificationService::SUBJECT_RESPONSIBLE_DELETED, '3'), 'en');
+	}
+
+	public function testHintOfADeletedGroupDisappears(): void {
+		$this->groupMapper->method('find')->willThrowException(new DoesNotExistException('gone'));
+		$this->expectException(AlreadyProcessedException::class);
+		$this->notifier->prepare($this->notification('laudatio', NotificationService::SUBJECT_RESPONSIBLE_DELETED, '3'), 'en');
+	}
+
+	private function group(string $responsible): Group {
+		$group = new Group();
+		$group->setId(3);
+		$group->setName('Board');
+		$group->setResponsibleUid($responsible);
+		return $group;
+	}
+
+	private function notification(string $app, string $subject, string $objectId = '7'): INotification&MockObject {
 		$notification = $this->createMock(INotification::class);
 		$notification->method('getApp')->willReturn($app);
 		$notification->method('getSubject')->willReturn($subject);
-		$notification->method('getObjectId')->willReturn('7');
+		$notification->method('getObjectId')->willReturn($objectId);
 		$notification->method('getUser')->willReturn('bob');
 		$notification->method('setParsedSubject')->willReturnSelf();
 		$notification->method('setParsedMessage')->willReturnSelf();

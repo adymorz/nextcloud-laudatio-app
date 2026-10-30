@@ -25,7 +25,7 @@ use OCP\IDBConnection;
 use OCP\IL10N;
 
 /**
- * Persons and their time slices. Every change is written to the audit log and
+ * Persons and their terms. Every change is written to the audit log and
  * the person's events are synchronized afterwards.
  */
 class PersonService {
@@ -36,6 +36,10 @@ class PersonService {
 	public const MAX_TEXT_LENGTH = 255;
 	public const MAX_SHORT_LENGTH = 32;
 	public const MAX_PHONE_LENGTH = 32;
+	/** Earliest year of a date of birth or a term */
+	public const MIN_YEAR = 1900;
+	/** Latest year of a term, keeps typos like 0202 out of the database */
+	public const MAX_YEAR = 2200;
 
 	public function __construct(
 		private PersonMapper $personMapper,
@@ -154,7 +158,7 @@ class PersonService {
 		try {
 			return $this->sliceMapper->find($sliceId);
 		} catch (DoesNotExistException) {
-			throw new NotFoundException($this->l10n->t('The time slice does not exist.'));
+			throw new NotFoundException($this->l10n->t('The term does not exist.'));
 		}
 	}
 
@@ -249,7 +253,7 @@ class PersonService {
 		if ($birth === null) {
 			throw new ValidationException($this->l10n->t('The date of birth must be a valid date (YYYY-MM-DD).'));
 		}
-		if ((int)$birth->format('Y') < 1900 || Dates::compare($birth, $this->clock->today()) > 0) {
+		if ((int)$birth->format('Y') < self::MIN_YEAR || Dates::compare($birth, $this->clock->today()) > 0) {
 			throw new ValidationException($this->l10n->t('The date of birth must be between 1900 and today.'));
 		}
 
@@ -349,6 +353,12 @@ class PersonService {
 		$end = $endDate === null || $endDate === '' ? null : Dates::parse($endDate);
 		if ($start === null || ($endDate !== null && $endDate !== '' && $end === null)) {
 			throw new ValidationException($this->l10n->t('Start and end date must be valid dates (YYYY-MM-DD).'));
+		}
+		foreach ([$start, $end] as $date) {
+			$year = $date === null ? self::MIN_YEAR : (int)$date->format('Y');
+			if ($year < self::MIN_YEAR || $year > self::MAX_YEAR) {
+				throw new ValidationException($this->l10n->t('Start and end date must be between %1$d and %2$d.', [self::MIN_YEAR, self::MAX_YEAR]));
+			}
 		}
 		return [$start, $end];
 	}

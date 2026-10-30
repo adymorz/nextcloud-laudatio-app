@@ -76,8 +76,17 @@ export function age(dateOfBirth: string): number {
 	const birth = parseIsoDate(dateOfBirth)
 	const today = new Date()
 	let years = today.getFullYear() - birth.getFullYear()
-	if (today.getMonth() < birth.getMonth() || (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate())) {
+	// A birthday on February 29 is celebrated on February 28 in common years, like on the server
+	const birthDay = birth.getMonth() === 1 && birth.getDate() === 29 && !isLeapYear(today.getFullYear()) ? 28 : birth.getDate()
+	if (today.getMonth() < birth.getMonth() || (today.getMonth() === birth.getMonth() && today.getDate() < birthDay)) {
 		years--
 	}
 	return years
+}
+
+/**
+ * @param year Full year
+ */
+function isLeapYear(year: number): boolean {
+	return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0
 }

@@ -14,8 +14,10 @@ import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { api, errorMessage } from '../api'
+import { api, errorMessage, isNotFound } from '../api'
+import LoadError from '../components/LoadError.vue'
 import { formatDate, toIsoDate } from '../dates'
+import { me } from '../store'
 
 const props = defineProps<{
 	id: number
@@ -24,6 +26,7 @@ const props = defineProps<{
 const person = ref<PersonDetail | null>(null)
 const loading = ref(true)
 const notFound = ref(false)
+const loadError = ref<string | null>(null)
 const printedOn = formatDate(toIsoDate(new Date()))
 
 // The sheet is handed to the person: the internal notes are deliberately left out
@@ -38,7 +41,7 @@ const rows = computed(() => {
 		{ label: t('laudatio', 'Date of birth'), value: p.dateOfBirth ? formatDate(p.dateOfBirth) : null },
 		{ label: t('laudatio', 'Street'), value: p.street },
 		{ label: t('laudatio', 'House number'), value: p.streetNumber },
-		{ label: t('laudatio', 'ZIP code'), value: p.postalCode },
+		{ label: t('laudatio', 'Postal code'), value: p.postalCode },
 		{ label: t('laudatio', 'City'), value: p.city },
 		{ label: t('laudatio', 'Country'), value: p.country },
 		{ label: t('laudatio', 'Mobile phone'), value: p.mobilePhone },
@@ -55,10 +58,15 @@ const functions = computed(() => [...(person.value?.currentFunctions ?? [])]
 async function load() {
 	loading.value = true
 	notFound.value = false
+	loadError.value = null
 	try {
 		person.value = await api.person(props.id)
 	} catch (error) {
-		notFound.value = true
+		if (isNotFound(error)) {
+			notFound.value = true
+		} else {
+			loadError.value = errorMessage(error)
+		}
 		showError(errorMessage(error))
 	} finally {
 		loading.value = false
@@ -100,6 +108,7 @@ watch(() => props.id, load, { immediate: true })
 		</div>
 
 		<NcLoadingIcon v-if="loading && person === null" :size="32" />
+		<LoadError v-else-if="loadError !== null && person === null" :message="loadError" @retry="load" />
 		<NcEmptyContent v-else-if="notFound || person === null" :name="t('laudatio', 'Person not found')" />
 		<NcEmptyContent
 			v-else-if="!person.sensitiveVisible"
@@ -113,6 +122,9 @@ watch(() => props.id, load, { immediate: true })
 				{{ person.displayName }} · {{ t('laudatio', 'Printed on {date}', { date: printedOn }) }}
 			</p>
 			<p>{{ t('laudatio', 'Please check your data. Correct wrong entries and add missing ones in the right column, then sign the sheet and return it.') }}</p>
+			<p v-if="me.sheetNote" class="sheet__note">
+				{{ me.sheetNote }}
+			</p>
 
 			<table class="sheet__table">
 				<thead>
@@ -139,7 +151,7 @@ watch(() => props.id, load, { immediate: true })
 					<tr>
 						<th>{{ t('laudatio', 'Function') }}</th>
 						<th>{{ t('laudatio', 'Group') }}</th>
-						<th>{{ t('laudatio', 'Start') }}</th>
+						<th>{{ t('laudatio', 'Start of current term') }}</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -201,6 +213,10 @@ watch(() => props.id, load, { immediate: true })
 
 .sheet__meta {
 	margin-block-end: 6mm;
+}
+
+.sheet__note {
+	white-space: pre-line;
 }
 
 .sheet__page h3 {

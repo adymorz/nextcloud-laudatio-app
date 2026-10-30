@@ -67,6 +67,17 @@ final class UpcomingServiceTest extends TestCase {
 		$this->assertSame([], $this->service->allAsRecipient('alice'));
 	}
 
+	public function testCalendarLeavesOutPersonsTheUserMayNoLongerSee(): void {
+		// A past birthday of person 5, who has left the groups of bob since
+		$this->eventMapper->method('findAll')->willReturn([$this->event(1, Event::TYPE_BIRTHDAY, '2024-12-01')]);
+		$this->recipients->method('roleOf')->willReturn(RecipientService::ROLE_INTERESTED);
+		$this->access->method('getVisiblePersonIds')->willReturnMap([['bob', [6]], ['alice', [5, 6]], ['manager', null]]);
+
+		$this->assertSame([], $this->service->allAsRecipient('bob'));
+		$this->assertCount(1, $this->service->allAsRecipient('alice'));
+		$this->assertCount(1, $this->service->allAsRecipient('manager'));
+	}
+
 	public function testGiftsCanBeMarkedWithoutTheGreetingChecklist(): void {
 		$this->settings->method('isGreetingReminderEnabled')->willReturn(false);
 		$this->access->method('isManager')->willReturnMap([['manager', true], ['alice', false], ['bob', false]]);
@@ -97,7 +108,7 @@ final class UpcomingServiceTest extends TestCase {
 		$this->eventMapper->expects($this->never())->method('update');
 
 		$this->expectException(ForbiddenException::class);
-		$this->expectExceptionMessage('Only the responsible person can mark a gift as presented.');
+		$this->expectExceptionMessage('Only managers and the responsible person can mark a gift as presented.');
 		$this->service->setGreeted('bob', 2, true);
 	}
 

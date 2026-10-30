@@ -15,6 +15,7 @@ use OCA\Laudatio\Db\EventMapper;
 use OCA\Laudatio\Db\NotifiedMapper;
 use OCP\IDateTimeFormatter;
 use OCP\IURLGenerator;
+use OCP\IUser;
 use OCP\IUserManager;
 use OCP\L10N\IFactory;
 use OCP\Mail\IMailer;
@@ -24,11 +25,13 @@ use Psr\Log\LoggerInterface;
 /**
  * Sends one reminder per event and recipient when the event (for yearly gifts:
  * the due date) enters the lead time: a Nextcloud notification and, if the
- * user opted in, an email. Gifts that are already presented get no reminder.
- * Notifications of past events are removed.
+ * user opted in, an email. Gifts that are already presented get no reminder,
+ * disabled accounts get none at all. Notifications of past events are removed.
+ * Also tells the managers when a group lost its responsible person.
  */
 class NotificationService {
 	public const SUBJECT_UPCOMING = 'upcoming';
+	public const SUBJECT_RESPONSIBLE_DELETED = 'responsible_deleted';
 
 	public function __construct(
 		private EventMapper $eventMapper,
@@ -37,6 +40,7 @@ class NotificationService {
 		private TitleBuilder $titles,
 		private SettingsService $settings,
 		private EventService $eventService,
+		private AccessService $access,
 		private INotificationManager $notificationManager,
 		private IMailer $mailer,
 		private IUserManager $userManager,
@@ -62,10 +66,15 @@ class NotificationService {
 			}
 			$alreadyNotified = $this->notifiedMapper->findUserIdsByEvent($event->getId());
 			foreach ($this->recipients->recipients($event) as $userId => $role) {
-				if (in_array($userId, $alreadyNotified, true) || !$this->userManager->userExists($userId)) {
+				if (in_array($userId, $alreadyNotified, true)) {
 					continue;
 				}
-				$this->notify($event, $userId, $role);
+				$user = $this->userManager->get($userId);
+				if ($user === null || !$user->isEnabled()) {
+					// Deleted and disabled accounts get no reminders
+					continue;
+				}
+				$this->notify($event, $user, $role);
 				$sent++;
 			}
 		}
@@ -84,9 +93,37 @@ class NotificationService {
 	}
 
 	/**
+	 * Tells every manager that the group has no responsible person any more.
+	 */
+	public function notifyResponsibleDeleted(int $groupId): void {
+		foreach ($this->access->getManagerUserIds() as $userId) {
+			$notification = $this->notificationManager->createNotification();
+			$notification->setApp(Application::APP_ID)
+				->setUser($userId)
+				->setDateTime(new \DateTime('@' . $this->clock->time()))
+				->setObject('group', (string)$groupId)
+				->setSubject(self::SUBJECT_RESPONSIBLE_DELETED);
+			$this->notificationManager->notify($notification);
+		}
+	}
+
+	/**
+	 * Removes the hints about the missing responsible person of the group for
+	 * all users, once a new one is assigned or the group is deleted.
+	 */
+	public function dismissResponsibleDeleted(int $groupId): void {
+		$notification = $this->notificationManager->createNotification();
+		$notification->setApp(Application::APP_ID)
+			->setObject('group', (string)$groupId)
+			->setSubject(self::SUBJECT_RESPONSIBLE_DELETED);
+		$this->notificationManager->markProcessed($notification);
+	}
+
+	/**
 	 * @param RecipientService::ROLE_* $role
 	 */
-	private function notify(Event $event, string $userId, string $role): void {
+	private function notify(Event $event, IUser $user, string $role): void {
+		$userId = $user->getUID();
 		$notification = $this->notificationManager->createNotification();
 		$notification->setApp(Application::APP_ID)
 			->setUser($userId)
@@ -97,17 +134,16 @@ class NotificationService {
 		$this->notifiedMapper->add($event->getId(), $userId, $this->clock->time());
 
 		if ($this->settings->isEmailEnabledForUser($userId)) {
-			$this->sendEmail($event, $userId, $role);
+			$this->sendEmail($event, $user, $role);
 		}
 	}
 
 	/**
 	 * @param RecipientService::ROLE_* $role
 	 */
-	private function sendEmail(Event $event, string $userId, string $role): void {
-		$user = $this->userManager->get($userId);
-		$address = $user?->getEMailAddress();
-		if ($user === null || $address === null || $address === '') {
+	private function sendEmail(Event $event, IUser $user, string $role): void {
+		$address = $user->getEMailAddress();
+		if ($address === null || $address === '') {
 			return;
 		}
 
@@ -131,6 +167,12 @@ class NotificationService {
 				$template->addBodyText($l->t('Remember to congratulate in time.'));
 			}
 		}
+		// Say why the user gets this email and how to stop it
+		$groups = implode('", "', $this->recipients->groupNamesFor($event, $user->getUID()));
+		$template->addBodyText($role === RecipientService::ROLE_RESPONSIBLE
+			? $l->t('You receive this reminder because you are the responsible person of the group "%s" in Laudatio.', [$groups])
+			: $l->t('You receive this reminder because you are interested in the group "%s" in Laudatio.', [$groups]));
+		$template->addBodyText($l->t('You can turn reminder emails off in the settings of Laudatio.'));
 		$template->addBodyButton($l->t('Open Laudatio'), $this->urlGenerator->linkToRouteAbsolute(Application::APP_ID . '.page.index'));
 		$template->addFooter();
 
@@ -140,7 +182,7 @@ class NotificationService {
 			$message->useTemplate($template);
 			$this->mailer->send($message);
 		} catch (\Exception $e) {
-			$this->logger->error('Could not send the reminder email to ' . $userId, ['exception' => $e]);
+			$this->logger->error('Could not send the reminder email to ' . $user->getUID(), ['exception' => $e]);
 		}
 	}
 }

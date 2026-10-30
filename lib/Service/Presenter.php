@@ -83,7 +83,9 @@ class Presenter {
 			'greetingReminder' => $this->settings->isGreetingReminderEnabled(),
 			'leadTimeDays' => $this->settings->getLeadTimeDays(),
 			'emailNotifications' => $this->settings->isEmailEnabledForUser($userId),
+			'hasEmail' => ($this->userManager->get($userId)?->getEMailAddress() ?? '') !== '',
 			'regulationsUrl' => $this->settings->getRegulationsUrl(),
+			'sheetNote' => $this->settings->getSheetNote(),
 		];
 	}
 
@@ -114,7 +116,8 @@ class Presenter {
 		return [
 			'id' => $group->getId(),
 			'name' => $group->getName(),
-			'responsible' => $this->user($group->getResponsibleUid()),
+			// Empty after the responsible user was deleted
+			'responsible' => $group->getResponsibleUid() === '' ? null : $this->user($group->getResponsibleUid()),
 			'interested' => array_map($this->user(...), $interested),
 			'jubileeYears' => $group->getJubileeYears(),
 			'effectiveJubileeYears' => $this->eventService->jubileeYearsForGroup($group),
@@ -202,7 +205,8 @@ class Presenter {
 			'id' => $event->getId(),
 			'type' => $type,
 			'date' => Dates::format($event->getEventDate()),
-			'ordinal' => $event->getOrdinal(),
+			// Interested users may not see the date of birth, so no age for them
+			'ordinal' => $event->getType() === Event::TYPE_BIRTHDAY && $role === RecipientService::ROLE_INTERESTED ? null : $event->getOrdinal(),
 			'title' => $this->titles->build($event, $role, $language),
 			'role' => $role,
 			'personId' => $event->getPersonId(),

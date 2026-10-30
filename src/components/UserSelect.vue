@@ -6,9 +6,10 @@
 <script setup lang="ts">
 import type { User } from '../types'
 
+import { showError } from '@nextcloud/dialogs'
 import NcSelectUsers from '@nextcloud/vue/components/NcSelectUsers'
 import { computed, ref } from 'vue'
-import { searchUsers } from '../api'
+import { errorMessage, searchUsers } from '../api'
 
 interface UserOption {
 	id: string
@@ -44,6 +45,8 @@ async function search(query: string) {
 	loading.value = true
 	try {
 		options.value = (await searchUsers(query)).map(toOption)
+	} catch (error) {
+		showError(errorMessage(error))
 	} finally {
 		loading.value = false
 	}

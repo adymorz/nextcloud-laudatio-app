@@ -32,6 +32,7 @@ class GroupService {
 	use TTransactional;
 
 	public const MAX_NAME_LENGTH = 255;
+	public const MAX_INTERESTED = 100;
 
 	public function __construct(
 		private GroupMapper $groupMapper,
@@ -43,6 +44,7 @@ class GroupService {
 		private AuditService $audit,
 		private RecipientService $recipients,
 		private AccessService $access,
+		private NotificationService $notifications,
 		private Clock $clock,
 		private IUserManager $userManager,
 		private IDBConnection $db,
@@ -81,7 +83,7 @@ class GroupService {
 	}
 
 	/**
-	 * @param list<string> $interested
+	 * @param array<array-key, mixed> $interested user IDs as sent by the client, validated here
 	 * @throws ValidationException
 	 */
 	public function create(?string $actor, string $name, string $responsibleUid, array $interested, ?string $jubileeYears): Group {
@@ -104,7 +106,7 @@ class GroupService {
 	}
 
 	/**
-	 * @param list<string> $interested
+	 * @param array<array-key, mixed> $interested user IDs as sent by the client, validated here
 	 * @throws NotFoundException|ValidationException
 	 */
 	public function update(?string $actor, int $id, string $name, string $responsibleUid, array $interested, ?string $jubileeYears): Group {
@@ -143,6 +145,10 @@ class GroupService {
 			$this->audit->log($actor, AuditEntry::ACTION_UPDATE, AuditService::ENTITY_GROUP, $group->getId(), $changed);
 		}, $this->db);
 		$this->afterChange($yearsChanged);
+		if (in_array('responsible_uid', $changed, true)) {
+			// The group may have been without a responsible user since the former one was deleted
+			$this->notifications->dismissResponsibleDeleted($id);
+		}
 		return $group;
 	}
 
@@ -159,6 +165,7 @@ class GroupService {
 			$this->groupMapper->delete($group);
 			$this->audit->log($actor, AuditEntry::ACTION_DELETE, AuditService::ENTITY_GROUP, $group->getId());
 		}, $this->db);
+		$this->notifications->dismissResponsibleDeleted($id);
 		$this->afterChange(false);
 	}
 
@@ -205,7 +212,7 @@ class GroupService {
 			$this->functionMapper->insert($function);
 			$this->audit->log($actor, AuditEntry::ACTION_CREATE, AuditService::ENTITY_FUNCTION, $function->getId(), ['group_id', 'name', 'yearly_gift']);
 		}, $this->db);
-		// A new function has no time slices yet, so no events
+		// A new function has no terms yet, so no events
 		$this->afterChange(false);
 		return $function;
 	}
@@ -242,12 +249,12 @@ class GroupService {
 	}
 
 	/**
-	 * @throws NotFoundException|ConflictException when the function still has time slices
+	 * @throws NotFoundException|ConflictException when the function still has terms
 	 */
 	public function deleteFunction(?string $actor, int $id): void {
 		$function = $this->getFunction($id);
 		if ($this->sliceMapper->countByFunction($id) > 0) {
-			throw new ConflictException($this->l10n->t('The function still has time slices. Delete them first.'));
+			throw new ConflictException($this->l10n->t('The function is still assigned to persons, also in the past. Remove those terms from their function history first.'));
 		}
 		$this->atomic(function () use ($actor, $function): void {
 			$this->functionMapper->delete($function);
@@ -257,7 +264,7 @@ class GroupService {
 	}
 
 	/**
-	 * @param list<string> $interested
+	 * @param array<array-key, mixed> $interested
 	 * @return array{string, list<string>, ?string} normalized name, interested users and jubilee years
 	 * @throws ValidationException
 	 */
@@ -268,7 +275,19 @@ class GroupService {
 			throw new ValidationException($this->l10n->t('The responsible person must be an existing user.'));
 		}
 
-		$interested = array_values(array_unique(array_filter($interested, static fn (string $uid): bool => $uid !== $responsibleUid)));
+		if (count($interested) > self::MAX_INTERESTED) {
+			throw new ValidationException($this->l10n->t('A group can have at most %d interested persons.', [self::MAX_INTERESTED]));
+		}
+		$userIds = [];
+		foreach ($interested as $userId) {
+			if (!is_string($userId)) {
+				throw new ValidationException($this->l10n->t('The interested persons must be a list of user IDs.'));
+			}
+			if ($userId !== $responsibleUid) {
+				$userIds[] = $userId;
+			}
+		}
+		$interested = array_values(array_unique($userIds));
 		foreach ($interested as $userId) {
 			if (!$this->userManager->userExists($userId)) {
 				throw new ValidationException($this->l10n->t('The user "%s" does not exist.', [$userId]));

@@ -16,6 +16,7 @@ import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
 import { computed, onMounted, ref, watch } from 'vue'
 import { api, errorMessage } from '../api'
+import LoadError from '../components/LoadError.vue'
 import { formatDate, relativeDay } from '../dates'
 
 interface RangeOption {
@@ -27,6 +28,7 @@ const ranges: RangeOption[] = [30, 60, 90, 365].map((days) => ({ days, label: n(
 const range = ref<RangeOption>(ranges[1]!)
 const events = ref<LaudatioEvent[]>([])
 const loading = ref(true)
+const loadError = ref<string | null>(null)
 
 const dated = computed(() => events.value.filter((event) => event.type !== 'gift'))
 
@@ -34,7 +36,8 @@ const dated = computed(() => events.value.filter((event) => event.type !== 'gift
 const giftYears = computed(() => {
 	const byYear = new Map<number, LaudatioEvent[]>()
 	for (const event of events.value.filter((e) => e.type === 'gift')) {
-		byYear.set(event.ordinal, [...(byYear.get(event.ordinal) ?? []), event])
+		const year = event.ordinal ?? 0
+		byYear.set(year, [...(byYear.get(year) ?? []), event])
 	}
 	return [...byYear.entries()]
 		.sort(([a], [b]) => a - b)
@@ -49,10 +52,12 @@ const giftYears = computed(() => {
  */
 async function load() {
 	loading.value = true
+	loadError.value = null
 	try {
 		events.value = await api.events(range.value.days)
 	} catch (error) {
-		showError(errorMessage(error))
+		loadError.value = errorMessage(error)
+		showError(loadError.value)
 	} finally {
 		loading.value = false
 	}
@@ -89,10 +94,11 @@ watch(range, load)
 		</div>
 
 		<NcLoadingIcon v-if="loading" :size="32" />
+		<LoadError v-else-if="loadError !== null" :message="loadError" @retry="load" />
 		<NcEmptyContent
 			v-else-if="events.length === 0"
 			:name="t('laudatio', 'Nothing coming up')"
-			:description="t('laudatio', 'There are no birthdays or anniversaries in your groups in this period.')">
+			:description="t('laudatio', 'There are no birthdays, anniversaries or yearly gifts in your groups in this period. Only persons who currently hold a function have events.')">
 			<template #icon>
 				<NcIconSvgWrapper :path="mdiCakeVariant" />
 			</template>
@@ -123,6 +129,7 @@ watch(range, load)
 							:model-value="event.greeted"
 							@update:model-value="setGreeted(event, $event)">
 							{{ t('laudatio', 'Presented') }}
+							<span class="hidden-visually">{{ event.title }}</span>
 						</NcCheckboxRadioSwitch>
 					</li>
 				</ul>
@@ -149,7 +156,7 @@ watch(range, load)
 							<span class="event__date">
 								{{ formatDate(event.date) }} · {{ relativeDay(event.date) }}
 								<template v-if="event.greeted && event.greetedBy">
-									· {{ t('laudatio', 'greeted by {name}', { name: event.greetedBy.displayName }) }}
+									· {{ t('laudatio', 'congratulated by {name}', { name: event.greetedBy.displayName }) }}
 								</template>
 							</span>
 						</div>
@@ -157,7 +164,8 @@ watch(range, load)
 							v-if="event.canGreet"
 							:model-value="event.greeted"
 							@update:model-value="setGreeted(event, $event)">
-							{{ t('laudatio', 'Greeted') }}
+							{{ t('laudatio', 'Congratulated') }}
+							<span class="hidden-visually">{{ event.title }}</span>
 						</NcCheckboxRadioSwitch>
 					</li>
 				</ul>

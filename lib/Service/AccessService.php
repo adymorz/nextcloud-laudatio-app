@@ -21,9 +21,9 @@ use OCP\IL10N;
  *
  * - Managers (admins and members of the manager group) see and edit everything.
  * - The responsible user of a group sees the current members of the group,
- *   including date of birth and notes.
- * - Interested users of a group see the current members without date of birth
- *   and notes.
+ *   including date of birth, contact data and notes.
+ * - Interested users of a group see the current members without date of
+ *   birth, contact data and notes.
  * - Everybody else has no access.
  *
  * Results are cached for the lifetime of the request.
@@ -61,9 +61,36 @@ class AccessService {
 	}
 
 	/**
+	 * Enabled users that are managers: the members of the admin group and of
+	 * the manager group.
+	 *
+	 * @return list<string>
+	 */
+	public function getManagerUserIds(): array {
+		$groupIds = ['admin'];
+		$managerGroup = $this->settings->getManagerGroup();
+		if ($managerGroup !== '' && $managerGroup !== 'admin') {
+			$groupIds[] = $managerGroup;
+		}
+		$userIds = [];
+		foreach ($groupIds as $groupId) {
+			foreach ($this->groupManager->get($groupId)?->getUsers() ?? [] as $user) {
+				if ($user->isEnabled()) {
+					$userIds[] = $user->getUID();
+				}
+			}
+		}
+		return array_values(array_unique($userIds));
+	}
+
+	/**
 	 * @return list<int>
 	 */
 	public function getResponsibleGroupIds(string $userId): array {
+		if ($userId === '') {
+			// Groups whose responsible user was deleted have an empty UID
+			return [];
+		}
 		return $this->responsibleCache[$userId] ??= $this->groupMapper->findIdsByResponsible($userId);
 	}
 

@@ -279,7 +279,7 @@ export interface components {
             type: "birthday" | "jubilee" | "gift";
             date: string;
             /** Format: int64 */
-            ordinal: number;
+            ordinal: number | null;
             title: string;
             /** @enum {string|null} */
             role: "responsible" | "interested" | null;
@@ -307,7 +307,7 @@ export interface components {
             /** Format: int64 */
             id: number;
             name: string;
-            responsible: components["schemas"]["User"];
+            responsible: components["schemas"]["User"] | null;
             interested: components["schemas"]["User"][];
             jubileeYears: string | null;
             effectiveJubileeYears: number[];
@@ -324,7 +324,9 @@ export interface components {
             /** Format: int64 */
             leadTimeDays: number;
             emailNotifications: boolean;
+            hasEmail: boolean;
             regulationsUrl: string | null;
+            sheetNote: string | null;
         };
         OCSMeta: {
             status: string;
@@ -1257,7 +1259,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description Not logged in */
+            /** @description No access to the app */
             403: {
                 headers: {
                     [name: string]: unknown;

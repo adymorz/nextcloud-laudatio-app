@@ -55,7 +55,7 @@ watch(open, (isOpen) => {
 }, { immediate: true })
 
 /**
- * Adds or updates the time slice.
+ * Adds or updates the term.
  */
 async function save() {
 	if (fn.value === null || startDate.value === null) {
@@ -84,7 +84,7 @@ async function save() {
 <template>
 	<NcDialog
 		v-model:open="open"
-		:name="slice === null ? t('laudatio', 'Add function') : t('laudatio', 'Edit time slice')"
+		:name="slice === null ? t('laudatio', 'Assign function') : t('laudatio', 'Edit term')"
 		size="normal">
 		<form class="form" @submit.prevent="save">
 			<NcSelect

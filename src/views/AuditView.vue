@@ -12,6 +12,7 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import { onMounted, ref } from 'vue'
 import { api, errorMessage } from '../api'
+import LoadError from '../components/LoadError.vue'
 import { formatDateTime } from '../dates'
 
 const PAGE_SIZE = 50
@@ -19,6 +20,7 @@ const PAGE_SIZE = 50
 const entries = ref<AuditEntry[]>([])
 const total = ref(0)
 const loading = ref(false)
+const loadError = ref<string | null>(null)
 
 const actions: Record<string, string> = {
 	create: t('laudatio', 'created'),
@@ -28,9 +30,41 @@ const actions: Record<string, string> = {
 
 const entityTypes: Record<string, string> = {
 	person: t('laudatio', 'Person'),
-	slice: t('laudatio', 'Time slice'),
+	slice: t('laudatio', 'Term'),
 	group: t('laudatio', 'Group'),
 	function: t('laudatio', 'Function'),
+}
+
+// The server records the database names of the changed fields
+const fieldLabels: Record<string, string> = {
+	first_name: t('laudatio', 'First name'),
+	last_name: t('laudatio', 'Last name'),
+	date_of_birth: t('laudatio', 'Date of birth'),
+	notes: t('laudatio', 'Notes'),
+	street: t('laudatio', 'Street'),
+	street_number: t('laudatio', 'House number'),
+	postal_code: t('laudatio', 'Postal code'),
+	city: t('laudatio', 'City'),
+	country: t('laudatio', 'Country'),
+	mobile_phone: t('laudatio', 'Mobile phone'),
+	other_phone: t('laudatio', 'Additional phone number'),
+	person_id: t('laudatio', 'Person'),
+	function_id: t('laudatio', 'Function'),
+	start_date: t('laudatio', 'Start date'),
+	end_date: t('laudatio', 'End date'),
+	name: t('laudatio', 'Name'),
+	responsible_uid: t('laudatio', 'Responsible person'),
+	interested: t('laudatio', 'Interested persons'),
+	jubilee_years: t('laudatio', 'Anniversary years'),
+	group_id: t('laudatio', 'Group'),
+	yearly_gift: t('laudatio', 'One gift per year'),
+}
+
+/**
+ * @param fields Database names of the changed fields
+ */
+function fieldList(fields: string[]): string {
+	return fields.map((field) => fieldLabels[field] ?? field).join(', ')
 }
 
 /**
@@ -38,12 +72,14 @@ const entityTypes: Record<string, string> = {
  */
 async function loadMore() {
 	loading.value = true
+	loadError.value = null
 	try {
 		const page = await api.audit(PAGE_SIZE, entries.value.length)
 		entries.value = [...entries.value, ...page.entries]
 		total.value = page.total
 	} catch (error) {
-		showError(errorMessage(error))
+		loadError.value = errorMessage(error)
+		showError(loadError.value)
 	} finally {
 		loading.value = false
 	}
@@ -56,7 +92,7 @@ onMounted(loadMore)
 	<div class="view">
 		<h2>{{ t('laudatio', 'Audit log') }}</h2>
 		<p class="muted">
-			{{ t('laudatio', 'Who created, changed or deleted master data. Only the names of changed fields are recorded, not their values.') }}
+			{{ t('laudatio', 'Who created, changed or deleted persons, groups, functions and terms. Only the names of changed fields are recorded, not their values.') }}
 		</p>
 
 		<table v-if="entries.length > 0" class="audit">
@@ -77,14 +113,15 @@ onMounted(loadMore)
 					<td>
 						{{ entityTypes[entry.entityType] ?? entry.entityType }}
 						<span v-if="entry.entityLabel">{{ entry.entityLabel }}</span>
-						<span v-else class="muted">#{{ entry.entityId }}</span>
+						<span v-else class="muted">{{ t('laudatio', '(deleted, ID {id})', { id: entry.entityId }) }}</span>
 					</td>
 					<td class="muted">
-						{{ entry.changedFields.join(', ') }}
+						{{ fieldList(entry.changedFields) }}
 					</td>
 				</tr>
 			</tbody>
 		</table>
+		<LoadError v-else-if="loadError !== null" :message="loadError" @retry="loadMore" />
 		<p v-else-if="!loading" class="muted">
 			{{ t('laudatio', 'No entries yet.') }}
 		</p>

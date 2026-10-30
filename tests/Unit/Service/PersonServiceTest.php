@@ -100,4 +100,22 @@ final class PersonServiceTest extends TestCase {
 		$this->expectException(ValidationException::class);
 		$this->service->create(null, $input);
 	}
+
+	/**
+	 * @return array<string, array{string, ?string}>
+	 */
+	public static function termsOutOfRange(): array {
+		return [
+			'start before 1900' => ['1899-12-31', null],
+			'end after 2200' => ['2020-01-01', '2201-01-01'],
+		];
+	}
+
+	#[DataProvider('termsOutOfRange')]
+	public function testTermsMustBeWithinPlausibleYears(string $start, ?string $end): void {
+		$this->personMapper->method('find')->willReturn(new Person());
+		$this->expectException(ValidationException::class);
+		$this->expectExceptionMessage('between 1900 and 2200');
+		$this->service->addSlice(null, 1, 10, $start, $end);
+	}
 }

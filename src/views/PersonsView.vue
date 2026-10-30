@@ -17,6 +17,7 @@ import NcTextField from '@nextcloud/vue/components/NcTextField'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { api, errorMessage } from '../api'
+import LoadError from '../components/LoadError.vue'
 import PersonDialog from '../components/PersonDialog.vue'
 import { formatDate } from '../dates'
 import { me } from '../store'
@@ -24,6 +25,7 @@ import { me } from '../store'
 const router = useRouter()
 const persons = ref<Person[]>([])
 const loading = ref(true)
+const loadError = ref<string | null>(null)
 const search = ref('')
 const dialogOpen = ref(false)
 
@@ -38,15 +40,21 @@ const filtered = computed(() => {
 
 const showDateOfBirth = computed(() => persons.value.some((person) => person.sensitiveVisible))
 
-onMounted(async () => {
+/**
+ * Loads all visible persons.
+ */
+async function load() {
+	loading.value = true
+	loadError.value = null
 	try {
 		persons.value = await api.persons()
 	} catch (error) {
-		showError(errorMessage(error))
+		loadError.value = errorMessage(error)
+		showError(loadError.value)
 	} finally {
 		loading.value = false
 	}
-})
+}
 
 /**
  * @param person The new person
@@ -54,6 +62,8 @@ onMounted(async () => {
 function onCreated(person: PersonDetail) {
 	router.push({ name: 'person', params: { id: person.id } })
 }
+
+onMounted(load)
 </script>
 
 <template>
@@ -81,9 +91,20 @@ function onCreated(person: PersonDetail) {
 		</NcTextField>
 
 		<NcLoadingIcon v-if="loading" :size="32" />
-		<NcEmptyContent v-else-if="filtered.length === 0" :name="t('laudatio', 'No persons found')">
+		<LoadError v-else-if="loadError !== null" :message="loadError" @retry="load" />
+		<NcEmptyContent
+			v-else-if="persons.length === 0"
+			:name="t('laudatio', 'No persons yet')"
+			:description="me.isManager
+				? t('laudatio', 'Add the persons of your organization and assign them their functions.')
+				: t('laudatio', 'The persons of your groups appear here.')">
 			<template #icon>
 				<NcIconSvgWrapper :path="mdiAccountMultiple" />
+			</template>
+		</NcEmptyContent>
+		<NcEmptyContent v-else-if="filtered.length === 0" :name="t('laudatio', 'No persons match your search')">
+			<template #icon>
+				<NcIconSvgWrapper :path="mdiMagnify" />
 			</template>
 		</NcEmptyContent>
 		<table v-else class="persons">

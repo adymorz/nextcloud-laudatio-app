@@ -49,30 +49,30 @@ class Version000200Date20261027120000 extends SimpleMigrationStep {
 			'last_name' => [Types::STRING, ['notnull' => true, 'length' => 255]],
 			'date_of_birth' => [Types::DATE, self::NOT_NULL],
 			'notes' => [Types::TEXT, self::NULLABLE],
-		], true, ['appr_persons_name' => ['last_name', 'first_name']]);
+		], true, ['laudatio_persons_name' => ['last_name', 'first_name']]);
 
 		$this->createTable($schema, 'laudatio_groups', [
 			'name' => [Types::STRING, ['notnull' => true, 'length' => 255]],
 			'responsible_uid' => [Types::STRING, ['notnull' => true, 'length' => 64]],
 			'jubilee_years' => [Types::STRING, ['notnull' => false, 'length' => 255]],
-		], true, ['appr_groups_resp' => ['responsible_uid']]);
+		], true, ['laudatio_groups_resp' => ['responsible_uid']]);
 
 		$this->createTable($schema, 'laudatio_interested', [
 			'group_id' => [Types::BIGINT, self::ID],
 			'user_id' => [Types::STRING, ['notnull' => true, 'length' => 64]],
-		], false, ['appr_interested_user' => ['user_id']], ['appr_interested_uniq' => ['group_id', 'user_id']]);
+		], false, ['laudatio_interested_user' => ['user_id']], ['laudatio_interested_uniq' => ['group_id', 'user_id']]);
 
 		$this->createTable($schema, 'laudatio_functions', [
 			'group_id' => [Types::BIGINT, self::ID],
 			'name' => [Types::STRING, ['notnull' => true, 'length' => 255]],
-		], true, ['appr_functions_group' => ['group_id']]);
+		], true, ['laudatio_functions_group' => ['group_id']]);
 
 		$this->createTable($schema, 'laudatio_slices', [
 			'person_id' => [Types::BIGINT, self::ID],
 			'function_id' => [Types::BIGINT, self::ID],
 			'start_date' => [Types::DATE, self::NOT_NULL],
 			'end_date' => [Types::DATE, self::NULLABLE],
-		], true, ['appr_slices_person' => ['person_id'], 'appr_slices_function' => ['function_id']]);
+		], true, ['laudatio_slices_person' => ['person_id'], 'laudatio_slices_function' => ['function_id']]);
 
 		$this->createTable($schema, 'laudatio_events', [
 			'uid' => [Types::STRING, ['notnull' => true, 'length' => 255]],
@@ -84,13 +84,13 @@ class Version000200Date20261027120000 extends SimpleMigrationStep {
 			'greeted_at' => [Types::BIGINT, self::ID_NULLABLE],
 			'greeted_by' => [Types::STRING, ['notnull' => false, 'length' => 64]],
 			'created_at' => [Types::BIGINT, self::ID],
-		], false, ['appr_events_date' => ['event_date'], 'appr_events_person' => ['person_id']], ['appr_events_uid' => ['uid']]);
+		], false, ['laudatio_events_date' => ['event_date'], 'laudatio_events_person' => ['person_id']], ['laudatio_events_uid' => ['uid']]);
 
 		$this->createTable($schema, 'laudatio_notified', [
 			'event_id' => [Types::BIGINT, self::ID],
 			'user_id' => [Types::STRING, ['notnull' => true, 'length' => 64]],
 			'notified_at' => [Types::BIGINT, self::ID],
-		], false, [], ['appr_notified_uniq' => ['event_id', 'user_id']]);
+		], false, [], ['laudatio_notified_uniq' => ['event_id', 'user_id']]);
 
 		$this->createTable($schema, 'laudatio_audit', [
 			'actor_uid' => [Types::STRING, ['notnull' => false, 'length' => 64]],
@@ -99,7 +99,7 @@ class Version000200Date20261027120000 extends SimpleMigrationStep {
 			'entity_id' => [Types::BIGINT, self::ID],
 			'changed_fields' => [Types::TEXT, self::NULLABLE],
 			'created_at' => [Types::BIGINT, self::ID],
-		], false, ['appr_audit_created' => ['created_at']]);
+		], false, ['laudatio_audit_created' => ['created_at']]);
 
 		return $schema;
 	}

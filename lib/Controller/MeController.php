@@ -39,14 +39,16 @@ class MeController extends BaseOCSController {
 	 * Get the permissions of the current user
 	 *
 	 * @return DataResponse<Http::STATUS_OK, LaudatioMe, array{}>
-	 * @throws OCSForbiddenException Not logged in
+	 * @throws OCSForbiddenException No access to the app
 	 *
 	 * 200: Permissions returned
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'GET', url: '/api/v1/me')]
 	public function show(): DataResponse {
-		return new DataResponse($this->presenter->me($this->currentUserId()));
+		$userId = $this->currentUserId();
+		$this->call(fn () => $this->access->requireAccess($userId));
+		return new DataResponse($this->presenter->me($userId));
 	}
 
 	/**
