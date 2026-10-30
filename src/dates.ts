@@ -56,15 +56,15 @@ export function daysUntil(value: string): number {
 export function relativeDay(value: string): string {
 	const days = daysUntil(value)
 	if (days === 0) {
-		return t('appreciation', 'today')
+		return t('laudatio', 'today')
 	}
 	if (days === 1) {
-		return t('appreciation', 'tomorrow')
+		return t('laudatio', 'tomorrow')
 	}
 	if (days > 1) {
-		return n('appreciation', 'in %n day', 'in %n days', days)
+		return n('laudatio', 'in %n day', 'in %n days', days)
 	}
-	return n('appreciation', '%n day ago', '%n days ago', -days)
+	return n('laudatio', '%n day ago', '%n days ago', -days)
 }
 
 /**

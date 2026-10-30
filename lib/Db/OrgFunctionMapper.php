@@ -7,7 +7,7 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Db;
+namespace OCA\Laudatio\Db;
 
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\QBMapper;
@@ -19,7 +19,7 @@ use OCP\IDBConnection;
  */
 class OrgFunctionMapper extends QBMapper {
 	public function __construct(IDBConnection $db) {
-		parent::__construct($db, 'appreciation_functions', OrgFunction::class);
+		parent::__construct($db, 'laudatio_functions', OrgFunction::class);
 	}
 
 	/**

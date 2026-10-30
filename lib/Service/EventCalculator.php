@@ -7,13 +7,13 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Service;
+namespace OCA\Laudatio\Service;
 
 use DateTimeImmutable;
-use OCA\Appreciation\Db\Event;
-use OCA\Appreciation\Db\Person;
-use OCA\Appreciation\Db\Slice;
-use OCA\Appreciation\Model\PlannedEvent;
+use OCA\Laudatio\Db\Event;
+use OCA\Laudatio\Db\Person;
+use OCA\Laudatio\Db\Slice;
+use OCA\Laudatio\Model\PlannedEvent;
 
 /**
  * Calculates which events a person should have within a date window. Pure
@@ -83,7 +83,7 @@ class EventCalculator {
 				continue;
 			}
 			$events[] = new PlannedEvent(
-				sprintf('appreciation-birthday-%d-%d', $person->getId(), $year),
+				sprintf('laudatio-birthday-%d-%d', $person->getId(), $year),
 				Event::TYPE_BIRTHDAY,
 				$person->getId(),
 				null,
@@ -111,7 +111,7 @@ class EventCalculator {
 					continue;
 				}
 				$events[] = new PlannedEvent(
-					sprintf('appreciation-jubilee-%d-%d-%s-%d', $person->getId(), $period->functionId, $period->start->format('Ymd'), $years),
+					sprintf('laudatio-jubilee-%d-%d-%s-%d', $person->getId(), $period->functionId, $period->start->format('Ymd'), $years),
 					Event::TYPE_JUBILEE,
 					$person->getId(),
 					$period->functionId,
@@ -139,7 +139,7 @@ class EventCalculator {
 			$endYear = $period->end === null ? $lastYear : min($lastYear, (int)$period->end->format('Y'));
 			for ($year = max((int)$from->format('Y'), (int)$period->start->format('Y')); $year <= $endYear; $year++) {
 				$due = $period->end !== null && (int)$period->end->format('Y') === $year ? $period->end : Dates::yearEnd($year);
-				$uid = sprintf('appreciation-gift-%d-%d-%d', $person->getId(), $period->functionId, $year);
+				$uid = sprintf('laudatio-gift-%d-%d-%d', $person->getId(), $period->functionId, $year);
 				// Several periods in the same function and year: one gift, due after the last one
 				if (isset($events[$uid]) && Dates::compare($events[$uid]->date, $due) >= 0) {
 					continue;

@@ -17,8 +17,8 @@ declare(strict_types=1);
 $CONFIG = [
 	'debug' => true,
 
-	'trusted_domains' => array_merge(['localhost'], explode(',', getenv('DDEV_HOSTNAME') ?: 'appreciation.ddev.site')),
-	'overwrite.cli.url' => getenv('DDEV_PRIMARY_URL') ?: 'https://appreciation.ddev.site',
+	'trusted_domains' => array_merge(['localhost'], explode(',', getenv('DDEV_HOSTNAME') ?: 'laudatio.ddev.site')),
+	'overwrite.cli.url' => getenv('DDEV_PRIMARY_URL') ?: 'https://laudatio.ddev.site',
 	// TLS is terminated by the DDEV router; Apache in the container speaks plain HTTP.
 	'overwriteprotocol' => 'https',
 	// Pretty URLs (no /index.php/) via Nextcloud's .htaccess.

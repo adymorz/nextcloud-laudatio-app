@@ -7,12 +7,12 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Service;
+namespace OCA\Laudatio\Service;
 
-use OCA\Appreciation\Db\GroupMapper;
-use OCA\Appreciation\Db\InterestedMapper;
-use OCA\Appreciation\Db\SliceMapper;
-use OCA\Appreciation\Exception\ForbiddenException;
+use OCA\Laudatio\Db\GroupMapper;
+use OCA\Laudatio\Db\InterestedMapper;
+use OCA\Laudatio\Db\SliceMapper;
+use OCA\Laudatio\Exception\ForbiddenException;
 use OCP\IGroupManager;
 use OCP\IL10N;
 

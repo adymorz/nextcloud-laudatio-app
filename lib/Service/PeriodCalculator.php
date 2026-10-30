@@ -7,10 +7,10 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Service;
+namespace OCA\Laudatio\Service;
 
-use OCA\Appreciation\Db\Slice;
-use OCA\Appreciation\Model\ServicePeriod;
+use OCA\Laudatio\Db\Slice;
+use OCA\Laudatio\Model\ServicePeriod;
 
 /**
  * Merges the time slices of a person into continuous service periods per

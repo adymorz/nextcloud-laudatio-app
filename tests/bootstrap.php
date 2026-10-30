@@ -7,10 +7,10 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-use OCA\Appreciation\AppInfo\Application;
+use OCA\Laudatio\AppInfo\Application;
 
 // Nextcloud server root: $NEXTCLOUD_ROOT (set in DDEV and CI), otherwise the
-// classic layout with this app checked out to <server>/apps/appreciation.
+// classic layout with this app checked out to <server>/apps/laudatio.
 $serverRoot = getenv('NEXTCLOUD_ROOT') ?: dirname(__DIR__, 3);
 
 if (file_exists($serverRoot . '/tests/bootstrap.php')) {

@@ -7,12 +7,12 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Service;
+namespace OCA\Laudatio\Service;
 
-use OCA\Appreciation\AppInfo\Application;
-use OCA\Appreciation\Db\Event;
-use OCA\Appreciation\Db\OrgFunctionMapper;
-use OCA\Appreciation\Db\PersonMapper;
+use OCA\Laudatio\AppInfo\Application;
+use OCA\Laudatio\Db\Event;
+use OCA\Laudatio\Db\OrgFunctionMapper;
+use OCA\Laudatio\Db\PersonMapper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\L10N\IFactory;
 

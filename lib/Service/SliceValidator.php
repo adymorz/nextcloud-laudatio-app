@@ -7,13 +7,13 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Service;
+namespace OCA\Laudatio\Service;
 
 use DateTimeImmutable;
-use OCA\Appreciation\Db\OrgFunctionMapper;
-use OCA\Appreciation\Db\SliceMapper;
-use OCA\Appreciation\Exception\ConflictException;
-use OCA\Appreciation\Exception\ValidationException;
+use OCA\Laudatio\Db\OrgFunctionMapper;
+use OCA\Laudatio\Db\SliceMapper;
+use OCA\Laudatio\Exception\ConflictException;
+use OCA\Laudatio\Exception\ValidationException;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\IL10N;
 

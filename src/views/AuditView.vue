@@ -21,16 +21,16 @@ const total = ref(0)
 const loading = ref(false)
 
 const actions: Record<string, string> = {
-	create: t('appreciation', 'created'),
-	update: t('appreciation', 'changed'),
-	delete: t('appreciation', 'deleted'),
+	create: t('laudatio', 'created'),
+	update: t('laudatio', 'changed'),
+	delete: t('laudatio', 'deleted'),
 }
 
 const entityTypes: Record<string, string> = {
-	person: t('appreciation', 'Person'),
-	slice: t('appreciation', 'Time slice'),
-	group: t('appreciation', 'Group'),
-	function: t('appreciation', 'Function'),
+	person: t('laudatio', 'Person'),
+	slice: t('laudatio', 'Time slice'),
+	group: t('laudatio', 'Group'),
+	function: t('laudatio', 'Function'),
 }
 
 /**
@@ -54,25 +54,25 @@ onMounted(loadMore)
 
 <template>
 	<div class="view">
-		<h2>{{ t('appreciation', 'Audit log') }}</h2>
+		<h2>{{ t('laudatio', 'Audit log') }}</h2>
 		<p class="muted">
-			{{ t('appreciation', 'Who created, changed or deleted master data. Only the names of changed fields are recorded, not their values.') }}
+			{{ t('laudatio', 'Who created, changed or deleted master data. Only the names of changed fields are recorded, not their values.') }}
 		</p>
 
 		<table v-if="entries.length > 0" class="audit">
 			<thead>
 				<tr>
-					<th>{{ t('appreciation', 'Time') }}</th>
-					<th>{{ t('appreciation', 'User') }}</th>
-					<th>{{ t('appreciation', 'Action') }}</th>
-					<th>{{ t('appreciation', 'Object') }}</th>
-					<th>{{ t('appreciation', 'Fields') }}</th>
+					<th>{{ t('laudatio', 'Time') }}</th>
+					<th>{{ t('laudatio', 'User') }}</th>
+					<th>{{ t('laudatio', 'Action') }}</th>
+					<th>{{ t('laudatio', 'Object') }}</th>
+					<th>{{ t('laudatio', 'Fields') }}</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr v-for="entry in entries" :key="entry.id">
 					<td>{{ formatDateTime(entry.createdAt) }}</td>
-					<td>{{ entry.actor?.displayName ?? t('appreciation', 'System') }}</td>
+					<td>{{ entry.actor?.displayName ?? t('laudatio', 'System') }}</td>
 					<td>{{ actions[entry.action] ?? entry.action }}</td>
 					<td>
 						{{ entityTypes[entry.entityType] ?? entry.entityType }}
@@ -86,12 +86,12 @@ onMounted(loadMore)
 			</tbody>
 		</table>
 		<p v-else-if="!loading" class="muted">
-			{{ t('appreciation', 'No entries yet.') }}
+			{{ t('laudatio', 'No entries yet.') }}
 		</p>
 
 		<NcLoadingIcon v-if="loading" :size="32" />
 		<NcButton v-else-if="entries.length < total" class="audit__more" @click="loadMore">
-			{{ t('appreciation', 'Show more') }}
+			{{ t('laudatio', 'Show more') }}
 		</NcButton>
 	</div>
 </template>

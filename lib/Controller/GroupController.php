@@ -7,14 +7,14 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Controller;
+namespace OCA\Laudatio\Controller;
 
-use OCA\Appreciation\Db\Group;
-use OCA\Appreciation\Exception\ConflictException;
-use OCA\Appreciation\ResponseDefinitions;
-use OCA\Appreciation\Service\AccessService;
-use OCA\Appreciation\Service\GroupService;
-use OCA\Appreciation\Service\Presenter;
+use OCA\Laudatio\Db\Group;
+use OCA\Laudatio\Exception\ConflictException;
+use OCA\Laudatio\ResponseDefinitions;
+use OCA\Laudatio\Service\AccessService;
+use OCA\Laudatio\Service\GroupService;
+use OCA\Laudatio\Service\Presenter;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\ApiRoute;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -26,8 +26,8 @@ use OCP\IRequest;
 use OCP\IUserSession;
 
 /**
- * @psalm-import-type AppreciationGroup from ResponseDefinitions
- * @psalm-import-type AppreciationError from ResponseDefinitions
+ * @psalm-import-type LaudatioGroup from ResponseDefinitions
+ * @psalm-import-type LaudatioError from ResponseDefinitions
  */
 class GroupController extends BaseOCSController {
 	public function __construct(
@@ -43,7 +43,7 @@ class GroupController extends BaseOCSController {
 	/**
 	 * List the groups visible to the current user with their functions
 	 *
-	 * @return DataResponse<Http::STATUS_OK, list<AppreciationGroup>, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<LaudatioGroup>, array{}>
 	 * @throws OCSForbiddenException No access to the app
 	 *
 	 * 200: Groups returned
@@ -72,7 +72,7 @@ class GroupController extends BaseOCSController {
 	 * @param string $responsible User ID of the responsible person
 	 * @param list<string> $interested User IDs of the interested persons
 	 * @param string|null $jubileeYears Comma separated jubilee years, null to use the global setting
-	 * @return DataResponse<Http::STATUS_CREATED, AppreciationGroup, array{}>
+	 * @return DataResponse<Http::STATUS_CREATED, LaudatioGroup, array{}>
 	 * @throws OCSBadRequestException Invalid input
 	 * @throws OCSForbiddenException Not a manager
 	 *
@@ -97,7 +97,7 @@ class GroupController extends BaseOCSController {
 	 * @param string $responsible User ID of the responsible person
 	 * @param list<string> $interested User IDs of the interested persons
 	 * @param string|null $jubileeYears Comma separated jubilee years, null to use the global setting
-	 * @return DataResponse<Http::STATUS_OK, AppreciationGroup, array{}>
+	 * @return DataResponse<Http::STATUS_OK, LaudatioGroup, array{}>
 	 * @throws OCSBadRequestException Invalid input
 	 * @throws OCSForbiddenException Not a manager
 	 * @throws OCSNotFoundException Group not found
@@ -119,7 +119,7 @@ class GroupController extends BaseOCSController {
 	 * Delete a group without functions
 	 *
 	 * @param int $id ID of the group
-	 * @return DataResponse<Http::STATUS_OK, list<empty>, array{}>|DataResponse<Http::STATUS_CONFLICT, AppreciationError, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<empty>, array{}>|DataResponse<Http::STATUS_CONFLICT, LaudatioError, array{}>
 	 * @throws OCSForbiddenException Not a manager
 	 * @throws OCSNotFoundException Group not found
 	 *
@@ -142,7 +142,7 @@ class GroupController extends BaseOCSController {
 	}
 
 	/**
-	 * @return AppreciationGroup
+	 * @return LaudatioGroup
 	 */
 	private function present(Group $group, string $userId): array {
 		$this->presenter->reset();

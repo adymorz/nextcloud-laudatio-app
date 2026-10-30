@@ -2,18 +2,18 @@
 # SPDX-FileCopyrightText: 2026 Adrian Dymorz <dev@adrian.dymorz.ch>
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# Builds the App Store archive build/appstore/appreciation-<version>.tar.gz from
+# Builds the App Store archive build/appstore/laudatio-<version>.tar.gz from
 # the working copy. Run `npm run build` first.
 #
 # Signing, needed for a release (all paths absolute):
-#   APP_PRIVATE_KEY  appreciation.key
-#   APP_CERTIFICATE  appreciation.crt
+#   APP_PRIVATE_KEY  laudatio.key
+#   APP_CERTIFICATE  laudatio.crt
 #   NEXTCLOUD_ROOT   an installed Nextcloud whose occ signs the code (appinfo/signature.json)
 # With a key, the archive signature for the App Store is written to <archive>.sig.
 
 set -eu
 
-APP_ID=appreciation
+APP_ID=laudatio
 MAX_SIZE=$((20 * 1024 * 1024))
 
 fail() {
@@ -34,7 +34,7 @@ esac
 awk -v h="$heading" '$0 == h || index($0, h " ") == 1 { found = 1 } END { exit !found }' CHANGELOG.md \
 	|| fail "CHANGELOG.md has no heading \"$heading\" (e.g. \"$heading – $(date +%Y-%m-%d)\")."
 
-[ -f js/appreciation-main.mjs ] || fail "The frontend is not built, run 'npm run build' first."
+[ -f js/laudatio-main.mjs ] || fail "The frontend is not built, run 'npm run build' first."
 
 out=build/appstore
 archive="$out/$APP_ID-$version.tar.gz"

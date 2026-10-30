@@ -7,12 +7,12 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Controller;
+namespace OCA\Laudatio\Controller;
 
-use OCA\Appreciation\ResponseDefinitions;
-use OCA\Appreciation\Service\AccessService;
-use OCA\Appreciation\Service\Presenter;
-use OCA\Appreciation\Service\SettingsService;
+use OCA\Laudatio\ResponseDefinitions;
+use OCA\Laudatio\Service\AccessService;
+use OCA\Laudatio\Service\Presenter;
+use OCA\Laudatio\Service\SettingsService;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\ApiRoute;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -22,7 +22,7 @@ use OCP\IRequest;
 use OCP\IUserSession;
 
 /**
- * @psalm-import-type AppreciationMe from ResponseDefinitions
+ * @psalm-import-type LaudatioMe from ResponseDefinitions
  */
 class MeController extends BaseOCSController {
 	public function __construct(
@@ -38,7 +38,7 @@ class MeController extends BaseOCSController {
 	/**
 	 * Get the permissions of the current user
 	 *
-	 * @return DataResponse<Http::STATUS_OK, AppreciationMe, array{}>
+	 * @return DataResponse<Http::STATUS_OK, LaudatioMe, array{}>
 	 * @throws OCSForbiddenException Not logged in
 	 *
 	 * 200: Permissions returned
@@ -53,7 +53,7 @@ class MeController extends BaseOCSController {
 	 * Change the personal settings of the current user
 	 *
 	 * @param bool $emailNotifications Whether reminders are also sent by email
-	 * @return DataResponse<Http::STATUS_OK, AppreciationMe, array{}>
+	 * @return DataResponse<Http::STATUS_OK, LaudatioMe, array{}>
 	 * @throws OCSForbiddenException No access to the app
 	 *
 	 * 200: Settings saved

@@ -7,21 +7,21 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Tests\Integration\Db;
+namespace OCA\Laudatio\Tests\Integration\Db;
 
-use OCA\Appreciation\Db\Event;
-use OCA\Appreciation\Db\EventMapper;
-use OCA\Appreciation\Db\Group;
-use OCA\Appreciation\Db\GroupMapper;
-use OCA\Appreciation\Db\InterestedMapper;
-use OCA\Appreciation\Db\OrgFunction;
-use OCA\Appreciation\Db\OrgFunctionMapper;
-use OCA\Appreciation\Db\Person;
-use OCA\Appreciation\Db\PersonMapper;
-use OCA\Appreciation\Db\Slice;
-use OCA\Appreciation\Db\SliceMapper;
-use OCA\Appreciation\Service\Dates;
-use OCA\Appreciation\Tests\Integration\IntegrationTestCase;
+use OCA\Laudatio\Db\Event;
+use OCA\Laudatio\Db\EventMapper;
+use OCA\Laudatio\Db\Group;
+use OCA\Laudatio\Db\GroupMapper;
+use OCA\Laudatio\Db\InterestedMapper;
+use OCA\Laudatio\Db\OrgFunction;
+use OCA\Laudatio\Db\OrgFunctionMapper;
+use OCA\Laudatio\Db\Person;
+use OCA\Laudatio\Db\PersonMapper;
+use OCA\Laudatio\Db\Slice;
+use OCA\Laudatio\Db\SliceMapper;
+use OCA\Laudatio\Service\Dates;
+use OCA\Laudatio\Tests\Integration\IntegrationTestCase;
 
 final class MapperTest extends IntegrationTestCase {
 	private PersonMapper $persons;

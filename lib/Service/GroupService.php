@@ -7,18 +7,18 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Service;
+namespace OCA\Laudatio\Service;
 
-use OCA\Appreciation\Db\AuditEntry;
-use OCA\Appreciation\Db\Group;
-use OCA\Appreciation\Db\GroupMapper;
-use OCA\Appreciation\Db\InterestedMapper;
-use OCA\Appreciation\Db\OrgFunction;
-use OCA\Appreciation\Db\OrgFunctionMapper;
-use OCA\Appreciation\Db\SliceMapper;
-use OCA\Appreciation\Exception\ConflictException;
-use OCA\Appreciation\Exception\NotFoundException;
-use OCA\Appreciation\Exception\ValidationException;
+use OCA\Laudatio\Db\AuditEntry;
+use OCA\Laudatio\Db\Group;
+use OCA\Laudatio\Db\GroupMapper;
+use OCA\Laudatio\Db\InterestedMapper;
+use OCA\Laudatio\Db\OrgFunction;
+use OCA\Laudatio\Db\OrgFunctionMapper;
+use OCA\Laudatio\Db\SliceMapper;
+use OCA\Laudatio\Exception\ConflictException;
+use OCA\Laudatio\Exception\NotFoundException;
+use OCA\Laudatio\Exception\ValidationException;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\TTransactional;
 use OCP\IDBConnection;

@@ -8,14 +8,14 @@
 #
 #   GITHUB_TOKEN       fine-grained token with "Contents: read and write" on the mirror
 #   APPSTORE_TOKEN     API token from https://apps.nextcloud.com/account/token
-#   GITHUB_REPOSITORY  owner/name of the mirror (default: adymorz/nextcloud-appreciation-app)
+#   GITHUB_REPOSITORY  owner/name of the mirror (default: adymorz/nextcloud-laudatio-app)
 #   DRY_RUN=1          only print what would be published
 #
 # Requires curl and jq.
 
 set -eu
 
-APP_ID=appreciation
+APP_ID=laudatio
 APPSTORE_API=https://apps.nextcloud.com/api/v1/apps/releases
 
 fail() {
@@ -25,7 +25,7 @@ fail() {
 
 cd "$(dirname "$0")/.."
 
-repo=${GITHUB_REPOSITORY:-adymorz/nextcloud-appreciation-app}
+repo=${GITHUB_REPOSITORY:-adymorz/nextcloud-laudatio-app}
 version=$(sed -n 's:.*<version>\(.*\)</version>.*:\1:p' appinfo/info.xml)
 tag="v$version"
 name="$APP_ID-$version.tar.gz"

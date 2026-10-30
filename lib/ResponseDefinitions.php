@@ -7,18 +7,18 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation;
+namespace OCA\Laudatio;
 
 /**
  * Response types of the OCS API, used by psalm and the OpenAPI extractor.
  * Dates are formatted as YYYY-MM-DD, timestamps are unix seconds.
  *
- * @psalm-type AppreciationUser = array{
+ * @psalm-type LaudatioUser = array{
  *     id: string,
  *     displayName: string,
  * }
  *
- * @psalm-type AppreciationMe = array{
+ * @psalm-type LaudatioMe = array{
  *     userId: string,
  *     isManager: bool,
  *     responsibleGroupIds: list<int>,
@@ -29,25 +29,25 @@ namespace OCA\Appreciation;
  *     regulationsUrl: ?string,
  * }
  *
- * @psalm-type AppreciationFunction = array{
+ * @psalm-type LaudatioFunction = array{
  *     id: int,
  *     groupId: int,
  *     name: string,
  *     yearlyGift: bool,
  * }
  *
- * @psalm-type AppreciationGroup = array{
+ * @psalm-type LaudatioGroup = array{
  *     id: int,
  *     name: string,
- *     responsible: AppreciationUser,
- *     interested: list<AppreciationUser>,
+ *     responsible: LaudatioUser,
+ *     interested: list<LaudatioUser>,
  *     jubileeYears: ?string,
  *     effectiveJubileeYears: list<int>,
- *     functions: list<AppreciationFunction>,
+ *     functions: list<LaudatioFunction>,
  *     role: 'manager'|'responsible'|'interested',
  * }
  *
- * @psalm-type AppreciationSlice = array{
+ * @psalm-type LaudatioSlice = array{
  *     id: int,
  *     personId: int,
  *     functionId: int,
@@ -58,7 +58,7 @@ namespace OCA\Appreciation;
  *     endDate: ?string,
  * }
  *
- * @psalm-type AppreciationPerson = array{
+ * @psalm-type LaudatioPerson = array{
  *     id: int,
  *     firstName: string,
  *     lastName: string,
@@ -73,10 +73,10 @@ namespace OCA\Appreciation;
  *     mobilePhone: ?string,
  *     otherPhone: ?string,
  *     sensitiveVisible: bool,
- *     currentFunctions: list<AppreciationSlice>,
+ *     currentFunctions: list<LaudatioSlice>,
  * }
  *
- * @psalm-type AppreciationPersonDetail = array{
+ * @psalm-type LaudatioPersonDetail = array{
  *     id: int,
  *     firstName: string,
  *     lastName: string,
@@ -91,11 +91,11 @@ namespace OCA\Appreciation;
  *     mobilePhone: ?string,
  *     otherPhone: ?string,
  *     sensitiveVisible: bool,
- *     currentFunctions: list<AppreciationSlice>,
- *     slices: list<AppreciationSlice>,
+ *     currentFunctions: list<LaudatioSlice>,
+ *     slices: list<LaudatioSlice>,
  * }
  *
- * @psalm-type AppreciationEvent = array{
+ * @psalm-type LaudatioEvent = array{
  *     id: int,
  *     type: 'birthday'|'jubilee'|'gift',
  *     date: string,
@@ -108,13 +108,13 @@ namespace OCA\Appreciation;
  *     functionName: ?string,
  *     greeted: bool,
  *     greetedAt: ?int,
- *     greetedBy: ?AppreciationUser,
+ *     greetedBy: ?LaudatioUser,
  *     canGreet: bool,
  * }
  *
- * @psalm-type AppreciationAuditEntry = array{
+ * @psalm-type LaudatioAuditEntry = array{
  *     id: int,
- *     actor: ?AppreciationUser,
+ *     actor: ?LaudatioUser,
  *     action: string,
  *     entityType: string,
  *     entityId: int,
@@ -123,12 +123,12 @@ namespace OCA\Appreciation;
  *     createdAt: int,
  * }
  *
- * @psalm-type AppreciationAuditPage = array{
- *     entries: list<AppreciationAuditEntry>,
+ * @psalm-type LaudatioAuditPage = array{
+ *     entries: list<LaudatioAuditEntry>,
  *     total: int,
  * }
  *
- * @psalm-type AppreciationError = array{
+ * @psalm-type LaudatioError = array{
  *     message: string,
  * }
  *

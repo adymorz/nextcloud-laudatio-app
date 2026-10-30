@@ -49,8 +49,8 @@ const addressLines = computed(() => {
 })
 
 const phones = computed(() => [
-	{ label: t('appreciation', 'Mobile phone'), number: person.value?.mobilePhone },
-	{ label: t('appreciation', 'Additional phone number'), number: person.value?.otherPhone },
+	{ label: t('laudatio', 'Mobile phone'), number: person.value?.mobilePhone },
+	{ label: t('laudatio', 'Additional phone number'), number: person.value?.otherPhone },
 ].filter((phone): phone is { label: string, number: string } => !!phone.number))
 
 /**
@@ -102,10 +102,10 @@ async function deletePerson() {
 		return
 	}
 	const confirmed = await showConfirmation({
-		name: t('appreciation', 'Delete person'),
-		text: t('appreciation', 'Delete {name} with all functions and events? This cannot be undone.', { name: person.value.displayName }),
-		labelConfirm: t('appreciation', 'Delete'),
-		labelReject: t('appreciation', 'Cancel'),
+		name: t('laudatio', 'Delete person'),
+		text: t('laudatio', 'Delete {name} with all functions and events? This cannot be undone.', { name: person.value.displayName }),
+		labelConfirm: t('laudatio', 'Delete'),
+		labelReject: t('laudatio', 'Cancel'),
 		severity: 'warning',
 	})
 	if (!confirmed) {
@@ -124,10 +124,10 @@ async function deletePerson() {
  */
 async function deleteSlice(slice: Slice) {
 	const confirmed = await showConfirmation({
-		name: t('appreciation', 'Delete time slice'),
-		text: t('appreciation', 'Delete the time slice "{function}" from {start}?', { function: slice.functionName, start: formatDate(slice.startDate) }),
-		labelConfirm: t('appreciation', 'Delete'),
-		labelReject: t('appreciation', 'Cancel'),
+		name: t('laudatio', 'Delete time slice'),
+		text: t('laudatio', 'Delete the time slice "{function}" from {start}?', { function: slice.functionName, start: formatDate(slice.startDate) }),
+		labelConfirm: t('laudatio', 'Delete'),
+		labelReject: t('laudatio', 'Cancel'),
 		severity: 'warning',
 	})
 	if (!confirmed) {
@@ -150,11 +150,11 @@ watch(() => props.id, load, { immediate: true })
 			<template #icon>
 				<NcIconSvgWrapper :path="mdiArrowLeft" />
 			</template>
-			{{ t('appreciation', 'All persons') }}
+			{{ t('laudatio', 'All persons') }}
 		</NcButton>
 
 		<NcLoadingIcon v-if="loading && person === null" :size="32" />
-		<NcEmptyContent v-else-if="notFound || person === null" :name="t('appreciation', 'Person not found')" />
+		<NcEmptyContent v-else-if="notFound || person === null" :name="t('laudatio', 'Person not found')" />
 		<template v-else>
 			<div class="view__header">
 				<h2>{{ person.displayName }}</h2>
@@ -163,33 +163,33 @@ watch(() => props.id, load, { immediate: true })
 						<template #icon>
 							<NcIconSvgWrapper :path="mdiFileDocumentOutline" />
 						</template>
-						{{ t('appreciation', 'Data sheet') }}
+						{{ t('laudatio', 'Data sheet') }}
 					</NcButton>
 					<template v-if="me.isManager">
 						<NcButton @click="personDialogOpen = true">
 							<template #icon>
 								<NcIconSvgWrapper :path="mdiPencil" />
 							</template>
-							{{ t('appreciation', 'Edit') }}
+							{{ t('laudatio', 'Edit') }}
 						</NcButton>
 						<NcButton variant="error" @click="deletePerson">
 							<template #icon>
 								<NcIconSvgWrapper :path="mdiDelete" />
 							</template>
-							{{ t('appreciation', 'Delete') }}
+							{{ t('laudatio', 'Delete') }}
 						</NcButton>
 					</template>
 				</div>
 			</div>
 
 			<dl v-if="person.sensitiveVisible" class="profile">
-				<dt>{{ t('appreciation', 'Date of birth') }}</dt>
+				<dt>{{ t('laudatio', 'Date of birth') }}</dt>
 				<dd v-if="person.dateOfBirth">
 					{{ formatDate(person.dateOfBirth) }}
-					<span class="muted">({{ n('appreciation', '%n year old', '%n years old', age(person.dateOfBirth)) }})</span>
+					<span class="muted">({{ n('laudatio', '%n year old', '%n years old', age(person.dateOfBirth)) }})</span>
 				</dd>
 				<template v-if="addressLines.length > 0">
-					<dt>{{ t('appreciation', 'Address') }}</dt>
+					<dt>{{ t('laudatio', 'Address') }}</dt>
 					<dd class="profile__address">
 						{{ addressLines.join('\n') }}
 					</dd>
@@ -200,23 +200,23 @@ watch(() => props.id, load, { immediate: true })
 						<a class="profile__link" :href="telLink(phone.number)">{{ phone.number }}</a>
 					</dd>
 				</template>
-				<dt>{{ t('appreciation', 'Notes') }}</dt>
+				<dt>{{ t('laudatio', 'Notes') }}</dt>
 				<dd class="profile__notes">
-					{{ person.notes ?? t('appreciation', 'No notes') }}
+					{{ person.notes ?? t('laudatio', 'No notes') }}
 				</dd>
 			</dl>
 
 			<div class="section__header">
-				<h3>{{ t('appreciation', 'Function history') }}</h3>
+				<h3>{{ t('laudatio', 'Function history') }}</h3>
 				<NcButton v-if="me.isManager" @click="openSlice(null)">
 					<template #icon>
 						<NcIconSvgWrapper :path="mdiPlus" />
 					</template>
-					{{ t('appreciation', 'Add function') }}
+					{{ t('laudatio', 'Add function') }}
 				</NcButton>
 			</div>
 			<p v-if="slices.length === 0" class="muted">
-				{{ t('appreciation', 'No functions yet.') }}
+				{{ t('laudatio', 'No functions yet.') }}
 			</p>
 			<ol v-else class="timeline">
 				<li v-for="slice in slices"
@@ -227,7 +227,7 @@ watch(() => props.id, load, { immediate: true })
 						<strong>{{ slice.functionName }}</strong> <span class="muted">{{ slice.groupName }}</span>
 						<span class="timeline__dates">
 							<template v-if="slice.endDate === null">
-								{{ t('appreciation', 'since {date}', { date: formatDate(slice.startDate) }) }}
+								{{ t('laudatio', 'since {date}', { date: formatDate(slice.startDate) }) }}
 							</template>
 							<template v-else>
 								{{ formatDate(slice.startDate) }} – {{ formatDate(slice.endDate) }}
@@ -239,13 +239,13 @@ watch(() => props.id, load, { immediate: true })
 							<template #icon>
 								<NcIconSvgWrapper :path="mdiPencil" />
 							</template>
-							{{ t('appreciation', 'Edit') }}
+							{{ t('laudatio', 'Edit') }}
 						</NcActionButton>
 						<NcActionButton close-after-click @click="deleteSlice(slice)">
 							<template #icon>
 								<NcIconSvgWrapper :path="mdiDelete" />
 							</template>
-							{{ t('appreciation', 'Delete') }}
+							{{ t('laudatio', 'Delete') }}
 						</NcActionButton>
 					</NcActions>
 				</li>

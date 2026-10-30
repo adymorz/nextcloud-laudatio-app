@@ -7,10 +7,10 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Service;
+namespace OCA\Laudatio\Service;
 
-use OCA\Appreciation\Db\AuditEntry;
-use OCA\Appreciation\Db\AuditMapper;
+use OCA\Laudatio\Db\AuditEntry;
+use OCA\Laudatio\Db\AuditMapper;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Log\Audit\CriticalActionPerformedEvent;
 
@@ -48,7 +48,7 @@ class AuditService {
 		$this->mapper->insert($entry);
 
 		$this->dispatcher->dispatchTyped(new CriticalActionPerformedEvent(
-			'Appreciation: "%s" performed %s on %s #%s (fields: %s)',
+			'Laudatio: "%s" performed %s on %s #%s (fields: %s)',
 			[
 				'actor' => $actorUid ?? 'system',
 				'action' => $action,

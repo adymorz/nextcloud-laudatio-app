@@ -33,16 +33,16 @@ const rows = computed(() => {
 		return []
 	}
 	return [
-		{ label: t('appreciation', 'First name'), value: p.firstName },
-		{ label: t('appreciation', 'Last name'), value: p.lastName },
-		{ label: t('appreciation', 'Date of birth'), value: p.dateOfBirth ? formatDate(p.dateOfBirth) : null },
-		{ label: t('appreciation', 'Street'), value: p.street },
-		{ label: t('appreciation', 'House number'), value: p.streetNumber },
-		{ label: t('appreciation', 'ZIP code'), value: p.postalCode },
-		{ label: t('appreciation', 'City'), value: p.city },
-		{ label: t('appreciation', 'Country'), value: p.country },
-		{ label: t('appreciation', 'Mobile phone'), value: p.mobilePhone },
-		{ label: t('appreciation', 'Additional phone number'), value: p.otherPhone },
+		{ label: t('laudatio', 'First name'), value: p.firstName },
+		{ label: t('laudatio', 'Last name'), value: p.lastName },
+		{ label: t('laudatio', 'Date of birth'), value: p.dateOfBirth ? formatDate(p.dateOfBirth) : null },
+		{ label: t('laudatio', 'Street'), value: p.street },
+		{ label: t('laudatio', 'House number'), value: p.streetNumber },
+		{ label: t('laudatio', 'ZIP code'), value: p.postalCode },
+		{ label: t('laudatio', 'City'), value: p.city },
+		{ label: t('laudatio', 'Country'), value: p.country },
+		{ label: t('laudatio', 'Mobile phone'), value: p.mobilePhone },
+		{ label: t('laudatio', 'Additional phone number'), value: p.otherPhone },
 	]
 })
 
@@ -73,8 +73,8 @@ function print() {
 }
 
 // Enables the print styles below that hide the Nextcloud header and navigation
-onMounted(() => document.documentElement.classList.add('appreciation-print'))
-onBeforeUnmount(() => document.documentElement.classList.remove('appreciation-print'))
+onMounted(() => document.documentElement.classList.add('laudatio-print'))
+onBeforeUnmount(() => document.documentElement.classList.remove('laudatio-print'))
 
 watch(() => props.id, load, { immediate: true })
 </script>
@@ -86,40 +86,40 @@ watch(() => props.id, load, { immediate: true })
 				<template #icon>
 					<NcIconSvgWrapper :path="mdiArrowLeft" />
 				</template>
-				{{ t('appreciation', 'Back to the person') }}
+				{{ t('laudatio', 'Back to the person') }}
 			</NcButton>
 			<template v-if="person?.sensitiveVisible">
 				<NcButton variant="primary" @click="print">
 					<template #icon>
 						<NcIconSvgWrapper :path="mdiPrinter" />
 					</template>
-					{{ t('appreciation', 'Print') }}
+					{{ t('laudatio', 'Print') }}
 				</NcButton>
-				<span class="sheet__hint">{{ t('appreciation', 'To get a PDF, choose "Save as PDF" in the print dialog.') }}</span>
+				<span class="sheet__hint">{{ t('laudatio', 'To get a PDF, choose "Save as PDF" in the print dialog.') }}</span>
 			</template>
 		</div>
 
 		<NcLoadingIcon v-if="loading && person === null" :size="32" />
-		<NcEmptyContent v-else-if="notFound || person === null" :name="t('appreciation', 'Person not found')" />
+		<NcEmptyContent v-else-if="notFound || person === null" :name="t('laudatio', 'Person not found')" />
 		<NcEmptyContent
 			v-else-if="!person.sensitiveVisible"
-			:name="t('appreciation', 'Data sheet not available')"
-			:description="t('appreciation', 'Only managers and the responsible person can print the data sheet.')" />
+			:name="t('laudatio', 'Data sheet not available')"
+			:description="t('laudatio', 'Only managers and the responsible person can print the data sheet.')" />
 		<article v-else class="sheet__page">
 			<h2 class="sheet__title">
-				{{ t('appreciation', 'Personal data sheet') }}
+				{{ t('laudatio', 'Personal data sheet') }}
 			</h2>
 			<p class="sheet__meta">
-				{{ person.displayName }} · {{ t('appreciation', 'Printed on {date}', { date: printedOn }) }}
+				{{ person.displayName }} · {{ t('laudatio', 'Printed on {date}', { date: printedOn }) }}
 			</p>
-			<p>{{ t('appreciation', 'Please check your data. Correct wrong entries and add missing ones in the right column, then sign the sheet and return it.') }}</p>
+			<p>{{ t('laudatio', 'Please check your data. Correct wrong entries and add missing ones in the right column, then sign the sheet and return it.') }}</p>
 
 			<table class="sheet__table">
 				<thead>
 					<tr>
-						<th>{{ t('appreciation', 'Field') }}</th>
-						<th>{{ t('appreciation', 'Current entry') }}</th>
-						<th>{{ t('appreciation', 'Correction') }}</th>
+						<th>{{ t('laudatio', 'Field') }}</th>
+						<th>{{ t('laudatio', 'Current entry') }}</th>
+						<th>{{ t('laudatio', 'Correction') }}</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -133,13 +133,13 @@ watch(() => props.id, load, { immediate: true })
 				</tbody>
 			</table>
 
-			<h3>{{ t('appreciation', 'Current functions') }}</h3>
+			<h3>{{ t('laudatio', 'Current functions') }}</h3>
 			<table v-if="functions.length > 0" class="sheet__table">
 				<thead>
 					<tr>
-						<th>{{ t('appreciation', 'Function') }}</th>
-						<th>{{ t('appreciation', 'Group') }}</th>
-						<th>{{ t('appreciation', 'Start') }}</th>
+						<th>{{ t('laudatio', 'Function') }}</th>
+						<th>{{ t('laudatio', 'Group') }}</th>
+						<th>{{ t('laudatio', 'Start') }}</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -151,17 +151,17 @@ watch(() => props.id, load, { immediate: true })
 				</tbody>
 			</table>
 			<p v-else>
-				{{ t('appreciation', 'No current functions.') }}
+				{{ t('laudatio', 'No current functions.') }}
 			</p>
 
-			<h3>{{ t('appreciation', 'Remarks') }}</h3>
+			<h3>{{ t('laudatio', 'Remarks') }}</h3>
 			<div class="sheet__lines">
 				<span v-for="line in 3" :key="line" />
 			</div>
 
 			<div class="sheet__signature">
-				<div>{{ t('appreciation', 'Place and date') }}</div>
-				<div>{{ t('appreciation', 'Signature') }}</div>
+				<div>{{ t('laudatio', 'Place and date') }}</div>
+				<div>{{ t('laudatio', 'Signature') }}</div>
 			</div>
 		</article>
 	</div>
@@ -293,24 +293,24 @@ watch(() => props.id, load, { immediate: true })
 		margin: 15mm;
 	}
 
-	html.appreciation-print,
-	html.appreciation-print body {
+	html.laudatio-print,
+	html.laudatio-print body {
 		position: static !important;
 		height: auto !important;
 		overflow: visible !important;
 		background: none !important;
 	}
 
-	html.appreciation-print #header,
-	html.appreciation-print #skip-actions,
-	html.appreciation-print #profiler-toolbar,
-	html.appreciation-print .app-navigation {
+	html.laudatio-print #header,
+	html.laudatio-print #skip-actions,
+	html.laudatio-print #profiler-toolbar,
+	html.laudatio-print .app-navigation {
 		display: none !important;
 	}
 
-	html.appreciation-print #content,
-	html.appreciation-print #content-vue,
-	html.appreciation-print #app-content-vue {
+	html.laudatio-print #content,
+	html.laudatio-print #content-vue,
+	html.laudatio-print #app-content-vue {
 		position: static !important;
 		width: auto !important;
 		height: auto !important;

@@ -7,10 +7,10 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Service;
+namespace OCA\Laudatio\Service;
 
-use OCA\Appreciation\AppInfo\Application;
-use OCA\Appreciation\Exception\ValidationException;
+use OCA\Laudatio\AppInfo\Application;
+use OCA\Laudatio\Exception\ValidationException;
 use OCP\Config\IUserConfig;
 use OCP\IAppConfig;
 use OCP\IL10N;

@@ -19,37 +19,37 @@ const settingsOpen = ref(false)
 </script>
 
 <template>
-	<NcContent app-name="appreciation">
-		<NcAppNavigation :aria-label="t('appreciation', 'Appreciation')">
+	<NcContent app-name="laudatio">
+		<NcAppNavigation :aria-label="t('laudatio', 'Laudatio')">
 			<template #list>
-				<NcAppNavigationItem :name="t('appreciation', 'Upcoming')" :to="{ name: 'upcoming' }">
+				<NcAppNavigationItem :name="t('laudatio', 'Upcoming')" :to="{ name: 'upcoming' }">
 					<template #icon>
 						<NcIconSvgWrapper :path="mdiCakeVariant" />
 					</template>
 				</NcAppNavigationItem>
-				<NcAppNavigationItem :name="t('appreciation', 'Persons')" :to="{ name: 'persons' }">
+				<NcAppNavigationItem :name="t('laudatio', 'Persons')" :to="{ name: 'persons' }">
 					<template #icon>
 						<NcIconSvgWrapper :path="mdiAccountMultiple" />
 					</template>
 				</NcAppNavigationItem>
-				<NcAppNavigationItem :name="t('appreciation', 'Groups & functions')" :to="{ name: 'groups' }">
+				<NcAppNavigationItem :name="t('laudatio', 'Groups & functions')" :to="{ name: 'groups' }">
 					<template #icon>
 						<NcIconSvgWrapper :path="mdiAccountGroup" />
 					</template>
 				</NcAppNavigationItem>
-				<NcAppNavigationItem v-if="me.isManager" :name="t('appreciation', 'Audit log')" :to="{ name: 'audit' }">
+				<NcAppNavigationItem v-if="me.isManager" :name="t('laudatio', 'Audit log')" :to="{ name: 'audit' }">
 					<template #icon>
 						<NcIconSvgWrapper :path="mdiHistory" />
 					</template>
 				</NcAppNavigationItem>
 			</template>
 			<template #footer>
-				<NcAppNavigationItem v-if="me.regulationsUrl" :name="t('appreciation', 'Gift regulations')" :href="me.regulationsUrl">
+				<NcAppNavigationItem v-if="me.regulationsUrl" :name="t('laudatio', 'Gift regulations')" :href="me.regulationsUrl">
 					<template #icon>
 						<NcIconSvgWrapper :path="mdiScaleBalance" />
 					</template>
 				</NcAppNavigationItem>
-				<NcAppNavigationItem :name="t('appreciation', 'Settings')" @click="settingsOpen = true">
+				<NcAppNavigationItem :name="t('laudatio', 'Settings')" @click="settingsOpen = true">
 					<template #icon>
 						<NcIconSvgWrapper :path="mdiCog" />
 					</template>

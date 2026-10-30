@@ -70,28 +70,28 @@ async function save() {
 <template>
 	<NcDialog
 		v-model:open="open"
-		:name="orgFunction === null ? t('appreciation', 'New function in {group}', { group: group.name }) : t('appreciation', 'Edit function')"
+		:name="orgFunction === null ? t('laudatio', 'New function in {group}', { group: group.name }) : t('laudatio', 'Edit function')"
 		size="small">
 		<form class="form" @submit.prevent="save">
-			<NcTextField v-model="name" :label="t('appreciation', 'Name of the function')" required />
+			<NcTextField v-model="name" :label="t('laudatio', 'Name of the function')" required />
 			<NcCheckboxRadioSwitch v-model="yearlyGift" type="switch">
-				{{ t('appreciation', 'One gift per year') }}
+				{{ t('laudatio', 'One gift per year') }}
 			</NcCheckboxRadioSwitch>
 			<p class="form__hint">
-				{{ t('appreciation', 'The responsible person is reminded to present one gift per calendar year to everybody holding this function.') }}
+				{{ t('laudatio', 'The responsible person is reminded to present one gift per calendar year to everybody holding this function.') }}
 			</p>
 			<NcNoteCard
 				v-if="switchingOff"
 				type="warning"
-				:text="t('appreciation', 'Saving removes this year\'s and future yearly gifts of everybody holding this function, including gifts already marked as presented. Gifts of past years are kept.')" />
+				:text="t('laudatio', 'Saving removes this year\'s and future yearly gifts of everybody holding this function, including gifts already marked as presented. Gifts of past years are kept.')" />
 			<button type="submit" hidden />
 		</form>
 		<template #actions>
 			<NcButton @click="open = false">
-				{{ t('appreciation', 'Cancel') }}
+				{{ t('laudatio', 'Cancel') }}
 			</NcButton>
 			<NcButton variant="primary" :disabled="!valid || saving" @click="save">
-				{{ t('appreciation', 'Save') }}
+				{{ t('laudatio', 'Save') }}
 			</NcButton>
 		</template>
 	</NcDialog>

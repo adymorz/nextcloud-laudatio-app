@@ -15,7 +15,7 @@ set -euo pipefail
 shopt -s inherit_errexit
 
 NC="${NEXTCLOUD_ROOT:-/var/www/nextcloud}"
-APP_ID="${NEXTCLOUD_APP_ID:-appreciation}"
+APP_ID="${NEXTCLOUD_APP_ID:-laudatio}"
 APP_DIR=/var/www/html
 DEV_CONFIG=/mnt/ddev_config/nextcloud/ddev.config.php
 
@@ -129,5 +129,5 @@ else
 	log "No appinfo/info.xml found in the repository, skipping app activation."
 fi
 
-log "Nextcloud $(installed_version) is ready at ${DDEV_PRIMARY_URL:-https://appreciation.ddev.site}"
+log "Nextcloud $(installed_version) is ready at ${DDEV_PRIMARY_URL:-https://laudatio.ddev.site}"
 log "Logins: admin/admin, alice/alice, bob/bob · Mails: ddev mailpit"

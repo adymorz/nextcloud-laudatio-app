@@ -7,10 +7,10 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Listener;
+namespace OCA\Laudatio\Listener;
 
-use OCA\Appreciation\AppInfo\Application;
-use OCA\Appreciation\Service\AccessService;
+use OCA\Laudatio\AppInfo\Application;
+use OCA\Laudatio\Service\AccessService;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 use OCP\INavigationManager;
@@ -51,7 +51,7 @@ class NavigationListener implements IEventListener {
 			'order' => 50,
 			'href' => $this->urlGenerator->linkToRoute(Application::APP_ID . '.page.index'),
 			'icon' => $this->urlGenerator->imagePath(Application::APP_ID, 'app.svg'),
-			'name' => $this->l10nFactory->get(Application::APP_ID)->t('Appreciation'),
+			'name' => $this->l10nFactory->get(Application::APP_ID)->t('Laudatio'),
 			'app' => Application::APP_ID,
 			'type' => 'link',
 		]);

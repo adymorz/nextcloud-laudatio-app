@@ -7,15 +7,15 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Controller;
+namespace OCA\Laudatio\Controller;
 
-use OCA\Appreciation\AppInfo\Application;
-use OCA\Appreciation\Exception\ConflictException;
-use OCA\Appreciation\Exception\ForbiddenException;
-use OCA\Appreciation\Exception\NotFoundException;
-use OCA\Appreciation\Exception\ValidationException;
-use OCA\Appreciation\ResponseDefinitions;
-use OCA\Appreciation\Service\AccessService;
+use OCA\Laudatio\AppInfo\Application;
+use OCA\Laudatio\Exception\ConflictException;
+use OCA\Laudatio\Exception\ForbiddenException;
+use OCA\Laudatio\Exception\NotFoundException;
+use OCA\Laudatio\Exception\ValidationException;
+use OCA\Laudatio\ResponseDefinitions;
+use OCA\Laudatio\Service\AccessService;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
@@ -29,7 +29,7 @@ use OCP\IUserSession;
  * Common helpers of the OCS controllers: the current user and the mapping of
  * service errors to OCS errors (400, 403, 404) or a 409 response.
  *
- * @psalm-import-type AppreciationError from ResponseDefinitions
+ * @psalm-import-type LaudatioError from ResponseDefinitions
  */
 abstract class BaseOCSController extends OCSController {
 	public function __construct(
@@ -76,7 +76,7 @@ abstract class BaseOCSController extends OCSController {
 	}
 
 	/**
-	 * @return DataResponse<Http::STATUS_CONFLICT, AppreciationError, array{}>
+	 * @return DataResponse<Http::STATUS_CONFLICT, LaudatioError, array{}>
 	 */
 	protected function conflict(ConflictException $e): DataResponse {
 		return new DataResponse(['message' => $e->getMessage()], Http::STATUS_CONFLICT);

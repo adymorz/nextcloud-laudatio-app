@@ -14,7 +14,7 @@ import PersonsView from './views/PersonsView.vue'
 import UpcomingView from './views/UpcomingView.vue'
 
 export const router = createRouter({
-	history: createWebHistory(generateUrl('/apps/appreciation')),
+	history: createWebHistory(generateUrl('/apps/laudatio')),
 	linkActiveClass: 'active',
 	routes: [
 		{ path: '/', redirect: { name: 'upcoming' } },

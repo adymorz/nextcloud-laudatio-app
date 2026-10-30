@@ -7,7 +7,7 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Db;
+namespace OCA\Laudatio\Db;
 
 use DateTimeImmutable;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -20,7 +20,7 @@ use OCP\IDBConnection;
  */
 class SliceMapper extends QBMapper {
 	public function __construct(IDBConnection $db) {
-		parent::__construct($db, 'appreciation_slices', Slice::class);
+		parent::__construct($db, 'laudatio_slices', Slice::class);
 	}
 
 	/**
@@ -96,7 +96,7 @@ class SliceMapper extends QBMapper {
 			$qb = $this->db->getQueryBuilder();
 			$qb->selectDistinct('s.person_id')
 				->from($this->getTableName(), 's')
-				->innerJoin('s', 'appreciation_functions', 'f', $qb->expr()->eq('f.id', 's.function_id'))
+				->innerJoin('s', 'laudatio_functions', 'f', $qb->expr()->eq('f.id', 's.function_id'))
 				->where($qb->expr()->in('f.group_id', $qb->createNamedParameter($chunk, IQueryBuilder::PARAM_INT_ARRAY)))
 				->andWhere($qb->expr()->orX(
 					$qb->expr()->isNull('s.end_date'),

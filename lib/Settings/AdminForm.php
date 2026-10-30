@@ -7,11 +7,11 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Settings;
+namespace OCA\Laudatio\Settings;
 
-use OCA\Appreciation\Exception\ValidationException;
-use OCA\Appreciation\Service\EventService;
-use OCA\Appreciation\Service\SettingsService;
+use OCA\Laudatio\Exception\ValidationException;
+use OCA\Laudatio\Service\EventService;
+use OCA\Laudatio\Service\SettingsService;
 use OCP\IGroup;
 use OCP\IGroupManager;
 use OCP\IL10N;
@@ -44,12 +44,12 @@ class AdminForm implements IDeclarativeSettingsFormWithHandlers {
 		}
 
 		return [
-			'id' => 'appreciation-admin',
+			'id' => 'laudatio-admin',
 			'priority' => 50,
 			'section_type' => DeclarativeSettingsTypes::SECTION_TYPE_ADMIN,
 			'section_id' => 'groupware',
 			'storage_type' => DeclarativeSettingsTypes::STORAGE_TYPE_EXTERNAL,
-			'title' => $this->l10n->t('Appreciation'),
+			'title' => $this->l10n->t('Laudatio'),
 			'description' => $this->l10n->t('Birthdays and work anniversaries of the persons engaged in your organization.'),
 			'fields' => [
 				[

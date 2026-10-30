@@ -4,7 +4,7 @@
  */
 
 import type {
-	AppreciationEvent,
+	LaudatioEvent,
 	AuditPage,
 	FunctionInput,
 	Group,
@@ -33,7 +33,7 @@ interface OcsResponse<T> {
 const headers = { 'OCS-APIRequest': 'true', Accept: 'application/json' }
 
 function url(path: string): string {
-	return generateOcsUrl('/apps/appreciation/api/v1' + path)
+	return generateOcsUrl('/apps/laudatio/api/v1' + path)
 }
 
 async function get<T>(path: string, params?: Record<string, unknown>): Promise<T> {
@@ -77,8 +77,8 @@ export const api = {
 	updateFunction: (id: number, input: FunctionInput) => put<OrgFunction>(`/functions/${id}`, input),
 	deleteFunction: (id: number) => del(`/functions/${id}`),
 
-	events: (days: number) => get<AppreciationEvent[]>('/events', { days }),
-	setGreeted: (id: number, greeted: boolean) => put<AppreciationEvent>(`/events/${id}/greeted`, { greeted }),
+	events: (days: number) => get<LaudatioEvent[]>('/events', { days }),
+	setGreeted: (id: number, greeted: boolean) => put<LaudatioEvent>(`/events/${id}/greeted`, { greeted }),
 
 	audit: (limit: number, offset: number) => get<AuditPage>('/audit', { limit, offset }),
 }
@@ -91,7 +91,7 @@ export const api = {
 export async function searchUsers(search: string): Promise<User[]> {
 	const response = await axios.get<OcsResponse<{ id: string, label: string }[]>>(generateOcsUrl('/core/autocomplete/get'), {
 		headers,
-		params: { search, itemType: 'appreciation', itemId: 'group', shareTypes: [0], limit: 20 },
+		params: { search, itemType: 'laudatio', itemId: 'group', shareTypes: [0], limit: 20 },
 	})
 	return response.data.ocs.data.map((entry) => ({ id: entry.id, displayName: entry.label }))
 }
@@ -110,5 +110,5 @@ export function errorMessage(error: unknown): string {
 			return message
 		}
 	}
-	return t('appreciation', 'Something went wrong. Please try again.')
+	return t('laudatio', 'Something went wrong. Please try again.')
 }

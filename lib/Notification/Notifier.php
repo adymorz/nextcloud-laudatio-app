@@ -7,14 +7,14 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Notification;
+namespace OCA\Laudatio\Notification;
 
-use OCA\Appreciation\AppInfo\Application;
-use OCA\Appreciation\Db\Event;
-use OCA\Appreciation\Db\EventMapper;
-use OCA\Appreciation\Service\NotificationService;
-use OCA\Appreciation\Service\RecipientService;
-use OCA\Appreciation\Service\TitleBuilder;
+use OCA\Laudatio\AppInfo\Application;
+use OCA\Laudatio\Db\Event;
+use OCA\Laudatio\Db\EventMapper;
+use OCA\Laudatio\Service\NotificationService;
+use OCA\Laudatio\Service\RecipientService;
+use OCA\Laudatio\Service\TitleBuilder;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\IDateTimeFormatter;
 use OCP\IURLGenerator;
@@ -47,7 +47,7 @@ class Notifier implements INotifier {
 
 	#[\Override]
 	public function getName(): string {
-		return $this->l10nFactory->get(Application::APP_ID)->t('Appreciation');
+		return $this->l10nFactory->get(Application::APP_ID)->t('Laudatio');
 	}
 
 	#[\Override]

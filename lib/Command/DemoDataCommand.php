@@ -7,14 +7,14 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Command;
+namespace OCA\Laudatio\Command;
 
 use DateTimeImmutable;
-use OCA\Appreciation\Model\PersonInput;
-use OCA\Appreciation\Service\Clock;
-use OCA\Appreciation\Service\Dates;
-use OCA\Appreciation\Service\GroupService;
-use OCA\Appreciation\Service\PersonService;
+use OCA\Laudatio\Model\PersonInput;
+use OCA\Laudatio\Service\Clock;
+use OCA\Laudatio\Service\Dates;
+use OCA\Laudatio\Service\GroupService;
+use OCA\Laudatio\Service\PersonService;
 use OCP\IUserManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -41,7 +41,7 @@ class DemoDataCommand extends Command {
 
 	#[\Override]
 	protected function configure(): void {
-		$this->setName('appreciation:demo-data')
+		$this->setName('laudatio:demo-data')
 			->setDescription('Create demo groups, functions and persons (for development)')
 			->setHelp('Requires the users "alice" and "bob". Alice is responsible for "Demo: Board" and interested in "Demo: Volunteers", Bob the other way round.')
 			->addOption('force', null, InputOption::VALUE_NONE, 'Create the demo data even if demo groups already exist');

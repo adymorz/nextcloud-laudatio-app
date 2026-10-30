@@ -7,18 +7,18 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Service;
+namespace OCA\Laudatio\Service;
 
 use DateTimeImmutable;
-use OCA\Appreciation\Db\AuditEntry;
-use OCA\Appreciation\Db\Person;
-use OCA\Appreciation\Db\PersonMapper;
-use OCA\Appreciation\Db\Slice;
-use OCA\Appreciation\Db\SliceMapper;
-use OCA\Appreciation\Exception\ConflictException;
-use OCA\Appreciation\Exception\NotFoundException;
-use OCA\Appreciation\Exception\ValidationException;
-use OCA\Appreciation\Model\PersonInput;
+use OCA\Laudatio\Db\AuditEntry;
+use OCA\Laudatio\Db\Person;
+use OCA\Laudatio\Db\PersonMapper;
+use OCA\Laudatio\Db\Slice;
+use OCA\Laudatio\Db\SliceMapper;
+use OCA\Laudatio\Exception\ConflictException;
+use OCA\Laudatio\Exception\NotFoundException;
+use OCA\Laudatio\Exception\ValidationException;
+use OCA\Laudatio\Model\PersonInput;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\TTransactional;
 use OCP\IDBConnection;

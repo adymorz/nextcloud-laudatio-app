@@ -7,7 +7,7 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Tests\Integration;
+namespace OCA\Laudatio\Tests\Integration;
 
 use OCP\IDBConnection;
 use OCP\Server;
@@ -31,7 +31,7 @@ abstract class IntegrationTestCase extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$qb = $this->service(IDBConnection::class)->getQueryBuilder();
-		$qb->select($qb->func()->max('id'))->from('appreciation_audit');
+		$qb->select($qb->func()->max('id'))->from('laudatio_audit');
 		$cursor = $qb->executeQuery();
 		$this->lastAuditId = (int)$cursor->fetchOne();
 		$cursor->closeCursor();
@@ -72,7 +72,7 @@ abstract class IntegrationTestCase extends TestCase {
 		$this->cleanups = [];
 
 		$qb = $this->service(IDBConnection::class)->getQueryBuilder();
-		$qb->delete('appreciation_audit')
+		$qb->delete('laudatio_audit')
 			->where($qb->expr()->gt('id', $qb->createNamedParameter($this->lastAuditId)));
 		$qb->executeStatement();
 

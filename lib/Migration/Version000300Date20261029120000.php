@@ -7,7 +7,7 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Migration;
+namespace OCA\Laudatio\Migration;
 
 use Closure;
 use OCP\DB\ISchemaWrapper;
@@ -20,13 +20,13 @@ use OCP\Migration\SimpleMigrationStep;
 /**
  * Address and phone numbers of persons, all optional.
  */
-#[AddColumn(table: 'appreciation_persons', name: 'street', type: ColumnType::STRING)]
-#[AddColumn(table: 'appreciation_persons', name: 'street_number', type: ColumnType::STRING)]
-#[AddColumn(table: 'appreciation_persons', name: 'postal_code', type: ColumnType::STRING)]
-#[AddColumn(table: 'appreciation_persons', name: 'city', type: ColumnType::STRING)]
-#[AddColumn(table: 'appreciation_persons', name: 'country', type: ColumnType::STRING)]
-#[AddColumn(table: 'appreciation_persons', name: 'mobile_phone', type: ColumnType::STRING)]
-#[AddColumn(table: 'appreciation_persons', name: 'other_phone', type: ColumnType::STRING)]
+#[AddColumn(table: 'laudatio_persons', name: 'street', type: ColumnType::STRING)]
+#[AddColumn(table: 'laudatio_persons', name: 'street_number', type: ColumnType::STRING)]
+#[AddColumn(table: 'laudatio_persons', name: 'postal_code', type: ColumnType::STRING)]
+#[AddColumn(table: 'laudatio_persons', name: 'city', type: ColumnType::STRING)]
+#[AddColumn(table: 'laudatio_persons', name: 'country', type: ColumnType::STRING)]
+#[AddColumn(table: 'laudatio_persons', name: 'mobile_phone', type: ColumnType::STRING)]
+#[AddColumn(table: 'laudatio_persons', name: 'other_phone', type: ColumnType::STRING)]
 class Version000300Date20261029120000 extends SimpleMigrationStep {
 	/** column => length */
 	private const COLUMNS = [
@@ -45,7 +45,7 @@ class Version000300Date20261029120000 extends SimpleMigrationStep {
 	#[\Override]
 	public function changeSchema(IOutput $output, Closure $schemaClosure, array $options): ?ISchemaWrapper {
 		$schema = $schemaClosure();
-		$table = $schema->getTable('appreciation_persons');
+		$table = $schema->getTable('laudatio_persons');
 		$changed = false;
 		foreach (self::COLUMNS as $column => $length) {
 			if (!$table->hasColumn($column)) {

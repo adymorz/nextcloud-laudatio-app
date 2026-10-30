@@ -118,8 +118,8 @@ php:unit:
   before_script:
     - *composer-setup
     - php $NEXTCLOUD_ROOT/occ maintenance:install --database=sqlite --admin-user=admin --admin-pass=admin
-    - ln -s "$CI_PROJECT_DIR" "$NEXTCLOUD_ROOT/apps/appreciation"
-    - php $NEXTCLOUD_ROOT/occ app:enable appreciation
+    - ln -s "$CI_PROJECT_DIR" "$NEXTCLOUD_ROOT/apps/laudatio"
+    - php $NEXTCLOUD_ROOT/occ app:enable laudatio
     - composer install --no-interaction --no-progress
   script:
     - composer test:unit

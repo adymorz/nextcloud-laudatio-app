@@ -7,19 +7,19 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Service;
+namespace OCA\Laudatio\Service;
 
-use OCA\Appreciation\Db\AuditEntry;
-use OCA\Appreciation\Db\Event;
-use OCA\Appreciation\Db\Group;
-use OCA\Appreciation\Db\GroupMapper;
-use OCA\Appreciation\Db\OrgFunction;
-use OCA\Appreciation\Db\OrgFunctionMapper;
-use OCA\Appreciation\Db\Person;
-use OCA\Appreciation\Db\PersonMapper;
-use OCA\Appreciation\Db\Slice;
-use OCA\Appreciation\Db\SliceMapper;
-use OCA\Appreciation\ResponseDefinitions;
+use OCA\Laudatio\Db\AuditEntry;
+use OCA\Laudatio\Db\Event;
+use OCA\Laudatio\Db\Group;
+use OCA\Laudatio\Db\GroupMapper;
+use OCA\Laudatio\Db\OrgFunction;
+use OCA\Laudatio\Db\OrgFunctionMapper;
+use OCA\Laudatio\Db\Person;
+use OCA\Laudatio\Db\PersonMapper;
+use OCA\Laudatio\Db\Slice;
+use OCA\Laudatio\Db\SliceMapper;
+use OCA\Laudatio\ResponseDefinitions;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\IUserManager;
 use OCP\L10N\IFactory;
@@ -29,15 +29,15 @@ use OCP\L10N\IFactory;
  * birth, contact data and notes only for viewers allowed to see them, and only
  * slices of groups the viewer can see.
  *
- * @psalm-import-type AppreciationUser from ResponseDefinitions
- * @psalm-import-type AppreciationMe from ResponseDefinitions
- * @psalm-import-type AppreciationFunction from ResponseDefinitions
- * @psalm-import-type AppreciationGroup from ResponseDefinitions
- * @psalm-import-type AppreciationSlice from ResponseDefinitions
- * @psalm-import-type AppreciationPerson from ResponseDefinitions
- * @psalm-import-type AppreciationPersonDetail from ResponseDefinitions
- * @psalm-import-type AppreciationEvent from ResponseDefinitions
- * @psalm-import-type AppreciationAuditEntry from ResponseDefinitions
+ * @psalm-import-type LaudatioUser from ResponseDefinitions
+ * @psalm-import-type LaudatioMe from ResponseDefinitions
+ * @psalm-import-type LaudatioFunction from ResponseDefinitions
+ * @psalm-import-type LaudatioGroup from ResponseDefinitions
+ * @psalm-import-type LaudatioSlice from ResponseDefinitions
+ * @psalm-import-type LaudatioPerson from ResponseDefinitions
+ * @psalm-import-type LaudatioPersonDetail from ResponseDefinitions
+ * @psalm-import-type LaudatioEvent from ResponseDefinitions
+ * @psalm-import-type LaudatioAuditEntry from ResponseDefinitions
  */
 class Presenter {
 	/** @var array<int, OrgFunction>|null */
@@ -64,7 +64,7 @@ class Presenter {
 	}
 
 	/**
-	 * @return AppreciationUser
+	 * @return LaudatioUser
 	 */
 	public function user(string $userId): array {
 		$this->displayNames[$userId] ??= $this->userManager->getDisplayName($userId) ?? $userId;
@@ -72,7 +72,7 @@ class Presenter {
 	}
 
 	/**
-	 * @return AppreciationMe
+	 * @return LaudatioMe
 	 */
 	public function me(string $userId): array {
 		return [
@@ -88,7 +88,7 @@ class Presenter {
 	}
 
 	/**
-	 * @return AppreciationFunction
+	 * @return LaudatioFunction
 	 */
 	public function function(OrgFunction $function): array {
 		return [
@@ -102,7 +102,7 @@ class Presenter {
 	/**
 	 * @param list<string> $interested
 	 * @param list<OrgFunction> $functions
-	 * @return AppreciationGroup
+	 * @return LaudatioGroup
 	 */
 	public function group(Group $group, array $interested, array $functions, string $viewer): array {
 		$role = 'manager';
@@ -124,7 +124,7 @@ class Presenter {
 	}
 
 	/**
-	 * @return AppreciationSlice
+	 * @return LaudatioSlice
 	 */
 	public function slice(Slice $slice): array {
 		$function = $this->functions()[$slice->getFunctionId()] ?? null;
@@ -144,7 +144,7 @@ class Presenter {
 
 	/**
 	 * @param list<Slice> $slices all slices of the person
-	 * @return AppreciationPerson
+	 * @return LaudatioPerson
 	 */
 	public function person(Person $person, array $slices, string $viewer): array {
 		$sensitive = $this->access->canSeeSensitive($viewer, $person->getId());
@@ -177,7 +177,7 @@ class Presenter {
 
 	/**
 	 * @param list<Slice> $slices all slices of the person
-	 * @return AppreciationPersonDetail
+	 * @return LaudatioPersonDetail
 	 */
 	public function personDetail(Person $person, array $slices, string $viewer): array {
 		$detail = $this->person($person, $slices, $viewer);
@@ -187,7 +187,7 @@ class Presenter {
 
 	/**
 	 * @param RecipientService::ROLE_*|null $role
-	 * @return AppreciationEvent
+	 * @return LaudatioEvent
 	 */
 	public function event(Event $event, ?string $role, string $viewer): array {
 		$language = $this->l10nFactory->getUserLanguage($this->userManager->get($viewer));
@@ -217,7 +217,7 @@ class Presenter {
 	}
 
 	/**
-	 * @return AppreciationAuditEntry
+	 * @return LaudatioAuditEntry
 	 */
 	public function auditEntry(AuditEntry $entry): array {
 		$actor = $entry->getActorUid();

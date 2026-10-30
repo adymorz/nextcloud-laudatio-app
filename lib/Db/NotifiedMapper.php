@@ -7,7 +7,7 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Db;
+namespace OCA\Laudatio\Db;
 
 use DateTimeImmutable;
 use OCP\AppFramework\Db\QBMapper;
@@ -19,7 +19,7 @@ use OCP\IDBConnection;
  */
 class NotifiedMapper extends QBMapper {
 	public function __construct(IDBConnection $db) {
-		parent::__construct($db, 'appreciation_notified', Notified::class);
+		parent::__construct($db, 'laudatio_notified', Notified::class);
 	}
 
 	/**
@@ -48,7 +48,7 @@ class NotifiedMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 		$qb->selectDistinct('n.event_id')
 			->from($this->getTableName(), 'n')
-			->innerJoin('n', 'appreciation_events', 'e', $qb->expr()->eq('e.id', 'n.event_id'))
+			->innerJoin('n', 'laudatio_events', 'e', $qb->expr()->eq('e.id', 'n.event_id'))
 			->where($qb->expr()->lt('e.event_date', $qb->createNamedParameter($day, IQueryBuilder::PARAM_DATE_IMMUTABLE)));
 		$cursor = $qb->executeQuery();
 		$ids = [];

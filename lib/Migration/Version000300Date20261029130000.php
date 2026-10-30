@@ -7,7 +7,7 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Migration;
+namespace OCA\Laudatio\Migration;
 
 use Closure;
 use OCP\DB\ISchemaWrapper;
@@ -20,7 +20,7 @@ use OCP\Migration\SimpleMigrationStep;
 /**
  * Functions whose holders get one gift per calendar year.
  */
-#[AddColumn(table: 'appreciation_functions', name: 'yearly_gift', type: ColumnType::BOOLEAN)]
+#[AddColumn(table: 'laudatio_functions', name: 'yearly_gift', type: ColumnType::BOOLEAN)]
 class Version000300Date20261029130000 extends SimpleMigrationStep {
 	/**
 	 * @param Closure(): ISchemaWrapper $schemaClosure
@@ -28,7 +28,7 @@ class Version000300Date20261029130000 extends SimpleMigrationStep {
 	#[\Override]
 	public function changeSchema(IOutput $output, Closure $schemaClosure, array $options): ?ISchemaWrapper {
 		$schema = $schemaClosure();
-		$table = $schema->getTable('appreciation_functions');
+		$table = $schema->getTable('laudatio_functions');
 		if ($table->hasColumn('yearly_gift')) {
 			return null;
 		}

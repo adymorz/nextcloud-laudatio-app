@@ -14,7 +14,7 @@ export type PersonDetail = Schemas['PersonDetail']
 export type Slice = Schemas['Slice']
 export type Group = Schemas['Group']
 export type OrgFunction = Schemas['Function']
-export type AppreciationEvent = Schemas['Event']
+export type LaudatioEvent = Schemas['Event']
 export type AuditEntry = Schemas['AuditEntry']
 export type AuditPage = Schemas['AuditPage']
 
