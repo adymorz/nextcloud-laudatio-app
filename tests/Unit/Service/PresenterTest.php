@@ -15,6 +15,7 @@ use OCA\Laudatio\Db\GroupMapper;
 use OCA\Laudatio\Db\OrgFunctionMapper;
 use OCA\Laudatio\Db\Person;
 use OCA\Laudatio\Db\PersonMapper;
+use OCA\Laudatio\Db\Slice;
 use OCA\Laudatio\Db\SliceMapper;
 use OCA\Laudatio\Service\AccessService;
 use OCA\Laudatio\Service\Clock;
@@ -80,6 +81,28 @@ final class PresenterTest extends TestCase {
 		$this->assertFalse($forBob['sensitiveVisible']);
 		$this->assertSame('Anna Muster', $forBob['displayName']);
 		foreach (['dateOfBirth', 'notes', 'street', 'streetNumber', 'postalCode', 'city', 'country', 'mobilePhone', 'otherPhone'] as $field) {
+			$this->assertNull($forBob[$field], $field);
+		}
+	}
+
+	public function testSourcesAndNotesOfTermsOnlyForViewersAllowedToSeeThem(): void {
+		$this->access->method('canSeeSensitive')->willReturnMap([['alice', 1, true], ['bob', 1, false]]);
+		$slice = new Slice();
+		$slice->setPersonId(1);
+		$slice->setFunctionId(9);
+		$slice->setStartDate(Dates::parse('2020-01-01') ?? throw new \LogicException());
+		$slice->setStartDateSource('Minutes 2020');
+		$slice->setEndDateSource('Resignation letter');
+		$slice->setNotes('Interim at first.');
+
+		$forAlice = $this->presenter->slice($slice, 'alice');
+		$this->assertSame('Minutes 2020', $forAlice['startDateSource']);
+		$this->assertSame('Resignation letter', $forAlice['endDateSource']);
+		$this->assertSame('Interim at first.', $forAlice['notes']);
+
+		$forBob = $this->presenter->slice($slice, 'bob');
+		$this->assertSame('2020-01-01', $forBob['startDate']);
+		foreach (['startDateSource', 'endDateSource', 'notes'] as $field) {
 			$this->assertNull($forBob[$field], $field);
 		}
 	}

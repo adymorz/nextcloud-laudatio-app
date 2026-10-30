@@ -274,7 +274,10 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** Update a time slice */
+        /**
+         * Update a time slice
+         * @description All fields are replaced: optional fields that are left out are cleared.
+         */
         put: operations["slice-update"];
         post?: never;
         /** Delete a time slice */
@@ -370,6 +373,9 @@ export interface components {
             functionId: number;
             startDate: string;
             endDate: string | null;
+            startDateSource: string | null;
+            endDateSource: string | null;
+            notes: string | null;
         };
         Function: {
             /** Format: int64 */
@@ -471,6 +477,9 @@ export interface components {
             groupName: string;
             startDate: string;
             endDate: string | null;
+            startDateSource: string | null;
+            endDateSource: string | null;
+            notes: string | null;
         };
         User: {
             id: string;
@@ -2062,6 +2071,21 @@ export interface operations {
                      * @default null
                      */
                     endDate?: string | null;
+                    /**
+                     * @description Source of the start date
+                     * @default null
+                     */
+                    startDateSource?: string | null;
+                    /**
+                     * @description Source of the end date
+                     * @default null
+                     */
+                    endDateSource?: string | null;
+                    /**
+                     * @description Free text notes
+                     * @default null
+                     */
+                    notes?: string | null;
                 };
             };
         };
@@ -2080,7 +2104,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description Invalid dates or function */
+            /** @description Invalid input */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -2180,6 +2204,21 @@ export interface operations {
                      * @default null
                      */
                     endDate?: string | null;
+                    /**
+                     * @description Source of the start date
+                     * @default null
+                     */
+                    startDateSource?: string | null;
+                    /**
+                     * @description Source of the end date
+                     * @default null
+                     */
+                    endDateSource?: string | null;
+                    /**
+                     * @description Free text notes
+                     * @default null
+                     */
+                    notes?: string | null;
                 };
             };
         };
@@ -2198,7 +2237,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description Invalid dates or function */
+            /** @description Invalid input */
             400: {
                 headers: {
                     [name: string]: unknown;

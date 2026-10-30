@@ -123,6 +123,7 @@ final class ImportServiceTest extends TestCase {
 		$this->db->expects($this->once())->method('beginTransaction');
 		$this->db->expects($this->once())->method('commit');
 		$this->persons->method('fieldNames')->willReturn(['first_name', 'last_name', 'date_of_birth']);
+		$this->persons->method('sliceFieldNames')->willReturn(['person_id', 'function_id', 'start_date']);
 		$audit = [];
 		$this->audit->method('log')->willReturnCallback(static function (?string $actor, string $action, string $type, int $id, array $fields) use (&$audit): void {
 			$audit[] = [$actor, $action, $type, $id, $fields];
@@ -137,8 +138,8 @@ final class ImportServiceTest extends TestCase {
 			['manager', 'create', 'function', 102, ['group_id', 'name', 'yearly_gift']],
 			['manager', 'create', 'function', 103, ['group_id', 'name', 'yearly_gift']],
 			['manager', 'create', 'person', 104, ['first_name', 'last_name', 'date_of_birth']],
-			['manager', 'create', 'slice', 105, ['person_id', 'function_id', 'start_date', 'end_date']],
-			['manager', 'create', 'slice', 106, ['person_id', 'function_id', 'start_date', 'end_date']],
+			['manager', 'create', 'slice', 105, ['person_id', 'function_id', 'start_date']],
+			['manager', 'create', 'slice', 106, ['person_id', 'function_id', 'start_date']],
 		], $audit);
 	}
 

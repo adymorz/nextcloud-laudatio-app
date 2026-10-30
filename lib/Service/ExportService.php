@@ -28,7 +28,9 @@ use OCA\Laudatio\ResponseDefinitions;
 class ExportService {
 	public const FORMAT = 'laudatio-export';
 	/** Increase on every change of the format and keep ImportValidator reading the older versions */
-	public const VERSION = 1;
+	public const VERSION = 2;
+	/** Oldest version ImportValidator reads, version 1 was never used in production */
+	public const MIN_VERSION = 2;
 
 	public function __construct(
 		private GroupService $groups,
@@ -102,6 +104,9 @@ class ExportService {
 					'functionId' => $slice->getFunctionId(),
 					'startDate' => Dates::format($slice->getStartDate()),
 					'endDate' => $end === null ? null : Dates::format($end),
+					'startDateSource' => $slice->getStartDateSource(),
+					'endDateSource' => $slice->getEndDateSource(),
+					'notes' => $slice->getNotes(),
 				];
 			}, $slices),
 		];

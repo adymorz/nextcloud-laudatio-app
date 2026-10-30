@@ -105,7 +105,7 @@ class ImportService {
 					$slice->setCreatedAt($now);
 					$slice->setUpdatedAt($now);
 					$this->sliceMapper->insert($slice);
-					$this->audit->log($actor, AuditEntry::ACTION_CREATE, AuditService::ENTITY_SLICE, $slice->getId(), ['person_id', 'function_id', 'start_date', 'end_date']);
+					$this->audit->log($actor, AuditEntry::ACTION_CREATE, AuditService::ENTITY_SLICE, $slice->getId(), $this->persons->sliceFieldNames($slice));
 					$counts['terms']++;
 				}
 			}

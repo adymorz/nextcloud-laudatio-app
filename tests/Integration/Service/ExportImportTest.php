@@ -17,6 +17,7 @@ use OCA\Laudatio\Db\Group;
 use OCA\Laudatio\Db\Person;
 use OCA\Laudatio\Exception\ConflictException;
 use OCA\Laudatio\Model\PersonInput;
+use OCA\Laudatio\Model\SliceInput;
 use OCA\Laudatio\Service\AuditService;
 use OCA\Laudatio\Service\Clock;
 use OCA\Laudatio\Service\Dates;
@@ -58,17 +59,20 @@ final class ExportImportTest extends IntegrationTestCase {
 		$this->onTearDown(fn () => $this->groups->deleteFunction('admin', $president->getId()));
 		$person = $this->persons->create('admin', new PersonInput('Test', $lastName, '1980-01-01', 'Some notes', city: 'Bern', mobilePhone: '+41 79 123 45 67'));
 		$this->onTearDown(fn () => $this->persons->delete('admin', $person->getId()));
-		$this->persons->addSlice('admin', $person->getId(), $treasurer->getId(), '2015-01-01', '2018-12-31');
-		$this->persons->addSlice('admin', $person->getId(), $treasurer->getId(), '2019-01-01', null);
-		$this->persons->addSlice('admin', $person->getId(), $president->getId(), Dates::format($today), null);
+		$this->persons->addSlice('admin', $person->getId(), new SliceInput($treasurer->getId(), '2015-01-01', '2018-12-31', 'Minutes 2014', 'Resignation letter', "Interim at first\nThen elected"));
+		$this->persons->addSlice('admin', $person->getId(), new SliceInput($treasurer->getId(), '2019-01-01'));
+		$this->persons->addSlice('admin', $person->getId(), new SliceInput($president->getId(), Dates::format($today)));
 
 		$this->onTearDown(fn () => $this->deleteCopies($groupName . $copySuffix, $lastName . $copySuffix));
 
 		$export = $this->exportOf($groupName, $lastName);
-		$this->assertSame(1, $export['version']);
+		$this->assertSame(2, $export['version']);
 		$this->assertCount(1, $export['groups']);
 		$this->assertCount(1, $export['persons']);
 		$this->assertCount(3, $export['persons'][0]['terms']);
+		$this->assertSame('Minutes 2014', $export['persons'][0]['terms'][0]['startDateSource']);
+		$this->assertSame('Resignation letter', $export['persons'][0]['terms'][0]['endDateSource']);
+		$this->assertSame("Interim at first\nThen elected", $export['persons'][0]['terms'][0]['notes']);
 
 		$export['groups'][0]['name'] .= $copySuffix;
 		$export['persons'][0]['lastName'] .= $copySuffix;

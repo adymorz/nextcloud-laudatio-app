@@ -20,6 +20,7 @@ import { useRouter } from 'vue-router'
 import { api, errorMessage, isNotFound } from '../api'
 import LoadError from '../components/LoadError.vue'
 import PersonDialog from '../components/PersonDialog.vue'
+import SliceDetails from '../components/SliceDetails.vue'
 import SliceDialog from '../components/SliceDialog.vue'
 import { age, daysUntil, formatDate } from '../dates'
 import { me } from '../store'
@@ -246,6 +247,7 @@ watch(() => props.id, load, { immediate: true })
 								{{ formatDate(slice.startDate) }} – {{ formatDate(slice.endDate) }}
 							</template>
 						</span>
+						<SliceDetails :slice="slice" />
 					</div>
 					<NcActions v-if="me.isManager" :aria-label="t('laudatio', 'Actions for {name}', { name: slice.functionName })">
 						<NcActionButton close-after-click @click="openSlice(slice)">

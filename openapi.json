@@ -336,7 +336,10 @@
                 "required": [
                     "functionId",
                     "startDate",
-                    "endDate"
+                    "endDate",
+                    "startDateSource",
+                    "endDateSource",
+                    "notes"
                 ],
                 "properties": {
                     "functionId": {
@@ -347,6 +350,18 @@
                         "type": "string"
                     },
                     "endDate": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "startDateSource": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "endDateSource": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "notes": {
                         "type": "string",
                         "nullable": true
                     }
@@ -724,7 +739,10 @@
                     "groupId",
                     "groupName",
                     "startDate",
-                    "endDate"
+                    "endDate",
+                    "startDateSource",
+                    "endDateSource",
+                    "notes"
                 ],
                 "properties": {
                     "id": {
@@ -753,6 +771,18 @@
                         "type": "string"
                     },
                     "endDate": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "startDateSource": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "endDateSource": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "notes": {
                         "type": "string",
                         "nullable": true
                     }
@@ -4032,6 +4062,24 @@
                                         "nullable": true,
                                         "default": null,
                                         "description": "Last day (YYYY-MM-DD), null while active"
+                                    },
+                                    "startDateSource": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Source of the start date"
+                                    },
+                                    "endDateSource": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Source of the end date"
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Free text notes"
                                     }
                                 }
                             }
@@ -4122,7 +4170,7 @@
                         }
                     },
                     "400": {
-                        "description": "Invalid dates or function",
+                        "description": "Invalid input",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4240,6 +4288,7 @@
             "put": {
                 "operationId": "slice-update",
                 "summary": "Update a time slice",
+                "description": "All fields are replaced: optional fields that are left out are cleared.",
                 "tags": [
                     "slice"
                 ],
@@ -4276,6 +4325,24 @@
                                         "nullable": true,
                                         "default": null,
                                         "description": "Last day (YYYY-MM-DD), null while active"
+                                    },
+                                    "startDateSource": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Source of the start date"
+                                    },
+                                    "endDateSource": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Source of the end date"
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Free text notes"
                                     }
                                 }
                             }
@@ -4366,7 +4433,7 @@
                         }
                     },
                     "400": {
-                        "description": "Invalid dates or function",
+                        "description": "Invalid input",
                         "content": {
                             "application/json": {
                                 "schema": {

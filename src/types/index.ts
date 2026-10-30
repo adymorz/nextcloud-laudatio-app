@@ -38,6 +38,9 @@ export interface SliceInput {
 	functionId: number
 	startDate: string
 	endDate: string | null
+	startDateSource: string | null
+	endDateSource: string | null
+	notes: string | null
 }
 
 export interface FunctionInput {

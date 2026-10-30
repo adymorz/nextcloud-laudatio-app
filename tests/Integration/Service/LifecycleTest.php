@@ -16,6 +16,7 @@ use OCA\Laudatio\Db\EventMapper;
 use OCA\Laudatio\Exception\ConflictException;
 use OCA\Laudatio\Exception\ValidationException;
 use OCA\Laudatio\Model\PersonInput;
+use OCA\Laudatio\Model\SliceInput;
 use OCA\Laudatio\Service\Clock;
 use OCA\Laudatio\Service\Dates;
 use OCA\Laudatio\Service\EventService;
@@ -62,7 +63,7 @@ final class LifecycleTest extends IntegrationTestCase {
 
 		$nextBirthday = static fn (string $birth): string => Dates::format(Dates::anniversary(Dates::parse($birth) ?? throw new \LogicException(), 31));
 
-		$this->persons->addSlice('admin', $person->getId(), $function->getId(), $in(20, 2), null);
+		$this->persons->addSlice('admin', $person->getId(), new SliceInput($function->getId(), $in(20, 2)));
 		$this->assertSame([
 			['birthday', $in(10), 30],
 			['jubilee', $in(20), 2],
@@ -70,7 +71,7 @@ final class LifecycleTest extends IntegrationTestCase {
 		], $this->describe($this->events->findByPerson($person->getId())));
 
 		try {
-			$this->persons->addSlice('admin', $person->getId(), $function->getId(), $in(0), null);
+			$this->persons->addSlice('admin', $person->getId(), new SliceInput($function->getId(), $in(0)));
 			$this->fail('Overlapping slice was accepted');
 		} catch (ConflictException) {
 		}
@@ -113,7 +114,7 @@ final class LifecycleTest extends IntegrationTestCase {
 		$this->onTearDown(fn () => $this->groups->deleteFunction('admin', $function->getId()));
 		$person = $this->persons->create('admin', new PersonInput('Test', $this->uniqueName('Person'), '1980-01-01'));
 		$this->onTearDown(fn () => $this->persons->delete('admin', $person->getId()));
-		$slice = $this->persons->addSlice('admin', $person->getId(), $function->getId(), $start, null);
+		$slice = $this->persons->addSlice('admin', $person->getId(), new SliceInput($function->getId(), $start));
 
 		$gifts = fn (): array => array_values(array_filter(
 			$this->events->findByPerson($person->getId()),
@@ -125,7 +126,7 @@ final class LifecycleTest extends IntegrationTestCase {
 		);
 
 		// Leaving today: this year's gift is due today, no later ones
-		$this->persons->updateSlice('admin', $slice->getId(), $function->getId(), $start, Dates::format($today));
+		$this->persons->updateSlice('admin', $slice->getId(), new SliceInput($function->getId(), $start, Dates::format($today)));
 		$this->assertSame([['gift', Dates::format($today), $thisYear]], $this->describe($gifts()));
 
 		// Presented stays presented when the events are synchronized again

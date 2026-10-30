@@ -69,6 +69,9 @@ final class ExportServiceTest extends TestCase {
 		$closed->setFunctionId(3);
 		$closed->setStartDate(Dates::parse('2015-01-01'));
 		$closed->setEndDate(Dates::parse('2018-12-31'));
+		$closed->setStartDateSource('Minutes 2014');
+		$closed->setEndDateSource('Resignation letter');
+		$closed->setNotes('Interim at first');
 
 		$this->groups->method('findAll')->willReturn([$group, $empty]);
 		$this->groups->method('getFunctions')->willReturn([$function]);
@@ -79,7 +82,7 @@ final class ExportServiceTest extends TestCase {
 	public function testExportsAllDataWithVersion(): void {
 		$this->assertSame([
 			'format' => 'laudatio-export',
-			'version' => 1,
+			'version' => 2,
 			'exportedAt' => '2026-10-30',
 			'groups' => [
 				[
@@ -103,8 +106,22 @@ final class ExportServiceTest extends TestCase {
 					'mobilePhone' => null,
 					'otherPhone' => null,
 					'terms' => [
-						['functionId' => 3, 'startDate' => '2015-01-01', 'endDate' => '2018-12-31'],
-						['functionId' => 3, 'startDate' => '2021-01-01', 'endDate' => null],
+						[
+							'functionId' => 3,
+							'startDate' => '2015-01-01',
+							'endDate' => '2018-12-31',
+							'startDateSource' => 'Minutes 2014',
+							'endDateSource' => 'Resignation letter',
+							'notes' => 'Interim at first',
+						],
+						[
+							'functionId' => 3,
+							'startDate' => '2021-01-01',
+							'endDate' => null,
+							'startDateSource' => null,
+							'endDateSource' => null,
+							'notes' => null,
+						],
 					],
 				],
 			],

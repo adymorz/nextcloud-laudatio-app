@@ -16,6 +16,7 @@ use OCA\Laudatio\Db\Slice;
 use OCA\Laudatio\Exception\ValidationException;
 use OCA\Laudatio\Model\ImportData;
 use OCA\Laudatio\Model\PersonInput;
+use OCA\Laudatio\Model\SliceInput;
 use OCP\IL10N;
 
 /**
@@ -28,7 +29,6 @@ class ImportValidator {
 	public function __construct(
 		private GroupService $groups,
 		private PersonService $persons,
-		private SliceValidator $sliceValidator,
 		private IL10N $l10n,
 	) {
 	}
@@ -81,6 +81,9 @@ class ImportValidator {
 		$version = $data['version'] ?? null;
 		if (($data['format'] ?? null) !== ExportService::FORMAT || !is_int($version) || $version < 1) {
 			throw new ValidationException($this->l10n->t('This is not a Laudatio export file.'));
+		}
+		if ($version < ExportService::MIN_VERSION) {
+			throw new ValidationException($this->l10n->t('This file has the old format version %1$d. This version of Laudatio only reads version %2$d and newer.', [$version, ExportService::MIN_VERSION]));
 		}
 		if ($version > ExportService::VERSION) {
 			throw new ValidationException($this->l10n->t('This file has format version %1$d, but this version of Laudatio only reads up to version %2$d. Please update the app first.', [$version, ExportService::VERSION]));
@@ -141,18 +144,19 @@ class ImportValidator {
 			if (!is_int($functionId) || !isset($functionIds[$functionId])) {
 				throw new ValidationException($this->l10n->t('A term refers to a function that is not in the file.'));
 			}
-			[$start, $end] = $this->persons->parseRange($this->string($term, 'startDate'), $this->optionalString($term, 'endDate'));
-			$this->sliceValidator->validateRange($start, $end);
+			$slice = $this->persons->buildSlice(new SliceInput(
+				$functionId,
+				$this->string($term, 'startDate'),
+				$this->optionalString($term, 'endDate'),
+				$this->optionalString($term, 'startDateSource'),
+				$this->optionalString($term, 'endDateSource'),
+				$this->optionalString($term, 'notes'),
+			));
 			foreach ($terms as $other) {
-				if ($other->getFunctionId() === $functionId && SliceValidator::overlaps($start, $end, $other->getStartDate(), $other->getEndDate())) {
+				if ($other->getFunctionId() === $functionId && SliceValidator::overlaps($slice->getStartDate(), $slice->getEndDate(), $other->getStartDate(), $other->getEndDate())) {
 					throw new ValidationException($this->l10n->t('The term overlaps another term of this person in the same function.'));
 				}
 			}
-
-			$slice = new Slice();
-			$slice->setFunctionId($functionId);
-			$slice->setStartDate($start);
-			$slice->setEndDate($end);
 			$terms[] = $slice;
 		}
 		return ['person' => $person, 'terms' => $terms];
