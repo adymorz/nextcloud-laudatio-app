@@ -30,9 +30,7 @@ class SliceValidator {
 	 * @throws ConflictException when the slice overlaps another slice of the same person and function
 	 */
 	public function validate(int $personId, int $functionId, DateTimeImmutable $start, ?DateTimeImmutable $end, ?int $ignoreSliceId = null): void {
-		if ($end !== null && Dates::compare($end, $start) < 0) {
-			throw new ValidationException($this->l10n->t('The end date must not be before the start date.'));
-		}
+		$this->validateRange($start, $end);
 
 		try {
 			$this->functionMapper->find($functionId);
@@ -47,6 +45,15 @@ class SliceValidator {
 			if (self::overlaps($start, $end, $other->getStartDate(), $other->getEndDate())) {
 				throw new ConflictException($this->l10n->t('The term overlaps another term of this person in the same function.'));
 			}
+		}
+	}
+
+	/**
+	 * @throws ValidationException when the end date is before the start date
+	 */
+	public function validateRange(DateTimeImmutable $start, ?DateTimeImmutable $end): void {
+		if ($end !== null && Dates::compare($end, $start) < 0) {
+			throw new ValidationException($this->l10n->t('The end date must not be before the start date.'));
 		}
 	}
 

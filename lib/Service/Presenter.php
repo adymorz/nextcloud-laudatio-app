@@ -116,7 +116,7 @@ class Presenter {
 		return [
 			'id' => $group->getId(),
 			'name' => $group->getName(),
-			// Empty after the responsible user was deleted
+			// Empty after the responsible user was deleted or the group was imported
 			'responsible' => $group->getResponsibleUid() === '' ? null : $this->user($group->getResponsibleUid()),
 			'interested' => array_map($this->user(...), $interested),
 			'jubileeYears' => $group->getJubileeYears(),

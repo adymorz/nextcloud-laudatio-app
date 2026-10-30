@@ -17,6 +17,8 @@ export type OrgFunction = Schemas['Function']
 export type LaudatioEvent = Schemas['Event']
 export type AuditEntry = Schemas['AuditEntry']
 export type AuditPage = Schemas['AuditPage']
+export type ExportFile = Schemas['Export']
+export type ImportResult = Schemas['ImportResult']
 
 export interface PersonInput {
 	firstName: string

@@ -130,6 +130,54 @@ namespace OCA\Laudatio;
  *     total: int,
  * }
  *
+ * @psalm-type LaudatioExportFunction = array{
+ *     id: int,
+ *     name: string,
+ *     yearlyGift: bool,
+ * }
+ *
+ * @psalm-type LaudatioExportGroup = array{
+ *     name: string,
+ *     jubileeYears: ?string,
+ *     functions: list<LaudatioExportFunction>,
+ * }
+ *
+ * @psalm-type LaudatioExportTerm = array{
+ *     functionId: int,
+ *     startDate: string,
+ *     endDate: ?string,
+ * }
+ *
+ * @psalm-type LaudatioExportPerson = array{
+ *     firstName: string,
+ *     lastName: string,
+ *     dateOfBirth: string,
+ *     notes: ?string,
+ *     street: ?string,
+ *     streetNumber: ?string,
+ *     postalCode: ?string,
+ *     city: ?string,
+ *     country: ?string,
+ *     mobilePhone: ?string,
+ *     otherPhone: ?string,
+ *     terms: list<LaudatioExportTerm>,
+ * }
+ *
+ * @psalm-type LaudatioExport = array{
+ *     format: string,
+ *     version: int,
+ *     exportedAt: string,
+ *     groups: list<LaudatioExportGroup>,
+ *     persons: list<LaudatioExportPerson>,
+ * }
+ *
+ * @psalm-type LaudatioImportResult = array{
+ *     groups: int,
+ *     functions: int,
+ *     persons: int,
+ *     terms: int,
+ * }
+ *
  * @psalm-type LaudatioError = array{
  *     message: string,
  * }

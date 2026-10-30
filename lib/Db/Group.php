@@ -13,7 +13,8 @@ use OCP\AppFramework\Db\Entity;
 use OCP\DB\Types;
 
 /**
- * An organizational group (not a Nextcloud group) with exactly one responsible user.
+ * An organizational group (not a Nextcloud group) with one responsible user,
+ * or none (empty UID) after that user was deleted or the group was imported.
  *
  * @method string getName()
  * @method void setName(string $name)
@@ -40,5 +41,14 @@ class Group extends Entity {
 		$this->addType('jubileeYears', Types::STRING);
 		$this->addType('createdAt', Types::BIGINT);
 		$this->addType('updatedAt', Types::BIGINT);
+	}
+
+	/**
+	 * Leaves the group without a responsible user. The setter ignores unchanged
+	 * values, so on a new group it would leave the column out of the insert.
+	 */
+	public function clearResponsible(): void {
+		$this->responsibleUid = '';
+		$this->markFieldUpdated('responsibleUid');
 	}
 }

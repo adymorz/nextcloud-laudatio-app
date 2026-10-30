@@ -23,7 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reminder notifications and optional emails that say why you receive them and how to turn them off; disabled accounts get no reminders
 - Upcoming view with "congratulated" checklist
 - Yearly gift per function: one open item per holder and calendar year, with reminder and "presented" checklist
-- Audit log of changes to persons, groups, functions and terms
+- Audit log of changes to persons, groups, functions and terms, and of exports
+- Import and export of groups, functions, persons and terms as a versioned file, for backups and the move to another Nextcloud, without references to Nextcloud users
 - Admin settings and personal email setting
 - Link to the gift regulations (external page or internal link of a Nextcloud file) in the app navigation
 - Managers are notified when the responsible user of a group is deleted, so they can assign a new one

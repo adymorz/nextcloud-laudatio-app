@@ -66,7 +66,7 @@ class RecipientService {
 			}
 			$responsible = $group->getResponsibleUid();
 			if ($responsible !== '') {
-				// Empty after the responsible user was deleted
+				// Empty after the responsible user was deleted or the group was imported
 				$recipients[$responsible] = self::ROLE_RESPONSIBLE;
 			}
 		}

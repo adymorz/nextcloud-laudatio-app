@@ -135,6 +135,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/ocs/v2.php/apps/laudatio/api/v1/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export all groups, functions, persons and terms, without references to Nextcloud users */
+        get: operations["import_export-export"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ocs/v2.php/apps/laudatio/api/v1/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Import an export file into an empty app
+         * @description The groups have no responsible or interested users afterwards.
+         */
+        post: operations["import_export-import"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/ocs/v2.php/apps/laudatio/api/v1/me": {
         parameters: {
             query?: never;
@@ -295,6 +332,45 @@ export interface components {
             greetedBy: components["schemas"]["User"] | null;
             canGreet: boolean;
         };
+        Export: {
+            format: string;
+            /** Format: int64 */
+            version: number;
+            exportedAt: string;
+            groups: components["schemas"]["ExportGroup"][];
+            persons: components["schemas"]["ExportPerson"][];
+        };
+        ExportFunction: {
+            /** Format: int64 */
+            id: number;
+            name: string;
+            yearlyGift: boolean;
+        };
+        ExportGroup: {
+            name: string;
+            jubileeYears: string | null;
+            functions: components["schemas"]["ExportFunction"][];
+        };
+        ExportPerson: {
+            firstName: string;
+            lastName: string;
+            dateOfBirth: string;
+            notes: string | null;
+            street: string | null;
+            streetNumber: string | null;
+            postalCode: string | null;
+            city: string | null;
+            country: string | null;
+            mobilePhone: string | null;
+            otherPhone: string | null;
+            terms: components["schemas"]["ExportTerm"][];
+        };
+        ExportTerm: {
+            /** Format: int64 */
+            functionId: number;
+            startDate: string;
+            endDate: string | null;
+        };
         Function: {
             /** Format: int64 */
             id: number;
@@ -314,6 +390,16 @@ export interface components {
             functions: components["schemas"]["Function"][];
             /** @enum {string} */
             role: "manager" | "responsible" | "interested";
+        };
+        ImportResult: {
+            /** Format: int64 */
+            groups: number;
+            /** Format: int64 */
+            functions: number;
+            /** Format: int64 */
+            persons: number;
+            /** Format: int64 */
+            terms: number;
         };
         Me: {
             userId: string;
@@ -1204,6 +1290,155 @@ export interface operations {
                 };
             };
             /** @description The group still has functions */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        ocs: {
+                            meta: components["schemas"]["OCSMeta"];
+                            data: components["schemas"]["Error"];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "import_export-export": {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Required to be true for the API request to pass */
+                "OCS-APIRequest": boolean;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Export returned */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        ocs: {
+                            meta: components["schemas"]["OCSMeta"];
+                            data: components["schemas"]["Export"];
+                        };
+                    };
+                };
+            };
+            /** @description Current user is not logged in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        ocs: {
+                            meta: components["schemas"]["OCSMeta"];
+                            data: unknown;
+                        };
+                    };
+                };
+            };
+            /** @description Not a manager */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        ocs: {
+                            meta: components["schemas"]["OCSMeta"];
+                            data: unknown;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "import_export-import": {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Required to be true for the API request to pass */
+                "OCS-APIRequest": boolean;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Content of the export file */
+                    data: {
+                        [key: string]: Record<string, never>;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Data imported */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        ocs: {
+                            meta: components["schemas"]["OCSMeta"];
+                            data: components["schemas"]["ImportResult"];
+                        };
+                    };
+                };
+            };
+            /** @description Invalid file */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        ocs: {
+                            meta: components["schemas"]["OCSMeta"];
+                            data: unknown;
+                        };
+                    };
+                };
+            };
+            /** @description Current user is not logged in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        ocs: {
+                            meta: components["schemas"]["OCSMeta"];
+                            data: unknown;
+                        };
+                    };
+                };
+            };
+            /** @description Not a manager */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        ocs: {
+                            meta: components["schemas"]["OCSMeta"];
+                            data: unknown;
+                        };
+                    };
+                };
+            };
+            /** @description The app already contains data */
             409: {
                 headers: {
                     [name: string]: unknown;

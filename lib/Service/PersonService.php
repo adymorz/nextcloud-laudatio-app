@@ -78,11 +78,21 @@ class PersonService {
 	}
 
 	/**
+	 * Validates the input and returns a new, unsaved person.
+	 *
+	 * @throws ValidationException
+	 */
+	public function build(PersonInput $input): Person {
+		$person = new Person();
+		$this->apply($person, $input);
+		return $person;
+	}
+
+	/**
 	 * @throws ValidationException
 	 */
 	public function create(?string $actor, PersonInput $input): Person {
-		$person = new Person();
-		$this->apply($person, $input);
+		$person = $this->build($input);
 		$now = $this->clock->time();
 		$person->setCreatedAt($now);
 		$person->setUpdatedAt($now);
@@ -321,7 +331,7 @@ class PersonService {
 	 *
 	 * @return list<string>
 	 */
-	private function fieldNames(Person $person): array {
+	public function fieldNames(Person $person): array {
 		$map = [
 			'firstName' => 'first_name',
 			'lastName' => 'last_name',
@@ -348,7 +358,7 @@ class PersonService {
 	 * @return array{DateTimeImmutable, ?DateTimeImmutable}
 	 * @throws ValidationException
 	 */
-	private function parseRange(string $startDate, ?string $endDate): array {
+	public function parseRange(string $startDate, ?string $endDate): array {
 		$start = Dates::parse($startDate);
 		$end = $endDate === null || $endDate === '' ? null : Dates::parse($endDate);
 		if ($start === null || ($endDate !== null && $endDate !== '' && $end === null)) {
