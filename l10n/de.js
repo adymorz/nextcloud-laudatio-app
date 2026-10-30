@@ -1,5 +1,5 @@
 OC.L10N.register(
-    "appreciation",
+    "laudatio",
     {
         "%1$s Anniversary for %2$s as %3$s": "%1$s Jubiläum von %2$s als %3$s",
         "%1$s Birthday of %2$s": "%1$s Geburtstag von %2$s",
@@ -19,8 +19,6 @@ OC.L10N.register(
         "All persons": "Alle Personen",
         "Also send reminders by email": "Erinnerungen auch per E-Mail senden",
         "Anniversary": "Jubiläum",
-        "Appreciation": "Appreciation",
-        "Appreciation settings": "Appreciation-Einstellungen",
         "Audit log": "Änderungsprotokoll",
         "Back to the person": "Zurück zur Person",
         "Birthday": "Geburtstag",
@@ -79,6 +77,8 @@ OC.L10N.register(
         "Jubilee years": "Jubiläumsjahre",
         "Jubilee years must be whole numbers between 1 and %d, separated by commas.": "Jubiläumsjahre müssen ganze Zahlen zwischen 1 und %d sein, getrennt durch Kommas.",
         "Last name": "Nachname",
+        "Laudatio": "Laudatio",
+        "Laudatio settings": "Laudatio-Einstellungen",
         "Let responsible persons mark events as greeted": "Verantwortliche können Ereignisse als gratuliert markieren",
         "Link shown to all users of the app, starting with https://. For a document in Nextcloud, use \"Copy internal link\" in the sharing tab of the file and share the file with the users of the app.": "Link, der allen Benutzern der App angezeigt wird, beginnend mit https://. Für ein Dokument in Nextcloud „Internen Link kopieren“ im Teilen-Tab der Datei verwenden und die Datei mit den Benutzern der App teilen.",
         "Manager": "Verwaltung",
@@ -105,7 +105,7 @@ OC.L10N.register(
         "Only managers and the responsible person can print the data sheet.": "Nur die Verwaltung und die verantwortliche Person können das Datenblatt drucken.",
         "Only the responsible person can mark a gift as presented.": "Nur die verantwortliche Person kann ein Geschenk als überreicht markieren.",
         "Only the responsible person can mark an event as greeted.": "Nur die verantwortliche Person kann ein Ereignis als gratuliert markieren.",
-        "Open Appreciation": "Appreciation öffnen",
+        "Open Laudatio": "Laudatio öffnen",
         "Period": "Zeitraum",
         "Person": "Person",
         "Person not found": "Person nicht gefunden",

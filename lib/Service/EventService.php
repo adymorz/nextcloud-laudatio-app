@@ -7,18 +7,18 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Service;
+namespace OCA\Laudatio\Service;
 
-use OCA\Appreciation\AppInfo\Application;
-use OCA\Appreciation\Db\Event;
-use OCA\Appreciation\Db\EventMapper;
-use OCA\Appreciation\Db\Group;
-use OCA\Appreciation\Db\GroupMapper;
-use OCA\Appreciation\Db\NotifiedMapper;
-use OCA\Appreciation\Db\OrgFunctionMapper;
-use OCA\Appreciation\Db\PersonMapper;
-use OCA\Appreciation\Db\SliceMapper;
-use OCA\Appreciation\Model\PlannedEvent;
+use OCA\Laudatio\AppInfo\Application;
+use OCA\Laudatio\Db\Event;
+use OCA\Laudatio\Db\EventMapper;
+use OCA\Laudatio\Db\Group;
+use OCA\Laudatio\Db\GroupMapper;
+use OCA\Laudatio\Db\NotifiedMapper;
+use OCA\Laudatio\Db\OrgFunctionMapper;
+use OCA\Laudatio\Db\PersonMapper;
+use OCA\Laudatio\Db\SliceMapper;
+use OCA\Laudatio\Model\PlannedEvent;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\DB\Exception as DbException;
 use OCP\Notification\IManager as INotificationManager;

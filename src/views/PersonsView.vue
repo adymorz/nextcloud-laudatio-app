@@ -59,19 +59,19 @@ function onCreated(person: PersonDetail) {
 <template>
 	<div class="view">
 		<div class="view__header">
-			<h2>{{ t('appreciation', 'Persons') }}</h2>
+			<h2>{{ t('laudatio', 'Persons') }}</h2>
 			<NcButton v-if="me.isManager" variant="primary" @click="dialogOpen = true">
 				<template #icon>
 					<NcIconSvgWrapper :path="mdiPlus" />
 				</template>
-				{{ t('appreciation', 'New person') }}
+				{{ t('laudatio', 'New person') }}
 			</NcButton>
 		</div>
 
 		<NcTextField
 			v-model="search"
 			class="view__search"
-			:label="t('appreciation', 'Search by name, function or group')"
+			:label="t('laudatio', 'Search by name, function or group')"
 			trailing-button-icon="close"
 			:show-trailing-button="search !== ''"
 			@trailing-button-click="search = ''">
@@ -81,7 +81,7 @@ function onCreated(person: PersonDetail) {
 		</NcTextField>
 
 		<NcLoadingIcon v-if="loading" :size="32" />
-		<NcEmptyContent v-else-if="filtered.length === 0" :name="t('appreciation', 'No persons found')">
+		<NcEmptyContent v-else-if="filtered.length === 0" :name="t('laudatio', 'No persons found')">
 			<template #icon>
 				<NcIconSvgWrapper :path="mdiAccountMultiple" />
 			</template>
@@ -89,10 +89,10 @@ function onCreated(person: PersonDetail) {
 		<table v-else class="persons">
 			<thead>
 				<tr>
-					<th>{{ t('appreciation', 'Name') }}</th>
-					<th>{{ t('appreciation', 'Current functions') }}</th>
+					<th>{{ t('laudatio', 'Name') }}</th>
+					<th>{{ t('laudatio', 'Current functions') }}</th>
 					<th v-if="showDateOfBirth">
-						{{ t('appreciation', 'Date of birth') }}
+						{{ t('laudatio', 'Date of birth') }}
 					</th>
 				</tr>
 			</thead>
@@ -104,7 +104,7 @@ function onCreated(person: PersonDetail) {
 						</RouterLink>
 					</td>
 					<td>
-						<span v-if="person.currentFunctions.length === 0" class="muted">{{ t('appreciation', 'none') }}</span>
+						<span v-if="person.currentFunctions.length === 0" class="muted">{{ t('laudatio', 'none') }}</span>
 						<span v-for="slice in person.currentFunctions" :key="slice.id" class="function">
 							{{ slice.functionName }} <span class="muted">({{ slice.groupName }})</span>
 						</span>

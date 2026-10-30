@@ -7,21 +7,21 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Tests\Unit\Service;
+namespace OCA\Laudatio\Tests\Unit\Service;
 
-use OCA\Appreciation\Db\Person;
-use OCA\Appreciation\Db\PersonMapper;
-use OCA\Appreciation\Db\SliceMapper;
-use OCA\Appreciation\Exception\ValidationException;
-use OCA\Appreciation\Model\PersonInput;
-use OCA\Appreciation\Service\AccessService;
-use OCA\Appreciation\Service\AuditService;
-use OCA\Appreciation\Service\Clock;
-use OCA\Appreciation\Service\Dates;
-use OCA\Appreciation\Service\EventService;
-use OCA\Appreciation\Service\PersonService;
-use OCA\Appreciation\Service\RecipientService;
-use OCA\Appreciation\Service\SliceValidator;
+use OCA\Laudatio\Db\Person;
+use OCA\Laudatio\Db\PersonMapper;
+use OCA\Laudatio\Db\SliceMapper;
+use OCA\Laudatio\Exception\ValidationException;
+use OCA\Laudatio\Model\PersonInput;
+use OCA\Laudatio\Service\AccessService;
+use OCA\Laudatio\Service\AuditService;
+use OCA\Laudatio\Service\Clock;
+use OCA\Laudatio\Service\Dates;
+use OCA\Laudatio\Service\EventService;
+use OCA\Laudatio\Service\PersonService;
+use OCA\Laudatio\Service\RecipientService;
+use OCA\Laudatio\Service\SliceValidator;
 use OCP\IDBConnection;
 use OCP\IL10N;
 use PHPUnit\Framework\Attributes\DataProvider;

@@ -7,17 +7,17 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Tests\Unit\Service;
+namespace OCA\Laudatio\Tests\Unit\Service;
 
 use DateTimeImmutable;
-use OCA\Appreciation\Db\OrgFunction;
-use OCA\Appreciation\Db\OrgFunctionMapper;
-use OCA\Appreciation\Db\Slice;
-use OCA\Appreciation\Db\SliceMapper;
-use OCA\Appreciation\Exception\ConflictException;
-use OCA\Appreciation\Exception\ValidationException;
-use OCA\Appreciation\Service\Dates;
-use OCA\Appreciation\Service\SliceValidator;
+use OCA\Laudatio\Db\OrgFunction;
+use OCA\Laudatio\Db\OrgFunctionMapper;
+use OCA\Laudatio\Db\Slice;
+use OCA\Laudatio\Db\SliceMapper;
+use OCA\Laudatio\Exception\ConflictException;
+use OCA\Laudatio\Exception\ValidationException;
+use OCA\Laudatio\Service\Dates;
+use OCA\Laudatio\Service\SliceValidator;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\IL10N;
 use PHPUnit\Framework\Attributes\DataProvider;

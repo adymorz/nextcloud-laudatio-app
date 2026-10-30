@@ -4,7 +4,7 @@
 -->
 
 <script setup lang="ts">
-import type { AppreciationEvent } from '../types'
+import type { LaudatioEvent } from '../types'
 
 import { mdiCakeVariant, mdiGift, mdiTrophyAward } from '@mdi/js'
 import { showError } from '@nextcloud/dialogs'
@@ -23,16 +23,16 @@ interface RangeOption {
 	days: number
 }
 
-const ranges: RangeOption[] = [30, 60, 90, 365].map((days) => ({ days, label: n('appreciation', 'Next %n day', 'Next %n days', days) }))
+const ranges: RangeOption[] = [30, 60, 90, 365].map((days) => ({ days, label: n('laudatio', 'Next %n day', 'Next %n days', days) }))
 const range = ref<RangeOption>(ranges[1]!)
-const events = ref<AppreciationEvent[]>([])
+const events = ref<LaudatioEvent[]>([])
 const loading = ref(true)
 
 const dated = computed(() => events.value.filter((event) => event.type !== 'gift'))
 
 // Yearly gifts per calendar year (the ordinal), open ones first
 const giftYears = computed(() => {
-	const byYear = new Map<number, AppreciationEvent[]>()
+	const byYear = new Map<number, LaudatioEvent[]>()
 	for (const event of events.value.filter((e) => e.type === 'gift')) {
 		byYear.set(event.ordinal, [...(byYear.get(event.ordinal) ?? []), event])
 	}
@@ -62,7 +62,7 @@ async function load() {
  * @param event The event
  * @param greeted New state
  */
-async function setGreeted(event: AppreciationEvent, greeted: boolean) {
+async function setGreeted(event: LaudatioEvent, greeted: boolean) {
 	try {
 		const updated = await api.setGreeted(event.id, greeted)
 		events.value = events.value.map((e) => e.id === updated.id ? updated : e)
@@ -78,28 +78,28 @@ watch(range, load)
 <template>
 	<div class="view">
 		<div class="view__header">
-			<h2>{{ t('appreciation', 'Upcoming birthdays and anniversaries') }}</h2>
+			<h2>{{ t('laudatio', 'Upcoming birthdays and anniversaries') }}</h2>
 			<NcSelect
 				v-model="range"
 				class="view__range"
 				:options="ranges"
 				:clearable="false"
-				:input-label="t('appreciation', 'Period')"
+				:input-label="t('laudatio', 'Period')"
 				label="label" />
 		</div>
 
 		<NcLoadingIcon v-if="loading" :size="32" />
 		<NcEmptyContent
 			v-else-if="events.length === 0"
-			:name="t('appreciation', 'Nothing coming up')"
-			:description="t('appreciation', 'There are no birthdays or anniversaries in your groups in this period.')">
+			:name="t('laudatio', 'Nothing coming up')"
+			:description="t('laudatio', 'There are no birthdays or anniversaries in your groups in this period.')">
 			<template #icon>
 				<NcIconSvgWrapper :path="mdiCakeVariant" />
 			</template>
 		</NcEmptyContent>
 		<template v-else>
 			<section v-for="giftYear in giftYears" :key="giftYear.year" class="events-section">
-				<h3>{{ t('appreciation', 'Yearly gifts {year}', { year: giftYear.year }) }}</h3>
+				<h3>{{ t('laudatio', 'Yearly gifts {year}', { year: giftYear.year }) }}</h3>
 				<ul class="events">
 					<li
 						v-for="event in giftYear.gifts"
@@ -112,9 +112,9 @@ watch(range, load)
 								{{ event.title }}
 							</RouterLink>
 							<span class="event__date">
-								{{ t('appreciation', 'due {date}', { date: formatDate(event.date) }) }} · {{ relativeDay(event.date) }}
+								{{ t('laudatio', 'due {date}', { date: formatDate(event.date) }) }} · {{ relativeDay(event.date) }}
 								<template v-if="event.greeted && event.greetedBy">
-									· {{ t('appreciation', 'presented by {name}', { name: event.greetedBy.displayName }) }}
+									· {{ t('laudatio', 'presented by {name}', { name: event.greetedBy.displayName }) }}
 								</template>
 							</span>
 						</div>
@@ -122,7 +122,7 @@ watch(range, load)
 							v-if="event.canGreet"
 							:model-value="event.greeted"
 							@update:model-value="setGreeted(event, $event)">
-							{{ t('appreciation', 'Presented') }}
+							{{ t('laudatio', 'Presented') }}
 						</NcCheckboxRadioSwitch>
 					</li>
 				</ul>
@@ -130,10 +130,10 @@ watch(range, load)
 
 			<section class="events-section">
 				<h3 v-if="giftYears.length > 0">
-					{{ t('appreciation', 'Birthdays and anniversaries') }}
+					{{ t('laudatio', 'Birthdays and anniversaries') }}
 				</h3>
 				<p v-if="dated.length === 0" class="muted">
-					{{ t('appreciation', 'There are no birthdays or anniversaries in your groups in this period.') }}
+					{{ t('laudatio', 'There are no birthdays or anniversaries in your groups in this period.') }}
 				</p>
 				<ul v-else class="events">
 					<li
@@ -149,7 +149,7 @@ watch(range, load)
 							<span class="event__date">
 								{{ formatDate(event.date) }} · {{ relativeDay(event.date) }}
 								<template v-if="event.greeted && event.greetedBy">
-									· {{ t('appreciation', 'greeted by {name}', { name: event.greetedBy.displayName }) }}
+									· {{ t('laudatio', 'greeted by {name}', { name: event.greetedBy.displayName }) }}
 								</template>
 							</span>
 						</div>
@@ -157,7 +157,7 @@ watch(range, load)
 							v-if="event.canGreet"
 							:model-value="event.greeted"
 							@update:model-value="setGreeted(event, $event)">
-							{{ t('appreciation', 'Greeted') }}
+							{{ t('laudatio', 'Greeted') }}
 						</NcCheckboxRadioSwitch>
 					</li>
 				</ul>

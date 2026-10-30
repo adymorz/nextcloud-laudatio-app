@@ -84,37 +84,37 @@ async function save() {
 <template>
 	<NcDialog
 		v-model:open="open"
-		:name="slice === null ? t('appreciation', 'Add function') : t('appreciation', 'Edit time slice')"
+		:name="slice === null ? t('laudatio', 'Add function') : t('laudatio', 'Edit time slice')"
 		size="normal">
 		<form class="form" @submit.prevent="save">
 			<NcSelect
 				v-model="fn"
 				:options="options"
-				:input-label="t('appreciation', 'Function')"
+				:input-label="t('laudatio', 'Function')"
 				:clearable="false"
 				label="label" />
 			<NcDateTimePickerNative
-				id="appreciation-slice-start"
+				id="laudatio-slice-start"
 				v-model="startDate"
 				type="date"
-				:label="t('appreciation', 'Start date')" />
+				:label="t('laudatio', 'Start date')" />
 			<NcDateTimePickerNative
-				id="appreciation-slice-end"
+				id="laudatio-slice-end"
 				v-model="endDate"
 				type="date"
 				:min="startDate"
-				:label="t('appreciation', 'End date (leave empty while active)')" />
+				:label="t('laudatio', 'End date (leave empty while active)')" />
 			<NcButton v-if="endDate !== null" variant="tertiary" @click="endDate = null">
-				{{ t('appreciation', 'Remove end date') }}
+				{{ t('laudatio', 'Remove end date') }}
 			</NcButton>
 			<button type="submit" hidden />
 		</form>
 		<template #actions>
 			<NcButton @click="open = false">
-				{{ t('appreciation', 'Cancel') }}
+				{{ t('laudatio', 'Cancel') }}
 			</NcButton>
 			<NcButton variant="primary" :disabled="!valid || saving" @click="save">
-				{{ t('appreciation', 'Save') }}
+				{{ t('laudatio', 'Save') }}
 			</NcButton>
 		</template>
 	</NcDialog>

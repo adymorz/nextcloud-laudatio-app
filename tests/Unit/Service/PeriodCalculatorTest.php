@@ -7,12 +7,12 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Tests\Unit\Service;
+namespace OCA\Laudatio\Tests\Unit\Service;
 
-use OCA\Appreciation\Db\Slice;
-use OCA\Appreciation\Model\ServicePeriod;
-use OCA\Appreciation\Service\Dates;
-use OCA\Appreciation\Service\PeriodCalculator;
+use OCA\Laudatio\Db\Slice;
+use OCA\Laudatio\Model\ServicePeriod;
+use OCA\Laudatio\Service\Dates;
+use OCA\Laudatio\Service\PeriodCalculator;
 use PHPUnit\Framework\TestCase;
 
 final class PeriodCalculatorTest extends TestCase {

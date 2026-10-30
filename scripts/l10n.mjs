@@ -7,7 +7,7 @@
  * Translation helper without external tools.
  *
  * - Extracts the translatable strings from lib/ (PHP: ->t('…'), ->n('…', '…'))
- *   and src/ (t('appreciation', '…'), n('appreciation', '…', '…')).
+ *   and src/ (t('laudatio', '…'), n('laudatio', '…', '…')).
  * - Checks every l10n/<lang>.json for missing and unused strings.
  * - Writes l10n/<lang>.js (used by the frontend) from l10n/<lang>.json.
  *
@@ -18,7 +18,7 @@
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-const APP = 'appreciation'
+const APP = 'laudatio'
 const root = new URL('..', import.meta.url).pathname
 const string = "'((?:[^'\\\\]|\\\\.)*)'"
 const patterns = {

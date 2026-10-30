@@ -7,16 +7,16 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Tests\Unit\Service;
+namespace OCA\Laudatio\Tests\Unit\Service;
 
-use OCA\Appreciation\Db\GroupMapper;
-use OCA\Appreciation\Db\InterestedMapper;
-use OCA\Appreciation\Db\SliceMapper;
-use OCA\Appreciation\Exception\ForbiddenException;
-use OCA\Appreciation\Service\AccessService;
-use OCA\Appreciation\Service\Clock;
-use OCA\Appreciation\Service\Dates;
-use OCA\Appreciation\Service\SettingsService;
+use OCA\Laudatio\Db\GroupMapper;
+use OCA\Laudatio\Db\InterestedMapper;
+use OCA\Laudatio\Db\SliceMapper;
+use OCA\Laudatio\Exception\ForbiddenException;
+use OCA\Laudatio\Service\AccessService;
+use OCA\Laudatio\Service\Clock;
+use OCA\Laudatio\Service\Dates;
+use OCA\Laudatio\Service\SettingsService;
 use OCP\IGroupManager;
 use OCP\IL10N;
 use PHPUnit\Framework\MockObject\MockObject;

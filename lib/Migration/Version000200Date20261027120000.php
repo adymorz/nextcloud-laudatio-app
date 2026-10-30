@@ -7,7 +7,7 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Migration;
+namespace OCA\Laudatio\Migration;
 
 use Closure;
 use OCP\DB\ISchemaWrapper;
@@ -23,14 +23,14 @@ use OCP\Migration\SimpleMigrationStep;
  * The table objects are only used inside createTable(): Nextcloud 34 returns
  * Doctrine tables, Nextcloud 35 its own ITable, both with the same methods.
  */
-#[CreateTable(table: 'appreciation_persons', description: 'Tracked persons')]
-#[CreateTable(table: 'appreciation_groups', description: 'Groups with their responsible user')]
-#[CreateTable(table: 'appreciation_interested', description: 'Interested users per group')]
-#[CreateTable(table: 'appreciation_functions', description: 'Functions within a group')]
-#[CreateTable(table: 'appreciation_slices', description: 'Time slices of a person in a function')]
-#[CreateTable(table: 'appreciation_events', description: 'Generated birthday and jubilee events')]
-#[CreateTable(table: 'appreciation_notified', description: 'Users already notified about an event')]
-#[CreateTable(table: 'appreciation_audit', description: 'Audit log of master data changes')]
+#[CreateTable(table: 'laudatio_persons', description: 'Tracked persons')]
+#[CreateTable(table: 'laudatio_groups', description: 'Groups with their responsible user')]
+#[CreateTable(table: 'laudatio_interested', description: 'Interested users per group')]
+#[CreateTable(table: 'laudatio_functions', description: 'Functions within a group')]
+#[CreateTable(table: 'laudatio_slices', description: 'Time slices of a person in a function')]
+#[CreateTable(table: 'laudatio_events', description: 'Generated birthday and jubilee events')]
+#[CreateTable(table: 'laudatio_notified', description: 'Users already notified about an event')]
+#[CreateTable(table: 'laudatio_audit', description: 'Audit log of master data changes')]
 class Version000200Date20261027120000 extends SimpleMigrationStep {
 	private const NOT_NULL = ['notnull' => true];
 	private const NULLABLE = ['notnull' => false];
@@ -44,37 +44,37 @@ class Version000200Date20261027120000 extends SimpleMigrationStep {
 	public function changeSchema(IOutput $output, Closure $schemaClosure, array $options): ?ISchemaWrapper {
 		$schema = $schemaClosure();
 
-		$this->createTable($schema, 'appreciation_persons', [
+		$this->createTable($schema, 'laudatio_persons', [
 			'first_name' => [Types::STRING, ['notnull' => true, 'length' => 255]],
 			'last_name' => [Types::STRING, ['notnull' => true, 'length' => 255]],
 			'date_of_birth' => [Types::DATE, self::NOT_NULL],
 			'notes' => [Types::TEXT, self::NULLABLE],
 		], true, ['appr_persons_name' => ['last_name', 'first_name']]);
 
-		$this->createTable($schema, 'appreciation_groups', [
+		$this->createTable($schema, 'laudatio_groups', [
 			'name' => [Types::STRING, ['notnull' => true, 'length' => 255]],
 			'responsible_uid' => [Types::STRING, ['notnull' => true, 'length' => 64]],
 			'jubilee_years' => [Types::STRING, ['notnull' => false, 'length' => 255]],
 		], true, ['appr_groups_resp' => ['responsible_uid']]);
 
-		$this->createTable($schema, 'appreciation_interested', [
+		$this->createTable($schema, 'laudatio_interested', [
 			'group_id' => [Types::BIGINT, self::ID],
 			'user_id' => [Types::STRING, ['notnull' => true, 'length' => 64]],
 		], false, ['appr_interested_user' => ['user_id']], ['appr_interested_uniq' => ['group_id', 'user_id']]);
 
-		$this->createTable($schema, 'appreciation_functions', [
+		$this->createTable($schema, 'laudatio_functions', [
 			'group_id' => [Types::BIGINT, self::ID],
 			'name' => [Types::STRING, ['notnull' => true, 'length' => 255]],
 		], true, ['appr_functions_group' => ['group_id']]);
 
-		$this->createTable($schema, 'appreciation_slices', [
+		$this->createTable($schema, 'laudatio_slices', [
 			'person_id' => [Types::BIGINT, self::ID],
 			'function_id' => [Types::BIGINT, self::ID],
 			'start_date' => [Types::DATE, self::NOT_NULL],
 			'end_date' => [Types::DATE, self::NULLABLE],
 		], true, ['appr_slices_person' => ['person_id'], 'appr_slices_function' => ['function_id']]);
 
-		$this->createTable($schema, 'appreciation_events', [
+		$this->createTable($schema, 'laudatio_events', [
 			'uid' => [Types::STRING, ['notnull' => true, 'length' => 255]],
 			'type' => [Types::STRING, ['notnull' => true, 'length' => 16]],
 			'person_id' => [Types::BIGINT, self::ID],
@@ -86,13 +86,13 @@ class Version000200Date20261027120000 extends SimpleMigrationStep {
 			'created_at' => [Types::BIGINT, self::ID],
 		], false, ['appr_events_date' => ['event_date'], 'appr_events_person' => ['person_id']], ['appr_events_uid' => ['uid']]);
 
-		$this->createTable($schema, 'appreciation_notified', [
+		$this->createTable($schema, 'laudatio_notified', [
 			'event_id' => [Types::BIGINT, self::ID],
 			'user_id' => [Types::STRING, ['notnull' => true, 'length' => 64]],
 			'notified_at' => [Types::BIGINT, self::ID],
 		], false, [], ['appr_notified_uniq' => ['event_id', 'user_id']]);
 
-		$this->createTable($schema, 'appreciation_audit', [
+		$this->createTable($schema, 'laudatio_audit', [
 			'actor_uid' => [Types::STRING, ['notnull' => false, 'length' => 64]],
 			'action' => [Types::STRING, ['notnull' => true, 'length' => 16]],
 			'entity_type' => [Types::STRING, ['notnull' => true, 'length' => 32]],

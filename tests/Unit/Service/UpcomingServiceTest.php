@@ -7,18 +7,18 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Tests\Unit\Service;
+namespace OCA\Laudatio\Tests\Unit\Service;
 
 use DateTimeImmutable;
-use OCA\Appreciation\Db\Event;
-use OCA\Appreciation\Db\EventMapper;
-use OCA\Appreciation\Exception\ForbiddenException;
-use OCA\Appreciation\Service\AccessService;
-use OCA\Appreciation\Service\Clock;
-use OCA\Appreciation\Service\Dates;
-use OCA\Appreciation\Service\RecipientService;
-use OCA\Appreciation\Service\SettingsService;
-use OCA\Appreciation\Service\UpcomingService;
+use OCA\Laudatio\Db\Event;
+use OCA\Laudatio\Db\EventMapper;
+use OCA\Laudatio\Exception\ForbiddenException;
+use OCA\Laudatio\Service\AccessService;
+use OCA\Laudatio\Service\Clock;
+use OCA\Laudatio\Service\Dates;
+use OCA\Laudatio\Service\RecipientService;
+use OCA\Laudatio\Service\SettingsService;
+use OCA\Laudatio\Service\UpcomingService;
 use OCP\IL10N;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;

@@ -7,16 +7,16 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Tests\Unit\Service;
+namespace OCA\Laudatio\Tests\Unit\Service;
 
-use OCA\Appreciation\Db\Event;
-use OCA\Appreciation\Db\OrgFunction;
-use OCA\Appreciation\Db\OrgFunctionMapper;
-use OCA\Appreciation\Db\Person;
-use OCA\Appreciation\Db\PersonMapper;
-use OCA\Appreciation\Service\OrdinalFormatter;
-use OCA\Appreciation\Service\RecipientService;
-use OCA\Appreciation\Service\TitleBuilder;
+use OCA\Laudatio\Db\Event;
+use OCA\Laudatio\Db\OrgFunction;
+use OCA\Laudatio\Db\OrgFunctionMapper;
+use OCA\Laudatio\Db\Person;
+use OCA\Laudatio\Db\PersonMapper;
+use OCA\Laudatio\Service\OrdinalFormatter;
+use OCA\Laudatio\Service\RecipientService;
+use OCA\Laudatio\Service\TitleBuilder;
 use OCP\IL10N;
 use OCP\L10N\IFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -84,7 +84,7 @@ final class TitleBuilderTest extends TestCase {
 		$l10n->method('getLanguageCode')->willReturn($language);
 		$l10n->method('t')->willReturnCallback(static fn (string $text, array $params = []): string => vsprintf($translations[$text] ?? $text, $params));
 		$factory = $this->createMock(IFactory::class);
-		$factory->method('get')->with('appreciation', $language)->willReturn($l10n);
+		$factory->method('get')->with('laudatio', $language)->willReturn($l10n);
 
 		$person = new Person();
 		$person->setFirstName('Anna');

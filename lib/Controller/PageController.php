@@ -7,11 +7,11 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Controller;
+namespace OCA\Laudatio\Controller;
 
-use OCA\Appreciation\AppInfo\Application;
-use OCA\Appreciation\Service\AccessService;
-use OCA\Appreciation\Service\Presenter;
+use OCA\Laudatio\AppInfo\Application;
+use OCA\Laudatio\Service\AccessService;
+use OCA\Laudatio\Service\Presenter;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\FrontpageRoute;
@@ -53,7 +53,7 @@ class PageController extends Controller {
 	}
 
 	/**
-	 * Deep links of the frontend router (e.g. /apps/appreciation/persons/12).
+	 * Deep links of the frontend router (e.g. /apps/laudatio/persons/12).
 	 * The path is resolved by the router in the browser.
 	 *
 	 * @psalm-suppress PossiblyUnusedParam

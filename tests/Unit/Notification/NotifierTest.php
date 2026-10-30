@@ -7,15 +7,15 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Tests\Unit\Notification;
+namespace OCA\Laudatio\Tests\Unit\Notification;
 
-use OCA\Appreciation\Db\Event;
-use OCA\Appreciation\Db\EventMapper;
-use OCA\Appreciation\Notification\Notifier;
-use OCA\Appreciation\Service\Dates;
-use OCA\Appreciation\Service\NotificationService;
-use OCA\Appreciation\Service\RecipientService;
-use OCA\Appreciation\Service\TitleBuilder;
+use OCA\Laudatio\Db\Event;
+use OCA\Laudatio\Db\EventMapper;
+use OCA\Laudatio\Notification\Notifier;
+use OCA\Laudatio\Service\Dates;
+use OCA\Laudatio\Service\NotificationService;
+use OCA\Laudatio\Service\RecipientService;
+use OCA\Laudatio\Service\TitleBuilder;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\IDateTimeFormatter;
 use OCP\IL10N;
@@ -45,7 +45,7 @@ final class NotifierTest extends TestCase {
 		$formatter = $this->createMock(IDateTimeFormatter::class);
 		$formatter->method('formatDate')->willReturn('October 30, 2026');
 		$urls = $this->createMock(IURLGenerator::class);
-		$urls->method('linkToRouteAbsolute')->willReturn('https://cloud.example/apps/appreciation/');
+		$urls->method('linkToRouteAbsolute')->willReturn('https://cloud.example/apps/laudatio/');
 		$urls->method('getAbsoluteURL')->willReturnArgument(0);
 
 		$this->notifier = new Notifier($factory, $this->eventMapper, $this->recipients, $titles, $formatter, $urls);
@@ -55,7 +55,7 @@ final class NotifierTest extends TestCase {
 		$this->eventMapper->method('find')->with(7)->willReturn($this->event());
 		$this->recipients->method('roleOf')->willReturn(RecipientService::ROLE_INTERESTED);
 
-		$notification = $this->notification('appreciation', NotificationService::SUBJECT_UPCOMING);
+		$notification = $this->notification('laudatio', NotificationService::SUBJECT_UPCOMING);
 		$notification->expects($this->once())->method('setParsedSubject')->with('40th Birthday of Anna Muster (for information) on October 30, 2026')->willReturnSelf();
 		$notification->expects($this->never())->method('setParsedMessage');
 		$this->notifier->prepare($notification, 'en');
@@ -65,7 +65,7 @@ final class NotifierTest extends TestCase {
 		$this->eventMapper->method('find')->willReturn($this->event());
 		$this->recipients->method('roleOf')->willReturn(RecipientService::ROLE_RESPONSIBLE);
 
-		$notification = $this->notification('appreciation', NotificationService::SUBJECT_UPCOMING);
+		$notification = $this->notification('laudatio', NotificationService::SUBJECT_UPCOMING);
 		$notification->expects($this->once())->method('setParsedMessage')->with('Remember to congratulate in time.')->willReturnSelf();
 		$this->notifier->prepare($notification, 'en');
 	}
@@ -74,7 +74,7 @@ final class NotifierTest extends TestCase {
 		$this->eventMapper->method('find')->willReturn($this->event(Event::TYPE_GIFT));
 		$this->recipients->method('roleOf')->willReturn(RecipientService::ROLE_RESPONSIBLE);
 
-		$notification = $this->notification('appreciation', NotificationService::SUBJECT_UPCOMING);
+		$notification = $this->notification('laudatio', NotificationService::SUBJECT_UPCOMING);
 		$notification->expects($this->once())->method('setParsedSubject')->with('Yearly gift for Anna Muster (Treasurer) due by October 30, 2026')->willReturnSelf();
 		$notification->expects($this->once())->method('setParsedMessage')->with('Remember to present the gift in time.')->willReturnSelf();
 		$this->notifier->prepare($notification, 'en');
@@ -84,14 +84,14 @@ final class NotifierTest extends TestCase {
 		$this->eventMapper->method('find')->willReturn($this->event(Event::TYPE_GIFT, 1000));
 		$this->recipients->method('roleOf')->willReturn(RecipientService::ROLE_RESPONSIBLE);
 		$this->expectException(AlreadyProcessedException::class);
-		$this->notifier->prepare($this->notification('appreciation', NotificationService::SUBJECT_UPCOMING), 'en');
+		$this->notifier->prepare($this->notification('laudatio', NotificationService::SUBJECT_UPCOMING), 'en');
 	}
 
 	public function testGreetedBirthdayKeepsTheNotification(): void {
 		$this->eventMapper->method('find')->willReturn($this->event(Event::TYPE_BIRTHDAY, 1000));
 		$this->recipients->method('roleOf')->willReturn(RecipientService::ROLE_INTERESTED);
 
-		$notification = $this->notification('appreciation', NotificationService::SUBJECT_UPCOMING);
+		$notification = $this->notification('laudatio', NotificationService::SUBJECT_UPCOMING);
 		$notification->expects($this->once())->method('setParsedSubject')->willReturnSelf();
 		$this->notifier->prepare($notification, 'en');
 	}
@@ -104,14 +104,14 @@ final class NotifierTest extends TestCase {
 	public function testDeletedEventRemovesTheNotification(): void {
 		$this->eventMapper->method('find')->willThrowException(new DoesNotExistException('gone'));
 		$this->expectException(AlreadyProcessedException::class);
-		$this->notifier->prepare($this->notification('appreciation', NotificationService::SUBJECT_UPCOMING), 'en');
+		$this->notifier->prepare($this->notification('laudatio', NotificationService::SUBJECT_UPCOMING), 'en');
 	}
 
 	public function testUserNoLongerRecipientRemovesTheNotification(): void {
 		$this->eventMapper->method('find')->willReturn($this->event());
 		$this->recipients->method('roleOf')->willReturn(null);
 		$this->expectException(AlreadyProcessedException::class);
-		$this->notifier->prepare($this->notification('appreciation', NotificationService::SUBJECT_UPCOMING), 'en');
+		$this->notifier->prepare($this->notification('laudatio', NotificationService::SUBJECT_UPCOMING), 'en');
 	}
 
 	private function notification(string $app, string $subject): INotification&MockObject {

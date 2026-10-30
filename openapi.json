@@ -1,7 +1,7 @@
 {
     "openapi": "3.0.3",
     "info": {
-        "title": "appreciation",
+        "title": "laudatio",
         "version": "0.0.1",
         "description": "Never miss the birthdays, anniversaries and yearly gifts of the people engaged in your organization",
         "license": {
@@ -570,7 +570,7 @@
         }
     },
     "paths": {
-        "/ocs/v2.php/apps/appreciation/api/v1/audit": {
+        "/ocs/v2.php/apps/laudatio/api/v1/audit": {
             "get": {
                 "operationId": "audit-index",
                 "summary": "Get the audit log, newest first",
@@ -707,7 +707,7 @@
                 }
             }
         },
-        "/ocs/v2.php/apps/appreciation/api/v1/events": {
+        "/ocs/v2.php/apps/laudatio/api/v1/events": {
             "get": {
                 "operationId": "event-index",
                 "summary": "List the upcoming events of the current user",
@@ -838,7 +838,7 @@
                 }
             }
         },
-        "/ocs/v2.php/apps/appreciation/api/v1/events/{id}/greeted": {
+        "/ocs/v2.php/apps/laudatio/api/v1/events/{id}/greeted": {
             "put": {
                 "operationId": "event-greet",
                 "summary": "Mark an event as greeted or not greeted",
@@ -1013,7 +1013,7 @@
                 }
             }
         },
-        "/ocs/v2.php/apps/appreciation/api/v1/groups/{groupId}/functions": {
+        "/ocs/v2.php/apps/laudatio/api/v1/groups/{groupId}/functions": {
             "post": {
                 "operationId": "function-create",
                 "summary": "Add a function to a group",
@@ -1220,7 +1220,7 @@
                 }
             }
         },
-        "/ocs/v2.php/apps/appreciation/api/v1/functions/{id}": {
+        "/ocs/v2.php/apps/laudatio/api/v1/functions/{id}": {
             "put": {
                 "operationId": "function-update",
                 "summary": "Update a function",
@@ -1609,7 +1609,7 @@
                 }
             }
         },
-        "/ocs/v2.php/apps/appreciation/api/v1/groups": {
+        "/ocs/v2.php/apps/laudatio/api/v1/groups": {
             "get": {
                 "operationId": "group-index",
                 "summary": "List the groups visible to the current user with their functions",
@@ -1910,7 +1910,7 @@
                 }
             }
         },
-        "/ocs/v2.php/apps/appreciation/api/v1/groups/{id}": {
+        "/ocs/v2.php/apps/laudatio/api/v1/groups/{id}": {
             "put": {
                 "operationId": "group-update",
                 "summary": "Update a group",
@@ -2312,7 +2312,7 @@
                 }
             }
         },
-        "/ocs/v2.php/apps/appreciation/api/v1/me": {
+        "/ocs/v2.php/apps/laudatio/api/v1/me": {
             "get": {
                 "operationId": "me-show",
                 "summary": "Get the permissions of the current user",
@@ -2429,7 +2429,7 @@
                 }
             }
         },
-        "/ocs/v2.php/apps/appreciation/api/v1/me/settings": {
+        "/ocs/v2.php/apps/laudatio/api/v1/me/settings": {
             "put": {
                 "operationId": "me-update-settings",
                 "summary": "Change the personal settings of the current user",
@@ -2565,7 +2565,7 @@
                 }
             }
         },
-        "/ocs/v2.php/apps/appreciation/api/v1/persons": {
+        "/ocs/v2.php/apps/laudatio/api/v1/persons": {
             "get": {
                 "operationId": "person-index",
                 "summary": "List the persons visible to the current user",
@@ -2906,7 +2906,7 @@
                 }
             }
         },
-        "/ocs/v2.php/apps/appreciation/api/v1/persons/{id}": {
+        "/ocs/v2.php/apps/laudatio/api/v1/persons/{id}": {
             "get": {
                 "operationId": "person-show",
                 "summary": "Get a person with the history of time slices",
@@ -3471,7 +3471,7 @@
                 }
             }
         },
-        "/ocs/v2.php/apps/appreciation/api/v1/persons/{personId}/slices": {
+        "/ocs/v2.php/apps/laudatio/api/v1/persons/{personId}/slices": {
             "post": {
                 "operationId": "slice-create",
                 "summary": "Add a time slice to a person",
@@ -3715,7 +3715,7 @@
                 }
             }
         },
-        "/ocs/v2.php/apps/appreciation/api/v1/slices/{id}": {
+        "/ocs/v2.php/apps/laudatio/api/v1/slices/{id}": {
             "put": {
                 "operationId": "slice-update",
                 "summary": "Update a time slice",

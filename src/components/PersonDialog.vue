@@ -104,49 +104,49 @@ async function save() {
 <template>
 	<NcDialog
 		v-model:open="open"
-		:name="person === null ? t('appreciation', 'New person') : t('appreciation', 'Edit person')"
+		:name="person === null ? t('laudatio', 'New person') : t('laudatio', 'Edit person')"
 		size="normal">
 		<form class="form" @submit.prevent="save">
-			<NcTextField v-model="firstName" :label="t('appreciation', 'First name')" required />
-			<NcTextField v-model="lastName" :label="t('appreciation', 'Last name')" required />
+			<NcTextField v-model="firstName" :label="t('laudatio', 'First name')" required />
+			<NcTextField v-model="lastName" :label="t('laudatio', 'Last name')" required />
 			<NcDateTimePickerNative
-				id="appreciation-date-of-birth"
+				id="laudatio-date-of-birth"
 				v-model="dateOfBirth"
 				type="date"
 				:max="new Date()"
-				:label="t('appreciation', 'Date of birth')" />
+				:label="t('laudatio', 'Date of birth')" />
 			<div class="form__row form__row--street">
-				<NcTextField v-model="contact.street" :label="t('appreciation', 'Street')" autocomplete="off" />
-				<NcTextField v-model="contact.streetNumber" :label="t('appreciation', 'House number')" autocomplete="off" />
+				<NcTextField v-model="contact.street" :label="t('laudatio', 'Street')" autocomplete="off" />
+				<NcTextField v-model="contact.streetNumber" :label="t('laudatio', 'House number')" autocomplete="off" />
 			</div>
 			<div class="form__row form__row--city">
-				<NcTextField v-model="contact.postalCode" :label="t('appreciation', 'ZIP code')" autocomplete="off" />
-				<NcTextField v-model="contact.city" :label="t('appreciation', 'City')" autocomplete="off" />
+				<NcTextField v-model="contact.postalCode" :label="t('laudatio', 'ZIP code')" autocomplete="off" />
+				<NcTextField v-model="contact.city" :label="t('laudatio', 'City')" autocomplete="off" />
 			</div>
-			<NcTextField v-model="contact.country" :label="t('appreciation', 'Country')" autocomplete="off" />
+			<NcTextField v-model="contact.country" :label="t('laudatio', 'Country')" autocomplete="off" />
 			<NcTextField
 				v-model="contact.mobilePhone"
 				type="tel"
-				:label="t('appreciation', 'Mobile phone')"
+				:label="t('laudatio', 'Mobile phone')"
 				autocomplete="off" />
 			<NcTextField
 				v-model="contact.otherPhone"
 				type="tel"
-				:label="t('appreciation', 'Additional phone number')"
+				:label="t('laudatio', 'Additional phone number')"
 				autocomplete="off" />
 			<NcTextArea
 				v-model="notes"
-				:label="t('appreciation', 'Notes')"
-				:helper-text="t('appreciation', 'Date of birth, contact data and notes are only visible to managers and the responsible person of the person\'s groups.')"
+				:label="t('laudatio', 'Notes')"
+				:helper-text="t('laudatio', 'Date of birth, contact data and notes are only visible to managers and the responsible person of the person\'s groups.')"
 				resize="vertical" />
 			<button type="submit" hidden />
 		</form>
 		<template #actions>
 			<NcButton @click="open = false">
-				{{ t('appreciation', 'Cancel') }}
+				{{ t('laudatio', 'Cancel') }}
 			</NcButton>
 			<NcButton variant="primary" :disabled="!valid || saving" @click="save">
-				{{ t('appreciation', 'Save') }}
+				{{ t('laudatio', 'Save') }}
 			</NcButton>
 		</template>
 	</NcDialog>

@@ -7,13 +7,13 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Controller;
+namespace OCA\Laudatio\Controller;
 
-use OCA\Appreciation\Exception\ConflictException;
-use OCA\Appreciation\ResponseDefinitions;
-use OCA\Appreciation\Service\AccessService;
-use OCA\Appreciation\Service\PersonService;
-use OCA\Appreciation\Service\Presenter;
+use OCA\Laudatio\Exception\ConflictException;
+use OCA\Laudatio\ResponseDefinitions;
+use OCA\Laudatio\Service\AccessService;
+use OCA\Laudatio\Service\PersonService;
+use OCA\Laudatio\Service\Presenter;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\ApiRoute;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -27,8 +27,8 @@ use OCP\IUserSession;
 /**
  * Time slices of a person in a function.
  *
- * @psalm-import-type AppreciationSlice from ResponseDefinitions
- * @psalm-import-type AppreciationError from ResponseDefinitions
+ * @psalm-import-type LaudatioSlice from ResponseDefinitions
+ * @psalm-import-type LaudatioError from ResponseDefinitions
  */
 class SliceController extends BaseOCSController {
 	public function __construct(
@@ -48,7 +48,7 @@ class SliceController extends BaseOCSController {
 	 * @param int $functionId ID of the function
 	 * @param string $startDate First day (YYYY-MM-DD)
 	 * @param string|null $endDate Last day (YYYY-MM-DD), null while active
-	 * @return DataResponse<Http::STATUS_CREATED, AppreciationSlice, array{}>|DataResponse<Http::STATUS_CONFLICT, AppreciationError, array{}>
+	 * @return DataResponse<Http::STATUS_CREATED, LaudatioSlice, array{}>|DataResponse<Http::STATUS_CONFLICT, LaudatioError, array{}>
 	 * @throws OCSBadRequestException Invalid dates or function
 	 * @throws OCSForbiddenException Not a manager
 	 * @throws OCSNotFoundException Person not found
@@ -78,7 +78,7 @@ class SliceController extends BaseOCSController {
 	 * @param int $functionId ID of the function
 	 * @param string $startDate First day (YYYY-MM-DD)
 	 * @param string|null $endDate Last day (YYYY-MM-DD), null while active
-	 * @return DataResponse<Http::STATUS_OK, AppreciationSlice, array{}>|DataResponse<Http::STATUS_CONFLICT, AppreciationError, array{}>
+	 * @return DataResponse<Http::STATUS_OK, LaudatioSlice, array{}>|DataResponse<Http::STATUS_CONFLICT, LaudatioError, array{}>
 	 * @throws OCSBadRequestException Invalid dates or function
 	 * @throws OCSForbiddenException Not a manager
 	 * @throws OCSNotFoundException Time slice not found

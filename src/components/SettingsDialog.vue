@@ -32,17 +32,17 @@ async function setEmail(enabled: boolean) {
 </script>
 
 <template>
-	<NcAppSettingsDialog v-model:open="open" :name="t('appreciation', 'Appreciation settings')">
-		<NcAppSettingsSection id="appreciation-reminders" :name="t('appreciation', 'Reminders')">
+	<NcAppSettingsDialog v-model:open="open" :name="t('laudatio', 'Laudatio settings')">
+		<NcAppSettingsSection id="laudatio-reminders" :name="t('laudatio', 'Reminders')">
 			<p class="hint">
-				{{ n('appreciation', 'You get a notification %n day before a birthday or jubilee of your groups.', 'You get a notification %n days before a birthday or jubilee of your groups.', me.leadTimeDays) }}
+				{{ n('laudatio', 'You get a notification %n day before a birthday or jubilee of your groups.', 'You get a notification %n days before a birthday or jubilee of your groups.', me.leadTimeDays) }}
 			</p>
 			<NcCheckboxRadioSwitch
 				:model-value="me.emailNotifications"
 				:loading="saving"
 				type="switch"
 				@update:model-value="setEmail">
-				{{ t('appreciation', 'Also send reminders by email') }}
+				{{ t('laudatio', 'Also send reminders by email') }}
 			</NcCheckboxRadioSwitch>
 		</NcAppSettingsSection>
 	</NcAppSettingsDialog>

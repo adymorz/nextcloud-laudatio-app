@@ -3,11 +3,11 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
-# Appreciation
+# Laudatio
 
 Manage the people engaged in your organization (members, employees, elected officials, volunteers) and never miss their birthdays and work anniversaries (jubilees).
 
-Requires Nextcloud 34 or 35 (PHP 8.2 or newer). Available in English and German. Report bugs and ideas in the [issue tracker](https://github.com/adymorz/nextcloud-appreciation-app/issues).
+Requires Nextcloud 34 or 35 (PHP 8.2 or newer). Available in English and German. Report bugs and ideas in the [issue tracker](https://github.com/adymorz/nextcloud-laudatio-app/issues).
 
 ![Upcoming birthdays and anniversaries](screenshots/upcoming.png)
 
@@ -49,24 +49,24 @@ Access is checked on the server for every request. Persons themselves need no Ne
 
 ### Settings
 
-- **Admin** (Administration settings → Groupware → Appreciation): manager group, jubilee years, reminder lead time, which events are generated, the "greeted" checklist, whether reminder emails are on by default, and the link to the gift regulations (an external page or the internal link of a file in Nextcloud), shown to all users in the app navigation.
+- **Admin** (Administration settings → Groupware → Laudatio): manager group, jubilee years, reminder lead time, which events are generated, the "greeted" checklist, whether reminder emails are on by default, and the link to the gift regulations (an external page or the internal link of a file in Nextcloud), shown to all users in the app navigation.
 - **Personal** (Settings at the bottom of the app navigation): reminder emails on or off.
 
 ## Installation
 
-As an administrator, open **Apps**, search for "Appreciation" (category "Organization") and click **Download and enable**, or run `occ app:install appreciation`.
+As an administrator, open **Apps**, search for "Laudatio" (category "Organization") and click **Download and enable**, or run `occ app:install laudatio`.
 
-Then choose the manager group and adjust the jubilee years and reminders in Administration settings → Groupware → Appreciation. Background jobs (cron) must run, they generate the events and send the reminders hourly. Install the Calendar app to see the birthdays and anniversaries in a calendar.
+Then choose the manager group and adjust the jubilee years and reminders in Administration settings → Groupware → Laudatio. Background jobs (cron) must run, they generate the events and send the reminders hourly. Install the Calendar app to see the birthdays and anniversaries in a calendar.
 
 ## Development
 
-The app is developed on a self-hosted GitLab, [GitHub](https://github.com/adymorz/nextcloud-appreciation-app) is a public mirror. The development environment is based on [DDEV](https://ddev.com). Docker and DDEV (v1.25 or newer) are the only requirements on your machine; PHP, Composer and Node.js run inside the DDEV containers.
+The app is developed on a self-hosted GitLab, [GitHub](https://github.com/adymorz/nextcloud-laudatio-app) is a public mirror. The development environment is based on [DDEV](https://ddev.com). Docker and DDEV (v1.25 or newer) are the only requirements on your machine; PHP, Composer and Node.js run inside the DDEV containers.
 
 ### Getting started
 
 ```sh
-git clone https://github.com/adymorz/nextcloud-appreciation-app.git
-cd nextcloud-appreciation-app
+git clone https://github.com/adymorz/nextcloud-laudatio-app.git
+cd nextcloud-laudatio-app
 ddev start             # the first start downloads and installs Nextcloud 35
 ddev composer install  # PHP dev tools and the OCP API for IDE autocompletion
 ddev npm ci
@@ -76,11 +76,11 @@ ddev launch
 
 Log in as `admin` / `admin`. The users `alice` / `alice` and `bob` / `bob` are created as well.
 
-To get some data to work with, run `ddev occ appreciation:demo-data`. It creates two groups, where alice is responsible for "Demo: Board" and interested in "Demo: Volunteers" and bob the other way round, with persons whose birthdays and jubilees fall in the next weeks. Install the Calendar app (`ddev occ app:install calendar`) to see their calendars.
+To get some data to work with, run `ddev occ laudatio:demo-data`. It creates two groups, where alice is responsible for "Demo: Board" and interested in "Demo: Volunteers" and bob the other way round, with persons whose birthdays and jubilees fall in the next weeks. Install the Calendar app (`ddev occ app:install calendar`) to see their calendars.
 
 ### How it works
 
-- Nextcloud (release tarball, version set by `NEXTCLOUD_VERSION` in [.ddev/config.yaml](.ddev/config.yaml)) lives in a Docker volume at `/var/www/nextcloud` in the web container. Your working copy is at `/var/www/html` and is symlinked to `/var/www/nextcloud/apps-extra/appreciation`, so changes are live immediately.
+- Nextcloud (release tarball, version set by `NEXTCLOUD_VERSION` in [.ddev/config.yaml](.ddev/config.yaml)) lives in a Docker volume at `/var/www/nextcloud` in the web container. Your working copy is at `/var/www/html` and is symlinked to `/var/www/nextcloud/apps-extra/laudatio`, so changes are live immediately.
 - [.ddev/nextcloud/setup.sh](.ddev/nextcloud/setup.sh) runs on every `ddev start`. It downloads and installs Nextcloud on the first run, and afterwards only re-links the app, applies pending upgrades and enables the app.
 - Development settings (debug mode, trusted domains, app paths, mail) are in [.ddev/nextcloud/ddev.config.php](.ddev/nextcloud/ddev.config.php).
 - Background jobs run every 5 minutes (`nextcloud-cron` daemon in the web container).
@@ -100,8 +100,8 @@ To get some data to work with, run `ddev occ appreciation:demo-data`. It creates
 | `ddev composer test:unit` | PHPUnit tests: unit tests and integration tests against the instance database (they only remove the rows they created) |
 | `ddev composer openapi` | Regenerate [openapi.json](openapi.json) after API changes, then `ddev npm run typescript:generate` for the frontend types |
 | `ddev npm run l10n` | Check translations and compile `l10n/*.js`, see below |
-| `ddev occ appreciation:sync` | Generate events and send due reminders now (otherwise hourly) |
-| `ddev occ appreciation:demo-data` | Create demo data |
+| `ddev occ laudatio:sync` | Generate events and send due reminders now (otherwise hourly) |
+| `ddev occ laudatio:demo-data` | Create demo data |
 | `ddev exec scripts/appstore-package.sh` | Build the unsigned App Store archive in `build/appstore/` (after `ddev npm run build`), see [Releasing](#releasing) |
 | `ddev occ <command>` | Run Nextcloud's `occ`, e.g. `ddev occ app:list` |
 | `ddev occ log:watch` | Follow the Nextcloud log |
@@ -147,19 +147,19 @@ The app supports Nextcloud 34 and 35 and PHP 8.2 to 8.5. The development instanc
 
 ### Translations
 
-Source strings are English: `$l->t('…')` in PHP and `t('appreciation', '…')` in the frontend. Translations live in [l10n/de.json](l10n/de.json) (German, informal) and [l10n/de_DE.json](l10n/de_DE.json) (German, formal). After adding or changing strings, add them to both files and run `ddev npm run l10n`: it lists missing and unused strings and writes the `l10n/*.js` files the frontend loads. CI fails if a translation is missing.
+Source strings are English: `$l->t('…')` in PHP and `t('laudatio', '…')` in the frontend. Translations live in [l10n/de.json](l10n/de.json) (German, informal) and [l10n/de_DE.json](l10n/de_DE.json) (German, formal). After adding or changing strings, add them to both files and run `ddev npm run l10n`: it lists missing and unused strings and writes the `l10n/*.js` files the frontend loads. CI fails if a translation is missing.
 
 ### Architecture
 
-- `lib/Service`: domain logic. `EventCalculator` and `PeriodCalculator` compute the events, `EventService` keeps the `appreciation_events` table in sync, `AccessService` holds all permission rules, `Presenter` applies them to API responses.
-- `lib/Controller`: OCS API (`/ocs/v2.php/apps/appreciation/api/v1/…`, documented in [openapi.json](openapi.json)) and the page.
+- `lib/Service`: domain logic. `EventCalculator` and `PeriodCalculator` compute the events, `EventService` keeps the `laudatio_events` table in sync, `AccessService` holds all permission rules, `Presenter` applies them to API responses.
+- `lib/Controller`: OCS API (`/ocs/v2.php/apps/laudatio/api/v1/…`, documented in [openapi.json](openapi.json)) and the page.
 - `lib/Calendar`: the calendar provider (public `ICalendarProvider` API).
 - `lib/Notification`, `lib/BackgroundJob`, `lib/Command`, `lib/Settings`: notifier, hourly job, occ commands, admin settings form.
 - `src`: Vue 3 frontend with `@nextcloud/vue`.
 
 ### Releasing
 
-Releases go to the [Nextcloud App Store](https://apps.nextcloud.com/apps/appreciation) through the GitLab CI pipeline of a version tag. The release archives are attached to the GitHub releases of the mirror, from where the App Store and every Nextcloud server download them.
+Releases go to the [Nextcloud App Store](https://apps.nextcloud.com/apps/laudatio) through the GitLab CI pipeline of a version tag. The release archives are attached to the GitHub releases of the mirror, from where the App Store and every Nextcloud server download them.
 
 For each release:
 
@@ -171,15 +171,15 @@ After all checks pass, `release:package` builds the archive and signs both the c
 
 One-time setup:
 
-1. **GitHub mirror**: a public repository `adymorz/nextcloud-appreciation-app` with issues enabled, created empty (no README or license) so the mirror can push to it. In GitLab, Settings → Repository → Mirroring repositories, push to `https://github.com/adymorz/nextcloud-appreciation-app.git` with a fine-grained GitHub token (Contents: read and write), including tags.
-2. **Certificate**: the private key `appreciation.key` and the signing request `appreciation.csr` are in `~/.nextcloud/certificates/`. Never commit or share the key. The GitHub profile must show its email address, then submit the request as `appreciation/appreciation.csr` in a pull request to [nextcloud/app-certificate-requests](https://github.com/nextcloud/app-certificate-requests) and save the signed certificate as `~/.nextcloud/certificates/appreciation.crt`.
-3. **App Store**: log in at [apps.nextcloud.com](https://apps.nextcloud.com) and [register the app](https://apps.nextcloud.com/developer/apps/new) with the certificate and the signature of the app ID: `echo -n appreciation | openssl dgst -sha512 -sign ~/.nextcloud/certificates/appreciation.key | openssl base64`.
+1. **GitHub mirror**: a public repository `adymorz/nextcloud-laudatio-app` with issues enabled, created empty (no README or license) so the mirror can push to it. In GitLab, Settings → Repository → Mirroring repositories, push to `https://github.com/adymorz/nextcloud-laudatio-app.git` with a fine-grained GitHub token (Contents: read and write), including tags.
+2. **Certificate**: the private key `laudatio.key` and the signing request `laudatio.csr` are in `~/.nextcloud/certificates/`. Never commit or share the key. The GitHub profile must show its email address, then submit the request as `laudatio/laudatio.csr` in a pull request to [nextcloud/app-certificate-requests](https://github.com/nextcloud/app-certificate-requests) and save the signed certificate as `~/.nextcloud/certificates/laudatio.crt`.
+3. **App Store**: log in at [apps.nextcloud.com](https://apps.nextcloud.com) and [register the app](https://apps.nextcloud.com/developer/apps/new) with the certificate and the signature of the app ID: `echo -n laudatio | openssl dgst -sha512 -sign ~/.nextcloud/certificates/laudatio.key | openssl base64`.
 4. **GitLab CI/CD**: protect the tags `v*` (Settings → Repository → Protected tags) and add these protected variables (Settings → CI/CD → Variables):
 
 | Variable | Type | Value |
 | --- | --- | --- |
-| `APP_PRIVATE_KEY` | File | Contents of `appreciation.key` |
-| `APP_CERTIFICATE` | File | Contents of `appreciation.crt` |
+| `APP_PRIVATE_KEY` | File | Contents of `laudatio.key` |
+| `APP_CERTIFICATE` | File | Contents of `laudatio.crt` |
 | `GITHUB_TOKEN` | Variable, masked | Fine-grained GitHub token for the mirror repository with "Contents: read and write" |
 | `APPSTORE_TOKEN` | Variable, masked | API token from [apps.nextcloud.com/account/token](https://apps.nextcloud.com/account/token) |
 

@@ -7,13 +7,13 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Calendar;
+namespace OCA\Laudatio\Calendar;
 
-use OCA\Appreciation\Db\Event;
-use OCA\Appreciation\Service\Dates;
-use OCA\Appreciation\Service\RecipientService;
-use OCA\Appreciation\Service\TitleBuilder;
-use OCA\Appreciation\Service\UpcomingService;
+use OCA\Laudatio\Db\Event;
+use OCA\Laudatio\Service\Dates;
+use OCA\Laudatio\Service\RecipientService;
+use OCA\Laudatio\Service\TitleBuilder;
+use OCA\Laudatio\Service\UpcomingService;
 use OCP\Calendar\ICalendar;
 use OCP\Constants;
 use OCP\IL10N;
@@ -35,7 +35,7 @@ use Sabre\VObject\Property;
  * the DAV backend instead. To serve CalDAV without breaking those consumers,
  * searches with options return no results.
  */
-class AppreciationCalendar implements ICalendar {
+class LaudatioCalendar implements ICalendar {
 	public const URI = 'events';
 
 	public function __construct(
@@ -51,7 +51,7 @@ class AppreciationCalendar implements ICalendar {
 
 	#[\Override]
 	public function getKey(): string {
-		return 'appreciation-' . self::URI;
+		return 'laudatio-' . self::URI;
 	}
 
 	#[\Override]

@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-    "/ocs/v2.php/apps/appreciation/api/v1/audit": {
+    "/ocs/v2.php/apps/laudatio/api/v1/audit": {
         parameters: {
             query?: never;
             header?: never;
@@ -21,7 +21,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/ocs/v2.php/apps/appreciation/api/v1/events": {
+    "/ocs/v2.php/apps/laudatio/api/v1/events": {
         parameters: {
             query?: never;
             header?: never;
@@ -41,7 +41,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/ocs/v2.php/apps/appreciation/api/v1/events/{id}/greeted": {
+    "/ocs/v2.php/apps/laudatio/api/v1/events/{id}/greeted": {
         parameters: {
             query?: never;
             header?: never;
@@ -61,7 +61,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/ocs/v2.php/apps/appreciation/api/v1/groups/{groupId}/functions": {
+    "/ocs/v2.php/apps/laudatio/api/v1/groups/{groupId}/functions": {
         parameters: {
             query?: never;
             header?: never;
@@ -78,7 +78,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/ocs/v2.php/apps/appreciation/api/v1/functions/{id}": {
+    "/ocs/v2.php/apps/laudatio/api/v1/functions/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -99,7 +99,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/ocs/v2.php/apps/appreciation/api/v1/groups": {
+    "/ocs/v2.php/apps/laudatio/api/v1/groups": {
         parameters: {
             query?: never;
             header?: never;
@@ -117,7 +117,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/ocs/v2.php/apps/appreciation/api/v1/groups/{id}": {
+    "/ocs/v2.php/apps/laudatio/api/v1/groups/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -135,7 +135,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/ocs/v2.php/apps/appreciation/api/v1/me": {
+    "/ocs/v2.php/apps/laudatio/api/v1/me": {
         parameters: {
             query?: never;
             header?: never;
@@ -152,7 +152,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/ocs/v2.php/apps/appreciation/api/v1/me/settings": {
+    "/ocs/v2.php/apps/laudatio/api/v1/me/settings": {
         parameters: {
             query?: never;
             header?: never;
@@ -169,7 +169,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/ocs/v2.php/apps/appreciation/api/v1/persons": {
+    "/ocs/v2.php/apps/laudatio/api/v1/persons": {
         parameters: {
             query?: never;
             header?: never;
@@ -190,7 +190,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/ocs/v2.php/apps/appreciation/api/v1/persons/{id}": {
+    "/ocs/v2.php/apps/laudatio/api/v1/persons/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -212,7 +212,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/ocs/v2.php/apps/appreciation/api/v1/persons/{personId}/slices": {
+    "/ocs/v2.php/apps/laudatio/api/v1/persons/{personId}/slices": {
         parameters: {
             query?: never;
             header?: never;
@@ -229,7 +229,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/ocs/v2.php/apps/appreciation/api/v1/slices/{id}": {
+    "/ocs/v2.php/apps/laudatio/api/v1/slices/{id}": {
         parameters: {
             query?: never;
             header?: never;

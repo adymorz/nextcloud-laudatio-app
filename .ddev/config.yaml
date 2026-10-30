@@ -1,4 +1,4 @@
-name: appreciation
+name: laudatio
 type: php
 docroot: ""
 php_version: "8.3"
@@ -13,7 +13,7 @@ webimage_extra_packages: ['php${DDEV_PHP_VERSION}-gmp']
 use_dns_when_possible: true
 composer_version: "2"
 web_environment:
-    - NEXTCLOUD_APP_ID=appreciation
+    - NEXTCLOUD_APP_ID=laudatio
     - NEXTCLOUD_ROOT=/var/www/nextcloud
     - NEXTCLOUD_VERSION=35.0.2
 nodejs_version: "24"

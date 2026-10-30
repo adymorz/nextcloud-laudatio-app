@@ -7,13 +7,13 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\AppInfo;
+namespace OCA\Laudatio\AppInfo;
 
-use OCA\Appreciation\Calendar\CalendarProvider;
-use OCA\Appreciation\Listener\NavigationListener;
-use OCA\Appreciation\Listener\UserDeletedListener;
-use OCA\Appreciation\Notification\Notifier;
-use OCA\Appreciation\Settings\AdminForm;
+use OCA\Laudatio\Calendar\CalendarProvider;
+use OCA\Laudatio\Listener\NavigationListener;
+use OCA\Laudatio\Listener\UserDeletedListener;
+use OCA\Laudatio\Notification\Notifier;
+use OCA\Laudatio\Settings\AdminForm;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
@@ -22,7 +22,7 @@ use OCP\Navigation\Events\LoadAdditionalEntriesEvent;
 use OCP\User\Events\UserDeletedEvent;
 
 class Application extends App implements IBootstrap {
-	public const APP_ID = 'appreciation';
+	public const APP_ID = 'laudatio';
 
 	/** @psalm-suppress PossiblyUnusedMethod */
 	public function __construct() {

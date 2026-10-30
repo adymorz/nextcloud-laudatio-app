@@ -7,22 +7,22 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Tests\Integration\Service;
+namespace OCA\Laudatio\Tests\Integration\Service;
 
-use OCA\Appreciation\Db\AuditEntry;
-use OCA\Appreciation\Db\AuditMapper;
-use OCA\Appreciation\Db\Event;
-use OCA\Appreciation\Db\EventMapper;
-use OCA\Appreciation\Exception\ConflictException;
-use OCA\Appreciation\Exception\ValidationException;
-use OCA\Appreciation\Model\PersonInput;
-use OCA\Appreciation\Service\Clock;
-use OCA\Appreciation\Service\Dates;
-use OCA\Appreciation\Service\EventService;
-use OCA\Appreciation\Service\GroupService;
-use OCA\Appreciation\Service\PersonService;
-use OCA\Appreciation\Service\UpcomingService;
-use OCA\Appreciation\Tests\Integration\IntegrationTestCase;
+use OCA\Laudatio\Db\AuditEntry;
+use OCA\Laudatio\Db\AuditMapper;
+use OCA\Laudatio\Db\Event;
+use OCA\Laudatio\Db\EventMapper;
+use OCA\Laudatio\Exception\ConflictException;
+use OCA\Laudatio\Exception\ValidationException;
+use OCA\Laudatio\Model\PersonInput;
+use OCA\Laudatio\Service\Clock;
+use OCA\Laudatio\Service\Dates;
+use OCA\Laudatio\Service\EventService;
+use OCA\Laudatio\Service\GroupService;
+use OCA\Laudatio\Service\PersonService;
+use OCA\Laudatio\Service\UpcomingService;
+use OCA\Laudatio\Tests\Integration\IntegrationTestCase;
 
 /**
  * Persons, slices, groups and functions through the services, including the

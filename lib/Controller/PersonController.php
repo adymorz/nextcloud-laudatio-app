@@ -7,14 +7,14 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Controller;
+namespace OCA\Laudatio\Controller;
 
-use OCA\Appreciation\Exception\NotFoundException;
-use OCA\Appreciation\Model\PersonInput;
-use OCA\Appreciation\ResponseDefinitions;
-use OCA\Appreciation\Service\AccessService;
-use OCA\Appreciation\Service\PersonService;
-use OCA\Appreciation\Service\Presenter;
+use OCA\Laudatio\Exception\NotFoundException;
+use OCA\Laudatio\Model\PersonInput;
+use OCA\Laudatio\ResponseDefinitions;
+use OCA\Laudatio\Service\AccessService;
+use OCA\Laudatio\Service\PersonService;
+use OCA\Laudatio\Service\Presenter;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\ApiRoute;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -27,8 +27,8 @@ use OCP\IRequest;
 use OCP\IUserSession;
 
 /**
- * @psalm-import-type AppreciationPerson from ResponseDefinitions
- * @psalm-import-type AppreciationPersonDetail from ResponseDefinitions
+ * @psalm-import-type LaudatioPerson from ResponseDefinitions
+ * @psalm-import-type LaudatioPersonDetail from ResponseDefinitions
  */
 class PersonController extends BaseOCSController {
 	public function __construct(
@@ -49,7 +49,7 @@ class PersonController extends BaseOCSController {
 	 * members of their groups. Date of birth, contact data and notes are only
 	 * included when the user may see them.
 	 *
-	 * @return DataResponse<Http::STATUS_OK, list<AppreciationPerson>, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<LaudatioPerson>, array{}>
 	 * @throws OCSForbiddenException No access to the app
 	 *
 	 * 200: Persons returned
@@ -73,7 +73,7 @@ class PersonController extends BaseOCSController {
 	 * Get a person with the history of time slices
 	 *
 	 * @param int $id ID of the person
-	 * @return DataResponse<Http::STATUS_OK, AppreciationPersonDetail, array{}>
+	 * @return DataResponse<Http::STATUS_OK, LaudatioPersonDetail, array{}>
 	 * @throws OCSForbiddenException No access to the app
 	 * @throws OCSNotFoundException Person not found or not visible
 	 *
@@ -107,7 +107,7 @@ class PersonController extends BaseOCSController {
 	 * @param string|null $country Country
 	 * @param string|null $mobilePhone Mobile phone number
 	 * @param string|null $otherPhone Additional phone number
-	 * @return DataResponse<Http::STATUS_CREATED, AppreciationPersonDetail, array{}>
+	 * @return DataResponse<Http::STATUS_CREATED, LaudatioPersonDetail, array{}>
 	 * @throws OCSBadRequestException Invalid input
 	 * @throws OCSForbiddenException Not a manager
 	 *
@@ -154,7 +154,7 @@ class PersonController extends BaseOCSController {
 	 * @param string|null $country Country
 	 * @param string|null $mobilePhone Mobile phone number
 	 * @param string|null $otherPhone Additional phone number
-	 * @return DataResponse<Http::STATUS_OK, AppreciationPersonDetail, array{}>
+	 * @return DataResponse<Http::STATUS_OK, LaudatioPersonDetail, array{}>
 	 * @throws OCSBadRequestException Invalid input
 	 * @throws OCSForbiddenException Not a manager
 	 * @throws OCSNotFoundException Person not found

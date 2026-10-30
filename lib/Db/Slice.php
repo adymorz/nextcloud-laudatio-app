@@ -7,7 +7,7 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Db;
+namespace OCA\Laudatio\Db;
 
 use DateTimeImmutable;
 use OCP\AppFramework\Db\Entity;

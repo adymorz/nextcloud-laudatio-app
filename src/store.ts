@@ -11,4 +11,4 @@ import { reactive } from 'vue'
 /**
  * Permissions and settings of the current user, provided by the page.
  */
-export const me = reactive<Me>(loadState<Me>('appreciation', 'me'))
+export const me = reactive<Me>(loadState<Me>('laudatio', 'me'))

@@ -31,9 +31,9 @@ const functionGroup = ref<Group | null>(null)
 const editedFunction = ref<OrgFunction | null>(null)
 
 const roleLabels: Record<Group['role'], string> = {
-	manager: t('appreciation', 'Manager'),
-	responsible: t('appreciation', 'Responsible'),
-	interested: t('appreciation', 'For information'),
+	manager: t('laudatio', 'Manager'),
+	responsible: t('laudatio', 'Responsible'),
+	interested: t('laudatio', 'For information'),
 }
 
 /**
@@ -62,10 +62,10 @@ function openGroup(group: Group | null) {
  */
 async function deleteGroup(group: Group) {
 	const confirmed = await showConfirmation({
-		name: t('appreciation', 'Delete group'),
-		text: t('appreciation', 'Delete the group "{name}"?', { name: group.name }),
-		labelConfirm: t('appreciation', 'Delete'),
-		labelReject: t('appreciation', 'Cancel'),
+		name: t('laudatio', 'Delete group'),
+		text: t('laudatio', 'Delete the group "{name}"?', { name: group.name }),
+		labelConfirm: t('laudatio', 'Delete'),
+		labelReject: t('laudatio', 'Cancel'),
 		severity: 'warning',
 	})
 	if (confirmed) {
@@ -88,10 +88,10 @@ function openFunction(group: Group, fn: OrgFunction | null) {
  */
 async function deleteFunction(fn: OrgFunction) {
 	const confirmed = await showConfirmation({
-		name: t('appreciation', 'Delete function'),
-		text: t('appreciation', 'Delete the function "{name}"?', { name: fn.name }),
-		labelConfirm: t('appreciation', 'Delete'),
-		labelReject: t('appreciation', 'Cancel'),
+		name: t('laudatio', 'Delete function'),
+		text: t('laudatio', 'Delete the function "{name}"?', { name: fn.name }),
+		labelConfirm: t('laudatio', 'Delete'),
+		labelReject: t('laudatio', 'Cancel'),
 		severity: 'warning',
 	})
 	if (confirmed) {
@@ -119,17 +119,17 @@ onMounted(load)
 <template>
 	<div class="view">
 		<div class="view__header">
-			<h2>{{ t('appreciation', 'Groups & functions') }}</h2>
+			<h2>{{ t('laudatio', 'Groups & functions') }}</h2>
 			<NcButton v-if="me.isManager" variant="primary" @click="openGroup(null)">
 				<template #icon>
 					<NcIconSvgWrapper :path="mdiPlus" />
 				</template>
-				{{ t('appreciation', 'New group') }}
+				{{ t('laudatio', 'New group') }}
 			</NcButton>
 		</div>
 
 		<NcLoadingIcon v-if="loading" :size="32" />
-		<NcEmptyContent v-else-if="groups.length === 0" :name="t('appreciation', 'No groups yet')">
+		<NcEmptyContent v-else-if="groups.length === 0" :name="t('laudatio', 'No groups yet')">
 			<template #icon>
 				<NcIconSvgWrapper :path="mdiAccountGroup" />
 			</template>
@@ -143,47 +143,47 @@ onMounted(load)
 						<template #icon>
 							<NcIconSvgWrapper :path="mdiPencil" />
 						</template>
-						{{ t('appreciation', 'Edit group') }}
+						{{ t('laudatio', 'Edit group') }}
 					</NcActionButton>
 					<NcActionButton close-after-click @click="openFunction(group, null)">
 						<template #icon>
 							<NcIconSvgWrapper :path="mdiPlus" />
 						</template>
-						{{ t('appreciation', 'Add function') }}
+						{{ t('laudatio', 'Add function') }}
 					</NcActionButton>
 					<NcActionButton close-after-click @click="deleteGroup(group)">
 						<template #icon>
 							<NcIconSvgWrapper :path="mdiDelete" />
 						</template>
-						{{ t('appreciation', 'Delete group') }}
+						{{ t('laudatio', 'Delete group') }}
 					</NcActionButton>
 				</NcActions>
 			</div>
 
 			<dl class="group__details">
-				<dt>{{ t('appreciation', 'Responsible person') }}</dt>
+				<dt>{{ t('laudatio', 'Responsible person') }}</dt>
 				<dd>
 					<NcUserBubble :user="group.responsible.id" :display-name="group.responsible.displayName" />
 				</dd>
-				<dt>{{ t('appreciation', 'Interested persons') }}</dt>
+				<dt>{{ t('laudatio', 'Interested persons') }}</dt>
 				<dd>
-					<span v-if="group.interested.length === 0" class="muted">{{ t('appreciation', 'none') }}</span>
+					<span v-if="group.interested.length === 0" class="muted">{{ t('laudatio', 'none') }}</span>
 					<NcUserBubble
 						v-for="user in group.interested"
 						:key="user.id"
 						:user="user.id"
 						:display-name="user.displayName" />
 				</dd>
-				<dt>{{ t('appreciation', 'Jubilee years') }}</dt>
+				<dt>{{ t('laudatio', 'Jubilee years') }}</dt>
 				<dd>
-					{{ group.effectiveJubileeYears.join(', ') || t('appreciation', 'none') }}
+					{{ group.effectiveJubileeYears.join(', ') || t('laudatio', 'none') }}
 					<span class="muted">
-						{{ group.jubileeYears === null ? t('appreciation', '(global setting)') : t('appreciation', '(group setting)') }}
+						{{ group.jubileeYears === null ? t('laudatio', '(global setting)') : t('laudatio', '(group setting)') }}
 					</span>
 				</dd>
-				<dt>{{ t('appreciation', 'Functions') }}</dt>
+				<dt>{{ t('laudatio', 'Functions') }}</dt>
 				<dd>
-					<span v-if="group.functions.length === 0" class="muted">{{ t('appreciation', 'none') }}</span>
+					<span v-if="group.functions.length === 0" class="muted">{{ t('laudatio', 'none') }}</span>
 					<ul class="functions">
 						<li v-for="fn in group.functions" :key="fn.id" class="function">
 							{{ fn.name }}
@@ -192,20 +192,20 @@ onMounted(load)
 								class="function__gift"
 								:path="mdiGift"
 								:size="16"
-								:name="t('appreciation', 'One gift per year')"
-								:title="t('appreciation', 'One gift per year')" />
-							<NcActions v-if="me.isManager" :aria-label="t('appreciation', 'Actions for {name}', { name: fn.name })">
+								:name="t('laudatio', 'One gift per year')"
+								:title="t('laudatio', 'One gift per year')" />
+							<NcActions v-if="me.isManager" :aria-label="t('laudatio', 'Actions for {name}', { name: fn.name })">
 								<NcActionButton close-after-click @click="openFunction(group, fn)">
 									<template #icon>
 										<NcIconSvgWrapper :path="mdiPencil" />
 									</template>
-									{{ t('appreciation', 'Edit') }}
+									{{ t('laudatio', 'Edit') }}
 								</NcActionButton>
 								<NcActionButton close-after-click @click="deleteFunction(fn)">
 									<template #icon>
 										<NcIconSvgWrapper :path="mdiDelete" />
 									</template>
-									{{ t('appreciation', 'Delete') }}
+									{{ t('laudatio', 'Delete') }}
 								</NcActionButton>
 							</NcActions>
 						</li>

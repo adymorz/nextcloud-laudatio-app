@@ -7,10 +7,10 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Tests\Unit\Service;
+namespace OCA\Laudatio\Tests\Unit\Service;
 
-use OCA\Appreciation\Exception\ValidationException;
-use OCA\Appreciation\Service\SettingsService;
+use OCA\Laudatio\Exception\ValidationException;
+use OCA\Laudatio\Service\SettingsService;
 use OCP\Config\IUserConfig;
 use OCP\IAppConfig;
 use OCP\IL10N;
@@ -89,7 +89,7 @@ final class SettingsServiceTest extends TestCase {
 
 	#[DataProvider('validRegulationsUrls')]
 	public function testRegulationsUrlIsStored(string $value, string $stored): void {
-		$this->appConfig->expects($this->once())->method('setValueString')->with('appreciation', SettingsService::REGULATIONS_URL, $stored);
+		$this->appConfig->expects($this->once())->method('setValueString')->with('laudatio', SettingsService::REGULATIONS_URL, $stored);
 		$this->settings->setRegulationsUrl($value);
 	}
 
@@ -122,11 +122,11 @@ final class SettingsServiceTest extends TestCase {
 
 	public function testUserEmailSettingDefaultsToAdminDefault(): void {
 		$this->appConfig->method('getValueBool')->willReturnMap([
-			['appreciation', SettingsService::EMAIL_DEFAULT, false, false, true],
+			['laudatio', SettingsService::EMAIL_DEFAULT, false, false, true],
 		]);
 		$this->userConfig->expects($this->once())
 			->method('getValueBool')
-			->with('alice', 'appreciation', SettingsService::EMAIL_NOTIFICATIONS, true)
+			->with('alice', 'laudatio', SettingsService::EMAIL_NOTIFICATIONS, true)
 			->willReturn(true);
 		$this->assertTrue($this->settings->isEmailEnabledForUser('alice'));
 	}

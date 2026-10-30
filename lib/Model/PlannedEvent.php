@@ -7,10 +7,10 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Model;
+namespace OCA\Laudatio\Model;
 
 use DateTimeImmutable;
-use OCA\Appreciation\Db\Event;
+use OCA\Laudatio\Db\Event;
 
 /**
  * An event as it should exist according to the current master data.

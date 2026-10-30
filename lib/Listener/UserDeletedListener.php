@@ -7,10 +7,10 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Listener;
+namespace OCA\Laudatio\Listener;
 
-use OCA\Appreciation\Db\GroupMapper;
-use OCA\Appreciation\Db\InterestedMapper;
+use OCA\Laudatio\Db\GroupMapper;
+use OCA\Laudatio\Db\InterestedMapper;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 use OCP\User\Events\UserDeletedEvent;

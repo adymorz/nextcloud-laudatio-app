@@ -75,31 +75,31 @@ async function save() {
 <template>
 	<NcDialog
 		v-model:open="open"
-		:name="group === null ? t('appreciation', 'New group') : t('appreciation', 'Edit group')"
+		:name="group === null ? t('laudatio', 'New group') : t('laudatio', 'Edit group')"
 		size="normal">
 		<form class="form" @submit.prevent="save">
-			<NcTextField v-model="name" :label="t('appreciation', 'Name')" required />
+			<NcTextField v-model="name" :label="t('laudatio', 'Name')" required />
 			<UserSelect
-				id="appreciation-group-responsible"
+				id="laudatio-group-responsible"
 				v-model="responsible"
-				:input-label="t('appreciation', 'Responsible person')" />
+				:input-label="t('laudatio', 'Responsible person')" />
 			<UserSelect
-				id="appreciation-group-interested"
+				id="laudatio-group-interested"
 				v-model="interested"
-				:input-label="t('appreciation', 'Interested persons (get the events for information)')"
+				:input-label="t('laudatio', 'Interested persons (get the events for information)')"
 				multiple />
 			<NcTextField
 				v-model="jubileeYears"
-				:label="t('appreciation', 'Jubilee years')"
-				:helper-text="t('appreciation', 'Comma separated, e.g. 5, 10, 25. Leave empty to use the global setting.')" />
+				:label="t('laudatio', 'Jubilee years')"
+				:helper-text="t('laudatio', 'Comma separated, e.g. 5, 10, 25. Leave empty to use the global setting.')" />
 			<button type="submit" hidden />
 		</form>
 		<template #actions>
 			<NcButton @click="open = false">
-				{{ t('appreciation', 'Cancel') }}
+				{{ t('laudatio', 'Cancel') }}
 			</NcButton>
 			<NcButton variant="primary" :disabled="!valid || saving" @click="save">
-				{{ t('appreciation', 'Save') }}
+				{{ t('laudatio', 'Save') }}
 			</NcButton>
 		</template>
 	</NcDialog>

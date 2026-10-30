@@ -7,14 +7,14 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Tests\Unit\Service;
+namespace OCA\Laudatio\Tests\Unit\Service;
 
-use OCA\Appreciation\Db\Person;
-use OCA\Appreciation\Db\Slice;
-use OCA\Appreciation\Model\PlannedEvent;
-use OCA\Appreciation\Service\Dates;
-use OCA\Appreciation\Service\EventCalculator;
-use OCA\Appreciation\Service\PeriodCalculator;
+use OCA\Laudatio\Db\Person;
+use OCA\Laudatio\Db\Slice;
+use OCA\Laudatio\Model\PlannedEvent;
+use OCA\Laudatio\Service\Dates;
+use OCA\Laudatio\Service\EventCalculator;
+use OCA\Laudatio\Service\PeriodCalculator;
 use PHPUnit\Framework\TestCase;
 
 final class EventCalculatorTest extends TestCase {
@@ -30,7 +30,7 @@ final class EventCalculatorTest extends TestCase {
 		$slices = [$this->slice(1, '2020-01-01', '2026-12-31')];
 
 		$events = $this->calculate($person, $slices, [], '2026-01-01', '2027-12-31', true, false);
-		$this->assertSame([['appreciation-birthday-7-2026', 'birthday', null, '2026-03-15', 36]], $this->describe($events));
+		$this->assertSame([['laudatio-birthday-7-2026', 'birthday', null, '2026-03-15', 36]], $this->describe($events));
 	}
 
 	public function testLeapDayBirthdayFallsOnFebruary28(): void {
@@ -48,7 +48,7 @@ final class EventCalculatorTest extends TestCase {
 			$this->slice(4, '2024-11-05', null),
 		];
 		$events = $this->calculate($person, $slices, [4 => [1, 5, 10]], '2026-01-01', '2027-01-31', false, true);
-		$this->assertSame([['appreciation-jubilee-3-4-20211105-5', 'jubilee', 4, '2026-11-05', 5]], $this->describe($events));
+		$this->assertSame([['laudatio-jubilee-3-4-20211105-5', 'jubilee', 4, '2026-11-05', 5]], $this->describe($events));
 	}
 
 	public function testJubileeOnlyIfPeriodLastsUntilTheDate(): void {
@@ -65,7 +65,7 @@ final class EventCalculatorTest extends TestCase {
 		$person = $this->person(3, '1970-01-01');
 		$slices = [$this->slice(4, '2023-06-01', null), $this->slice(5, '2023-06-01', null)];
 		$events = $this->calculate($person, $slices, [4 => [3], 5 => [5]], '2026-01-01', '2026-12-31', false, true);
-		$this->assertSame([['appreciation-jubilee-3-4-20230601-3', 'jubilee', 4, '2026-06-01', 3]], $this->describe($events));
+		$this->assertSame([['laudatio-jubilee-3-4-20230601-3', 'jubilee', 4, '2026-06-01', 3]], $this->describe($events));
 	}
 
 	public function testWindowBoundariesAreInclusive(): void {
@@ -82,8 +82,8 @@ final class EventCalculatorTest extends TestCase {
 		// Only function 4 has a yearly gift; the window touches 2026 and 2027
 		$events = $this->calculate($person, $slices, [], '2026-11-30', '2027-12-30', false, false, [4]);
 		$this->assertSame([
-			['appreciation-gift-7-4-2026', 'gift', 4, '2026-12-31', 2026],
-			['appreciation-gift-7-4-2027', 'gift', 4, '2027-12-31', 2027],
+			['laudatio-gift-7-4-2026', 'gift', 4, '2026-12-31', 2026],
+			['laudatio-gift-7-4-2027', 'gift', 4, '2027-12-31', 2027],
 		], $this->describe($events));
 	}
 
@@ -91,7 +91,7 @@ final class EventCalculatorTest extends TestCase {
 		$person = $this->person(7, '1990-03-15');
 		// Left in March, before the window starts: this year's gift is still open
 		$events = $this->calculate($person, [$this->slice(4, '2020-06-01', '2026-03-31')], [], '2026-10-29', '2027-12-02', false, false, [4]);
-		$this->assertSame([['appreciation-gift-7-4-2026', 'gift', 4, '2026-03-31', 2026]], $this->describe($events));
+		$this->assertSame([['laudatio-gift-7-4-2026', 'gift', 4, '2026-03-31', 2026]], $this->describe($events));
 
 		$endsJanuaryFirst = [$this->slice(4, '2020-06-01', '2027-01-01')];
 		$events = $this->calculate($person, $endsJanuaryFirst, [], '2026-10-29', '2027-12-02', false, false, [4]);
@@ -102,7 +102,7 @@ final class EventCalculatorTest extends TestCase {
 		$person = $this->person(7, '1990-03-15');
 		$slices = [$this->slice(4, '2026-01-01', '2026-03-31'), $this->slice(4, '2026-09-01', '2026-10-31')];
 		$events = $this->calculate($person, $slices, [], '2026-01-01', '2026-12-31', false, false, [4]);
-		$this->assertSame([['appreciation-gift-7-4-2026', 'gift', 4, '2026-10-31', 2026]], $this->describe($events));
+		$this->assertSame([['laudatio-gift-7-4-2026', 'gift', 4, '2026-10-31', 2026]], $this->describe($events));
 	}
 
 	public function testYearlyGiftOnlyInYearsWithTheFunction(): void {
@@ -111,7 +111,7 @@ final class EventCalculatorTest extends TestCase {
 		$endedLastYear = [$this->slice(4, '2020-06-01', '2025-12-31')];
 
 		$events = $this->calculate($person, $startsNextYear, [], '2026-10-29', '2027-12-02', false, false, [4]);
-		$this->assertSame([['appreciation-gift-7-4-2027', 'gift', 4, '2027-12-31', 2027]], $this->describe($events));
+		$this->assertSame([['laudatio-gift-7-4-2027', 'gift', 4, '2027-12-31', 2027]], $this->describe($events));
 		$this->assertSame([], $this->calculate($person, $endedLastYear, [], '2026-10-29', '2027-12-02', false, false, [4]));
 		$this->assertSame([], $this->calculate($person, $startsNextYear, [], '2026-10-29', '2027-12-02', false, false, []));
 	}

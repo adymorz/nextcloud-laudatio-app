@@ -5,11 +5,11 @@
 -->
 <info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	  xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
-	<id>appreciation</id>
-	<name>Appreciation</name>
+	<id>laudatio</id>
+	<name>Laudatio</name>
 	<summary>Never miss the birthdays, anniversaries and yearly gifts of the people engaged in your organization</summary>
 	<summary lang="de">Verpasse keine Geburtstage, Dienstjubiläen und Jahresgeschenke der Personen, die sich in deiner Organisation engagieren</summary>
-	<description><![CDATA[Appreciation helps clubs, associations, parishes and companies to appreciate the people engaged with them: members, employees, elected officials and volunteers. Record who holds which function since when, and the app reminds the right people of every birthday, anniversary and yearly gift.
+	<description><![CDATA[Laudatio helps clubs, associations, parishes and companies to appreciate the people engaged with them: members, employees, elected officials and volunteers. Record who holds which function since when, and the app reminds the right people of every birthday, anniversary and yearly gift.
 
 - **Persons, groups and functions**: persons with date of birth, address, phone numbers and notes, and the functions they hold over time, e.g. "Treasurer" of the "Board" from 2021 to 2024.
 - **Birthdays and jubilees** are generated automatically. Jubilees are counted from the start of a continuous period of service, so a re-election does not reset the count. The jubilee years can be set globally and per group.
@@ -22,7 +22,7 @@
 - **Audit log** of all changes to persons, groups and functions.
 
 Persons don't need a Nextcloud account. Available in English and German.]]></description>
-	<description lang="de"><![CDATA[Appreciation hilft Vereinen, Verbänden, Pfarreien und Firmen, die Menschen wertzuschätzen, die sich bei ihnen engagieren: Mitglieder, Mitarbeitende, Gewählte und Freiwillige. Erfasse, wer welche Funktion seit wann innehat, und die App erinnert die richtigen Personen an jeden Geburtstag, jedes Jubiläum und jedes Jahresgeschenk.
+	<description lang="de"><![CDATA[Laudatio hilft Vereinen, Verbänden, Pfarreien und Firmen, die Menschen wertzuschätzen, die sich bei ihnen engagieren: Mitglieder, Mitarbeitende, Gewählte und Freiwillige. Erfasse, wer welche Funktion seit wann innehat, und die App erinnert die richtigen Personen an jeden Geburtstag, jedes Jubiläum und jedes Jahresgeschenk.
 
 - **Personen, Gruppen und Funktionen**: Personen mit Geburtsdatum, Adresse, Telefonnummern und Notizen sowie den Funktionen, die sie im Lauf der Zeit innehaben, z. B. „Kassier“ im „Vorstand“ von 2021 bis 2024.
 - **Geburtstage und Jubiläen** werden automatisch erzeugt. Jubiläen zählen ab dem Beginn einer ununterbrochenen Amtszeit, eine Wiederwahl setzt die Zählung also nicht zurück. Die Jubiläumsjahre lassen sich global und pro Gruppe festlegen.
@@ -38,33 +38,33 @@ Die Personen brauchen kein Nextcloud-Konto. Verfügbar auf Englisch und Deutsch.
 	<version>0.3.0</version>
 	<licence>AGPL-3.0-or-later</licence>
 	<author mail="dev@adrian.dymorz.ch">Adrian Dymorz</author>
-	<namespace>Appreciation</namespace>
+	<namespace>Laudatio</namespace>
 	<documentation>
-		<user>https://github.com/adymorz/nextcloud-appreciation-app#features</user>
-		<admin>https://github.com/adymorz/nextcloud-appreciation-app#installation</admin>
-		<developer>https://github.com/adymorz/nextcloud-appreciation-app#development</developer>
+		<user>https://github.com/adymorz/nextcloud-laudatio-app#features</user>
+		<admin>https://github.com/adymorz/nextcloud-laudatio-app#installation</admin>
+		<developer>https://github.com/adymorz/nextcloud-laudatio-app#development</developer>
 	</documentation>
 	<category>organization</category>
 	<category>social</category>
-	<website>https://github.com/adymorz/nextcloud-appreciation-app</website>
-	<bugs>https://github.com/adymorz/nextcloud-appreciation-app/issues</bugs>
-	<repository type="git">https://github.com/adymorz/nextcloud-appreciation-app.git</repository>
-	<screenshot>https://raw.githubusercontent.com/adymorz/nextcloud-appreciation-app/main/screenshots/upcoming.png</screenshot>
-	<screenshot>https://raw.githubusercontent.com/adymorz/nextcloud-appreciation-app/main/screenshots/persons.png</screenshot>
-	<screenshot>https://raw.githubusercontent.com/adymorz/nextcloud-appreciation-app/main/screenshots/person.png</screenshot>
-	<screenshot>https://raw.githubusercontent.com/adymorz/nextcloud-appreciation-app/main/screenshots/sheet.png</screenshot>
-	<screenshot>https://raw.githubusercontent.com/adymorz/nextcloud-appreciation-app/main/screenshots/groups.png</screenshot>
-	<screenshot>https://raw.githubusercontent.com/adymorz/nextcloud-appreciation-app/main/screenshots/calendar.png</screenshot>
-	<screenshot>https://raw.githubusercontent.com/adymorz/nextcloud-appreciation-app/main/screenshots/settings.png</screenshot>
+	<website>https://github.com/adymorz/nextcloud-laudatio-app</website>
+	<bugs>https://github.com/adymorz/nextcloud-laudatio-app/issues</bugs>
+	<repository type="git">https://github.com/adymorz/nextcloud-laudatio-app.git</repository>
+	<screenshot>https://raw.githubusercontent.com/adymorz/nextcloud-laudatio-app/main/screenshots/upcoming.png</screenshot>
+	<screenshot>https://raw.githubusercontent.com/adymorz/nextcloud-laudatio-app/main/screenshots/persons.png</screenshot>
+	<screenshot>https://raw.githubusercontent.com/adymorz/nextcloud-laudatio-app/main/screenshots/person.png</screenshot>
+	<screenshot>https://raw.githubusercontent.com/adymorz/nextcloud-laudatio-app/main/screenshots/sheet.png</screenshot>
+	<screenshot>https://raw.githubusercontent.com/adymorz/nextcloud-laudatio-app/main/screenshots/groups.png</screenshot>
+	<screenshot>https://raw.githubusercontent.com/adymorz/nextcloud-laudatio-app/main/screenshots/calendar.png</screenshot>
+	<screenshot>https://raw.githubusercontent.com/adymorz/nextcloud-laudatio-app/main/screenshots/settings.png</screenshot>
 	<dependencies>
 		<php min-version="8.2"/>
 		<nextcloud min-version="34" max-version="35"/>
 	</dependencies>
 	<background-jobs>
-		<job>OCA\Appreciation\BackgroundJob\SyncJob</job>
+		<job>OCA\Laudatio\BackgroundJob\SyncJob</job>
 	</background-jobs>
 	<commands>
-		<command>OCA\Appreciation\Command\SyncCommand</command>
-		<command>OCA\Appreciation\Command\DemoDataCommand</command>
+		<command>OCA\Laudatio\Command\SyncCommand</command>
+		<command>OCA\Laudatio\Command\DemoDataCommand</command>
 	</commands>
 </info>

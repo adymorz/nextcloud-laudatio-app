@@ -7,13 +7,13 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Controller;
+namespace OCA\Laudatio\Controller;
 
-use OCA\Appreciation\ResponseDefinitions;
-use OCA\Appreciation\Service\AccessService;
-use OCA\Appreciation\Service\EventService;
-use OCA\Appreciation\Service\Presenter;
-use OCA\Appreciation\Service\UpcomingService;
+use OCA\Laudatio\ResponseDefinitions;
+use OCA\Laudatio\Service\AccessService;
+use OCA\Laudatio\Service\EventService;
+use OCA\Laudatio\Service\Presenter;
+use OCA\Laudatio\Service\UpcomingService;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\ApiRoute;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -26,7 +26,7 @@ use OCP\IUserSession;
 /**
  * Upcoming birthdays and jubilees.
  *
- * @psalm-import-type AppreciationEvent from ResponseDefinitions
+ * @psalm-import-type LaudatioEvent from ResponseDefinitions
  */
 class EventController extends BaseOCSController {
 	public function __construct(
@@ -49,7 +49,7 @@ class EventController extends BaseOCSController {
 	 * year.
 	 *
 	 * @param int $days Number of days from today, 1 to 400
-	 * @return DataResponse<Http::STATUS_OK, list<AppreciationEvent>, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<LaudatioEvent>, array{}>
 	 * @throws OCSForbiddenException No access to the app
 	 *
 	 * 200: Events returned, each part ordered by date
@@ -77,7 +77,7 @@ class EventController extends BaseOCSController {
 	 *
 	 * @param int $id ID of the event
 	 * @param bool $greeted Whether the person has been greeted (gifts: the gift was presented)
-	 * @return DataResponse<Http::STATUS_OK, AppreciationEvent, array{}>
+	 * @return DataResponse<Http::STATUS_OK, LaudatioEvent, array{}>
 	 * @throws OCSForbiddenException Only the responsible person and managers may do this
 	 * @throws OCSNotFoundException Event not found or not visible
 	 *

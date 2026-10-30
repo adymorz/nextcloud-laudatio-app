@@ -7,12 +7,12 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Controller;
+namespace OCA\Laudatio\Controller;
 
-use OCA\Appreciation\ResponseDefinitions;
-use OCA\Appreciation\Service\AccessService;
-use OCA\Appreciation\Service\AuditService;
-use OCA\Appreciation\Service\Presenter;
+use OCA\Laudatio\ResponseDefinitions;
+use OCA\Laudatio\Service\AccessService;
+use OCA\Laudatio\Service\AuditService;
+use OCA\Laudatio\Service\Presenter;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\ApiRoute;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -22,7 +22,7 @@ use OCP\IRequest;
 use OCP\IUserSession;
 
 /**
- * @psalm-import-type AppreciationAuditPage from ResponseDefinitions
+ * @psalm-import-type LaudatioAuditPage from ResponseDefinitions
  */
 class AuditController extends BaseOCSController {
 	public function __construct(
@@ -40,7 +40,7 @@ class AuditController extends BaseOCSController {
 	 *
 	 * @param int $limit Number of entries, 1 to 200
 	 * @param int $offset Number of entries to skip
-	 * @return DataResponse<Http::STATUS_OK, AppreciationAuditPage, array{}>
+	 * @return DataResponse<Http::STATUS_OK, LaudatioAuditPage, array{}>
 	 * @throws OCSForbiddenException Not a manager
 	 *
 	 * 200: Audit log entries returned

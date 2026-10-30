@@ -7,14 +7,14 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Controller;
+namespace OCA\Laudatio\Controller;
 
-use OCA\Appreciation\Db\OrgFunction;
-use OCA\Appreciation\Exception\ConflictException;
-use OCA\Appreciation\ResponseDefinitions;
-use OCA\Appreciation\Service\AccessService;
-use OCA\Appreciation\Service\GroupService;
-use OCA\Appreciation\Service\Presenter;
+use OCA\Laudatio\Db\OrgFunction;
+use OCA\Laudatio\Exception\ConflictException;
+use OCA\Laudatio\ResponseDefinitions;
+use OCA\Laudatio\Service\AccessService;
+use OCA\Laudatio\Service\GroupService;
+use OCA\Laudatio\Service\Presenter;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\ApiRoute;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -28,8 +28,8 @@ use OCP\IUserSession;
 /**
  * Functions (roles) within a group.
  *
- * @psalm-import-type AppreciationFunction from ResponseDefinitions
- * @psalm-import-type AppreciationError from ResponseDefinitions
+ * @psalm-import-type LaudatioFunction from ResponseDefinitions
+ * @psalm-import-type LaudatioError from ResponseDefinitions
  */
 class FunctionController extends BaseOCSController {
 	public function __construct(
@@ -48,7 +48,7 @@ class FunctionController extends BaseOCSController {
 	 * @param int $groupId ID of the group
 	 * @param string $name Name of the function, e.g. "Treasurer"
 	 * @param bool $yearlyGift Whether the holders get one gift per calendar year
-	 * @return DataResponse<Http::STATUS_CREATED, AppreciationFunction, array{}>
+	 * @return DataResponse<Http::STATUS_CREATED, LaudatioFunction, array{}>
 	 * @throws OCSBadRequestException Invalid name
 	 * @throws OCSForbiddenException Not a manager
 	 * @throws OCSNotFoundException Group not found
@@ -75,7 +75,7 @@ class FunctionController extends BaseOCSController {
 	 * @param int $id ID of the function
 	 * @param string $name Name of the function
 	 * @param bool $yearlyGift Whether the holders get one gift per calendar year
-	 * @return DataResponse<Http::STATUS_OK, AppreciationFunction, array{}>
+	 * @return DataResponse<Http::STATUS_OK, LaudatioFunction, array{}>
 	 * @throws OCSBadRequestException Invalid name
 	 * @throws OCSForbiddenException Not a manager
 	 * @throws OCSNotFoundException Function not found
@@ -97,7 +97,7 @@ class FunctionController extends BaseOCSController {
 	 * Delete a function without time slices
 	 *
 	 * @param int $id ID of the function
-	 * @return DataResponse<Http::STATUS_OK, list<empty>, array{}>|DataResponse<Http::STATUS_CONFLICT, AppreciationError, array{}>
+	 * @return DataResponse<Http::STATUS_OK, list<empty>, array{}>|DataResponse<Http::STATUS_CONFLICT, LaudatioError, array{}>
 	 * @throws OCSForbiddenException Not a manager
 	 * @throws OCSNotFoundException Function not found
 	 *

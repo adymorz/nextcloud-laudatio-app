@@ -7,13 +7,13 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Calendar;
+namespace OCA\Laudatio\Calendar;
 
-use OCA\Appreciation\AppInfo\Application;
-use OCA\Appreciation\Service\AccessService;
-use OCA\Appreciation\Service\SettingsService;
-use OCA\Appreciation\Service\TitleBuilder;
-use OCA\Appreciation\Service\UpcomingService;
+use OCA\Laudatio\AppInfo\Application;
+use OCA\Laudatio\Service\AccessService;
+use OCA\Laudatio\Service\SettingsService;
+use OCA\Laudatio\Service\TitleBuilder;
+use OCA\Laudatio\Service\UpcomingService;
 use OCP\Calendar\ICalendarProvider;
 use OCP\IURLGenerator;
 use OCP\IUserManager;
@@ -23,7 +23,7 @@ use OCP\L10N\IFactory;
  * Provides one read-only calendar per user that is responsible for or
  * interested in at least one group. Nextcloud exposes it via CalDAV, so it
  * shows up in the Calendar app and in CalDAV clients as
- * "app-generated--appreciation--events".
+ * "app-generated--laudatio--events".
  */
 class CalendarProvider implements ICalendarProvider {
 	private const PRINCIPAL_PREFIX = 'principals/users/';
@@ -44,7 +44,7 @@ class CalendarProvider implements ICalendarProvider {
 		if (!str_starts_with($principalUri, self::PRINCIPAL_PREFIX)) {
 			return [];
 		}
-		if ($calendarUris !== [] && !in_array(AppreciationCalendar::URI, $calendarUris, true)) {
+		if ($calendarUris !== [] && !in_array(LaudatioCalendar::URI, $calendarUris, true)) {
 			return [];
 		}
 
@@ -58,7 +58,7 @@ class CalendarProvider implements ICalendarProvider {
 		}
 
 		$language = $this->l10nFactory->getUserLanguage($user);
-		return [new AppreciationCalendar(
+		return [new LaudatioCalendar(
 			$userId,
 			$this->l10nFactory->get(Application::APP_ID, $language),
 			$language,

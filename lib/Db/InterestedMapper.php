@@ -7,7 +7,7 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\Appreciation\Db;
+namespace OCA\Laudatio\Db;
 
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
@@ -18,7 +18,7 @@ use OCP\IDBConnection;
  */
 class InterestedMapper extends QBMapper {
 	public function __construct(IDBConnection $db) {
-		parent::__construct($db, 'appreciation_interested', Interested::class);
+		parent::__construct($db, 'laudatio_interested', Interested::class);
 	}
 
 	/**

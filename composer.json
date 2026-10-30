@@ -1,6 +1,6 @@
 {
-	"name": "dymorz/appreciation",
-	"description": "Appreciation app for Nextcloud",
+	"name": "dymorz/laudatio",
+	"description": "Laudatio app for Nextcloud",
 	"license": "AGPL-3.0-or-later",
 	"authors": [
 		{
@@ -10,12 +10,12 @@
 	],
 	"autoload": {
 		"psr-4": {
-			"OCA\\Appreciation\\": "lib/"
+			"OCA\\Laudatio\\": "lib/"
 		}
 	},
 	"autoload-dev": {
 		"psr-4": {
-			"OCA\\Appreciation\\Tests\\": "tests/"
+			"OCA\\Laudatio\\Tests\\": "tests/"
 		}
 	},
 	"scripts": {
