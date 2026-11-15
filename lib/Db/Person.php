@@ -36,6 +36,8 @@ use OCP\DB\Types;
  * @method void setMobilePhone(?string $mobilePhone)
  * @method string|null getOtherPhone()
  * @method void setOtherPhone(?string $otherPhone)
+ * @method string|null getEmail()
+ * @method void setEmail(?string $email)
  * @method int getCreatedAt()
  * @method void setCreatedAt(int $createdAt)
  * @method int getUpdatedAt()
@@ -53,6 +55,7 @@ class Person extends Entity {
 	protected ?string $country = null;
 	protected ?string $mobilePhone = null;
 	protected ?string $otherPhone = null;
+	protected ?string $email = null;
 	protected int $createdAt = 0;
 	protected int $updatedAt = 0;
 
@@ -68,6 +71,7 @@ class Person extends Entity {
 		$this->addType('country', Types::STRING);
 		$this->addType('mobilePhone', Types::STRING);
 		$this->addType('otherPhone', Types::STRING);
+		$this->addType('email', Types::STRING);
 		$this->addType('createdAt', Types::BIGINT);
 		$this->addType('updatedAt', Types::BIGINT);
 	}

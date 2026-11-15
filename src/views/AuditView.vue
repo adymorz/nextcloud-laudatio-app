@@ -50,6 +50,7 @@ const fieldLabels: Record<string, string> = {
 	country: t('laudatio', 'Country'),
 	mobile_phone: t('laudatio', 'Mobile phone'),
 	other_phone: t('laudatio', 'Additional phone number'),
+	email: t('laudatio', 'Email'),
 	person_id: t('laudatio', 'Person'),
 	function_id: t('laudatio', 'Function'),
 	start_date: t('laudatio', 'Start date'),

@@ -107,6 +107,7 @@ class PersonController extends BaseOCSController {
 	 * @param string|null $country Country
 	 * @param string|null $mobilePhone Mobile phone number
 	 * @param string|null $otherPhone Additional phone number
+	 * @param string|null $email Email address
 	 * @return DataResponse<Http::STATUS_CREATED, LaudatioPersonDetail, array{}>
 	 * @throws OCSBadRequestException Invalid input
 	 * @throws OCSForbiddenException Not a manager
@@ -127,9 +128,10 @@ class PersonController extends BaseOCSController {
 		?string $country = null,
 		?string $mobilePhone = null,
 		?string $otherPhone = null,
+		?string $email = null,
 	): DataResponse {
 		$userId = $this->currentUserId();
-		$input = new PersonInput($firstName, $lastName, $dateOfBirth, $notes, $street, $streetNumber, $postalCode, $city, $country, $mobilePhone, $otherPhone);
+		$input = new PersonInput($firstName, $lastName, $dateOfBirth, $notes, $street, $streetNumber, $postalCode, $city, $country, $mobilePhone, $otherPhone, $email);
 		$person = $this->call(function () use ($userId, $input) {
 			$this->access->requireManager($userId);
 			return $this->persons->create($userId, $input);
@@ -154,6 +156,7 @@ class PersonController extends BaseOCSController {
 	 * @param string|null $country Country
 	 * @param string|null $mobilePhone Mobile phone number
 	 * @param string|null $otherPhone Additional phone number
+	 * @param string|null $email Email address
 	 * @return DataResponse<Http::STATUS_OK, LaudatioPersonDetail, array{}>
 	 * @throws OCSBadRequestException Invalid input
 	 * @throws OCSForbiddenException Not a manager
@@ -176,9 +179,10 @@ class PersonController extends BaseOCSController {
 		?string $country = null,
 		?string $mobilePhone = null,
 		?string $otherPhone = null,
+		?string $email = null,
 	): DataResponse {
 		$userId = $this->currentUserId();
-		$input = new PersonInput($firstName, $lastName, $dateOfBirth, $notes, $street, $streetNumber, $postalCode, $city, $country, $mobilePhone, $otherPhone);
+		$input = new PersonInput($firstName, $lastName, $dateOfBirth, $notes, $street, $streetNumber, $postalCode, $city, $country, $mobilePhone, $otherPhone, $email);
 		$person = $this->call(function () use ($userId, $id, $input) {
 			$this->access->requireManager($userId);
 			return $this->persons->update($userId, $id, $input);

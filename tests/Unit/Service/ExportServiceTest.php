@@ -82,7 +82,7 @@ final class ExportServiceTest extends TestCase {
 	public function testExportsAllDataWithVersion(): void {
 		$this->assertSame([
 			'format' => 'laudatio-export',
-			'version' => 2,
+			'version' => 3,
 			'exportedAt' => '2026-10-30',
 			'groups' => [
 				[
@@ -105,6 +105,7 @@ final class ExportServiceTest extends TestCase {
 					'country' => null,
 					'mobilePhone' => null,
 					'otherPhone' => null,
+					'email' => null,
 					'terms' => [
 						[
 							'functionId' => 3,

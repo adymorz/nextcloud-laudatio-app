@@ -366,6 +366,7 @@ export interface components {
             country: string | null;
             mobilePhone: string | null;
             otherPhone: string | null;
+            email: string | null;
             terms: components["schemas"]["ExportTerm"][];
         };
         ExportTerm: {
@@ -442,6 +443,7 @@ export interface components {
             country: string | null;
             mobilePhone: string | null;
             otherPhone: string | null;
+            email: string | null;
             sensitiveVisible: boolean;
             currentFunctions: components["schemas"]["Slice"][];
         };
@@ -460,6 +462,7 @@ export interface components {
             country: string | null;
             mobilePhone: string | null;
             otherPhone: string | null;
+            email: string | null;
             sensitiveVisible: boolean;
             currentFunctions: components["schemas"]["Slice"][];
             slices: components["schemas"]["Slice"][];
@@ -1697,6 +1700,11 @@ export interface operations {
                      * @default null
                      */
                     otherPhone?: string | null;
+                    /**
+                     * @description Email address
+                     * @default null
+                     */
+                    email?: string | null;
                 };
             };
         };
@@ -1894,6 +1902,11 @@ export interface operations {
                      * @default null
                      */
                     otherPhone?: string | null;
+                    /**
+                     * @description Email address
+                     * @default null
+                     */
+                    email?: string | null;
                 };
             };
         };

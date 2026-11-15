@@ -47,6 +47,7 @@ const rows = computed(() => {
 		{ label: t('laudatio', 'Country'), value: p.country },
 		{ label: t('laudatio', 'Mobile phone'), value: p.mobilePhone },
 		{ label: t('laudatio', 'Additional phone number'), value: p.otherPhone },
+		{ label: t('laudatio', 'Email'), value: p.email },
 	]
 })
 

@@ -81,6 +81,7 @@ class DemoDataCommand extends Command {
 			city: 'Zürich',
 			country: 'Switzerland',
 			mobilePhone: '+41 79 123 45 67',
+			email: 'anna.muster@example.com',
 		));
 		$this->persons->addSlice(null, $anna->getId(), new SliceInput($president->getId(), $this->ago($today, 10, 10)));
 

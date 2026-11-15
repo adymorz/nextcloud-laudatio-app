@@ -26,6 +26,7 @@ use OCA\Laudatio\Service\RecipientService;
 use OCA\Laudatio\Service\SliceValidator;
 use OCP\IDBConnection;
 use OCP\IL10N;
+use OCP\Mail\IEmailValidator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -46,6 +47,8 @@ final class PersonServiceTest extends TestCase {
 		$clock->method('time')->willReturn(1000);
 		$l10n = $this->createMock(IL10N::class);
 		$l10n->method('t')->willReturnCallback(static fn (string $text, array $params = []): string => vsprintf($text, $params));
+		$emailValidator = $this->createMock(IEmailValidator::class);
+		$emailValidator->method('isValid')->willReturnCallback(static fn (string $email): bool => filter_var($email, FILTER_VALIDATE_EMAIL) !== false);
 		$this->service = new PersonService(
 			$this->personMapper,
 			$this->sliceMapper,
@@ -55,6 +58,7 @@ final class PersonServiceTest extends TestCase {
 			$this->createMock(RecipientService::class),
 			$this->createMock(AccessService::class),
 			$clock,
+			$emailValidator,
 			$this->createMock(IDBConnection::class),
 			$l10n,
 		);
@@ -75,6 +79,7 @@ final class PersonServiceTest extends TestCase {
 			country: '',
 			mobilePhone: '+41 (0)79 123 45-67',
 			otherPhone: '044/123.45.67',
+			email: ' anna.muster@example.com ',
 		));
 		$this->assertSame('Bahnhofstrasse', $person->getStreet());
 		$this->assertSame('12a', $person->getStreetNumber());
@@ -83,6 +88,18 @@ final class PersonServiceTest extends TestCase {
 		$this->assertNull($person->getCountry());
 		$this->assertSame('+41 (0)79 123 45-67', $person->getMobilePhone());
 		$this->assertSame('044/123.45.67', $person->getOtherPhone());
+		$this->assertSame('anna.muster@example.com', $person->getEmail());
+	}
+
+	public function testEmptyEmailBecomesNull(): void {
+		$person = $this->service->build(new PersonInput('Anna', 'Muster', '1986-11-01', email: ' '));
+		$this->assertNull($person->getEmail());
+	}
+
+	public function testInvalidEmailIsRejectedWithAMessage(): void {
+		$this->expectException(ValidationException::class);
+		$this->expectExceptionMessage('The email address is not valid.');
+		$this->service->build(new PersonInput('Anna', 'Muster', '1986-11-01', email: 'anna.muster@'));
 	}
 
 	/**
@@ -97,6 +114,7 @@ final class PersonServiceTest extends TestCase {
 			'street too long' => [$person(street: str_repeat('a', 256))],
 			'ZIP code too long' => [$person(postalCode: str_repeat('1', 33))],
 			'country too long' => [$person(country: str_repeat('a', 256))],
+			'email too long' => [$person(email: str_repeat('a', 64) . '@' . str_repeat('b', 187) . '.com')],
 		];
 	}
 

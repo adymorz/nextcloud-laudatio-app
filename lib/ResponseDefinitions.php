@@ -77,6 +77,7 @@ namespace OCA\Laudatio;
  *     country: ?string,
  *     mobilePhone: ?string,
  *     otherPhone: ?string,
+ *     email: ?string,
  *     sensitiveVisible: bool,
  *     currentFunctions: list<LaudatioSlice>,
  * }
@@ -95,6 +96,7 @@ namespace OCA\Laudatio;
  *     country: ?string,
  *     mobilePhone: ?string,
  *     otherPhone: ?string,
+ *     email: ?string,
  *     sensitiveVisible: bool,
  *     currentFunctions: list<LaudatioSlice>,
  *     slices: list<LaudatioSlice>,
@@ -166,6 +168,7 @@ namespace OCA\Laudatio;
  *     country: ?string,
  *     mobilePhone: ?string,
  *     otherPhone: ?string,
+ *     email: ?string,
  *     terms: list<LaudatioExportTerm>,
  * }
  *

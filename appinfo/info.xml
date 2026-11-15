@@ -11,7 +11,7 @@
 	<summary lang="de">Verpasse keine Geburtstage, Dienstjubiläen und Jahresgeschenke der Personen, die sich in deiner Organisation engagieren</summary>
 	<description><![CDATA[Laudatio helps clubs, associations, parishes and companies to appreciate the people engaged with them: members, employees, elected officials and volunteers. Record who holds which function since when, and the app reminds the right people of every birthday, anniversary and yearly gift.
 
-- **Persons, groups and functions**: persons with date of birth, address, phone numbers and notes, and the functions they hold over time, e.g. "Treasurer" of the "Board" from 2021 to 2024.
+- **Persons, groups and functions**: persons with date of birth, address, phone numbers, email address and notes, and the functions they hold over time, e.g. "Treasurer" of the "Board" from 2021 to 2024.
 - **Birthdays and anniversaries** are generated automatically. Anniversaries are counted from the start of a continuous period of service, so a re-election does not reset the count. The anniversary years can be set globally and per group.
 - **Yearly gifts**: mark a function "One gift per year", and the responsible person is reminded to present one gift per calendar year to everybody holding it. A link to the gift regulations can be shown in the app navigation.
 - **Calendar**: everybody involved in a group gets a read-only calendar "Birthdays & anniversaries" in the Calendar app and on CalDAV devices.
@@ -26,7 +26,7 @@
 Persons don't need a Nextcloud account. Available in English and German.]]></description>
 	<description lang="de"><![CDATA[Laudatio hilft Vereinen, Verbänden, Pfarreien und Firmen, die Menschen wertzuschätzen, die sich bei ihnen engagieren: Mitglieder, Mitarbeitende, Gewählte und Freiwillige. Erfasse, wer welche Funktion seit wann innehat, und die App erinnert die richtigen Personen an jeden Geburtstag, jedes Jubiläum und jedes Jahresgeschenk.
 
-- **Personen, Gruppen und Funktionen**: Personen mit Geburtsdatum, Adresse, Telefonnummern und Notizen sowie den Funktionen, die sie im Lauf der Zeit innehaben, z. B. „Kassier“ im „Vorstand“ von 2021 bis 2024.
+- **Personen, Gruppen und Funktionen**: Personen mit Geburtsdatum, Adresse, Telefonnummern, E-Mail-Adresse und Notizen sowie den Funktionen, die sie im Lauf der Zeit innehaben, z. B. „Kassier“ im „Vorstand“ von 2021 bis 2024.
 - **Geburtstage und Jubiläen** werden automatisch erzeugt. Jubiläen zählen ab dem Beginn einer ununterbrochenen Amtszeit, eine Wiederwahl setzt die Zählung also nicht zurück. Die Jubiläumsjahre lassen sich global und pro Gruppe festlegen.
 - **Jahresgeschenke**: Markiere eine Funktion mit „Ein Geschenk pro Jahr“, und die verantwortliche Person wird daran erinnert, allen, die sie innehaben, einmal pro Kalenderjahr ein Geschenk zu überreichen. Ein Link auf das Geschenkreglement lässt sich in der App-Navigation anzeigen.
 - **Kalender**: Alle Beteiligten einer Gruppe erhalten einen schreibgeschützten Kalender „Geburtstage & Jubiläen“ in der Kalender-App und auf CalDAV-Geräten.
