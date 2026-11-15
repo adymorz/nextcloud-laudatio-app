@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Optional email address of persons, visible like the phone numbers and printed on the data sheet; export files now include it and can only be imported by this version or newer
+
 ### Changed
 
 - The function history on the data sheet shows each date next to its source, in the columns "Function / Group", "Start date / Source" and "End date / Source"

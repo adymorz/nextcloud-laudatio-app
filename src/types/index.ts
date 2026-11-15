@@ -32,6 +32,7 @@ export interface PersonInput {
 	country: string | null
 	mobilePhone: string | null
 	otherPhone: string | null
+	email: string | null
 }
 
 export interface SliceInput {

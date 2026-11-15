@@ -28,7 +28,7 @@ use OCA\Laudatio\ResponseDefinitions;
 class ExportService {
 	public const FORMAT = 'laudatio-export';
 	/** Increase on every change of the format and keep ImportValidator reading the older versions */
-	public const VERSION = 2;
+	public const VERSION = 3;
 	/** Oldest version ImportValidator reads, version 1 was never used in production */
 	public const MIN_VERSION = 2;
 
@@ -98,6 +98,7 @@ class ExportService {
 			'country' => $person->getCountry(),
 			'mobilePhone' => $person->getMobilePhone(),
 			'otherPhone' => $person->getOtherPhone(),
+			'email' => $person->getEmail(),
 			'terms' => array_map(static function (Slice $slice): array {
 				$end = $slice->getEndDate();
 				return [

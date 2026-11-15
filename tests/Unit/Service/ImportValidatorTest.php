@@ -30,6 +30,7 @@ use OCA\Laudatio\Service\SliceValidator;
 use OCP\IDBConnection;
 use OCP\IL10N;
 use OCP\IUserManager;
+use OCP\Mail\IEmailValidator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -147,6 +148,8 @@ final class ImportValidatorTest extends TestCase {
 			$this->createMock(IDBConnection::class),
 			$l10n,
 		);
+		$emailValidator = $this->createMock(IEmailValidator::class);
+		$emailValidator->method('isValid')->willReturnCallback(static fn (string $email): bool => filter_var($email, FILTER_VALIDATE_EMAIL) !== false);
 		$persons = new PersonService(
 			$this->createMock(PersonMapper::class),
 			$this->createMock(SliceMapper::class),
@@ -156,6 +159,7 @@ final class ImportValidatorTest extends TestCase {
 			$this->createMock(RecipientService::class),
 			$this->createMock(AccessService::class),
 			$clock,
+			$emailValidator,
 			$this->createMock(IDBConnection::class),
 			$l10n,
 		);
@@ -188,6 +192,7 @@ final class ImportValidatorTest extends TestCase {
 		$this->assertSame('Switzerland', $person->getCountry());
 		$this->assertSame('+41 79 123 45 67', $person->getMobilePhone());
 		$this->assertNull($person->getOtherPhone());
+		$this->assertNull($person->getEmail());
 
 		$terms = $data->persons[0]['terms'];
 		$this->assertCount(3, $terms);
@@ -204,6 +209,18 @@ final class ImportValidatorTest extends TestCase {
 		$this->assertSame([], $data->persons[1]['terms']);
 	}
 
+	public function testReadsTheEmailAddressOfVersion3(): void {
+		$sample = self::sample();
+		$sample['version'] = 3;
+		$sample['persons'][0]['email'] = 'anna.muster@example.com';
+		$sample['persons'][1]['email'] = null;
+
+		$data = $this->validator->validate($sample);
+
+		$this->assertSame('anna.muster@example.com', $data->persons[0]['person']->getEmail());
+		$this->assertNull($data->persons[1]['person']->getEmail());
+	}
+
 	public function testGroupsHaveNoResponsibleUser(): void {
 		$sample = self::sample();
 		$sample['groups'][0]['responsible'] = 'alice';
@@ -218,9 +235,9 @@ final class ImportValidatorTest extends TestCase {
 
 	public function testRefusesNewerVersionsWithAHint(): void {
 		$sample = self::sample();
-		$sample['version'] = 3;
+		$sample['version'] = 4;
 		$this->expectException(ValidationException::class);
-		$this->expectExceptionMessage('format version 3, but this version of Laudatio only reads up to version 2');
+		$this->expectExceptionMessage('format version 4, but this version of Laudatio only reads up to version 3');
 		$this->validator->validate($sample);
 	}
 
@@ -281,6 +298,8 @@ final class ImportValidatorTest extends TestCase {
 			'person without name' => [$set(['persons', 1, 'firstName'], null), 'Person 2 "Beispiel": The value of "firstName" is missing or invalid.'],
 			'date of birth' => [$set(['persons', 0, 'dateOfBirth'], '1986-13-01'), $person . 'The date of birth must be a valid date (YYYY-MM-DD).'],
 			'phone' => [$set(['persons', 0, 'otherPhone'], 'call me'), $person . 'Additional phone number may only contain digits'],
+			'email' => [$set(['persons', 0, 'email'], 'anna.muster@'), $person . 'The email address is not valid.'],
+			'email no text' => [$set(['persons', 0, 'email'], ['anna.muster@example.com']), $person . 'The value of "email" is missing or invalid.'],
 			'notes no text' => [$set(['persons', 0, 'notes'], 5), $person . 'The value of "notes" is missing or invalid.'],
 			'terms missing' => [$set(['persons', 0, 'terms'], null), $person . 'The value of "terms" is missing or invalid.'],
 			'unknown function' => [$set(['persons', 0, 'terms', 0, 'functionId'], 99), $person . 'A term refers to a function that is not in the file.'],

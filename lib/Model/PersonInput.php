@@ -25,6 +25,7 @@ final class PersonInput {
 		public readonly ?string $country = null,
 		public readonly ?string $mobilePhone = null,
 		public readonly ?string $otherPhone = null,
+		public readonly ?string $email = null,
 	) {
 	}
 }

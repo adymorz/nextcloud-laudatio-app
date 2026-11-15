@@ -136,6 +136,7 @@ class ImportValidator {
 			$this->optionalString($entry, 'country'),
 			$this->optionalString($entry, 'mobilePhone'),
 			$this->optionalString($entry, 'otherPhone'),
+			$this->optionalString($entry, 'email'),
 		));
 
 		$terms = [];

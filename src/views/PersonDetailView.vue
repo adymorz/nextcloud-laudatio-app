@@ -64,6 +64,14 @@ function telLink(number: string): string {
 }
 
 /**
+ * @param address Email address as entered
+ */
+function mailLink(address: string): string {
+	// The local part may contain characters with a meaning in mailto: links
+	return 'mailto:' + address.replace(/[%?#]/g, (char) => encodeURIComponent(char))
+}
+
+/**
  * Loads the person (and, for managers, the groups for the term dialog).
  */
 async function load() {
@@ -212,6 +220,12 @@ watch(() => props.id, load, { immediate: true })
 					<dt>{{ phone.label }}</dt>
 					<dd>
 						<a class="profile__link" :href="telLink(phone.number)">{{ phone.number }}</a>
+					</dd>
+				</template>
+				<template v-if="person.email">
+					<dt>{{ t('laudatio', 'Email') }}</dt>
+					<dd>
+						<a class="profile__link" :href="mailLink(person.email)">{{ person.email }}</a>
 					</dd>
 				</template>
 				<dt>{{ t('laudatio', 'Notes') }}</dt>

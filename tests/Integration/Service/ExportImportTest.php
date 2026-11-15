@@ -57,7 +57,7 @@ final class ExportImportTest extends IntegrationTestCase {
 		$this->onTearDown(fn () => $this->groups->deleteFunction('admin', $treasurer->getId()));
 		$president = $this->groups->createFunction('admin', $group->getId(), 'President');
 		$this->onTearDown(fn () => $this->groups->deleteFunction('admin', $president->getId()));
-		$person = $this->persons->create('admin', new PersonInput('Test', $lastName, '1980-01-01', 'Some notes', city: 'Bern', mobilePhone: '+41 79 123 45 67'));
+		$person = $this->persons->create('admin', new PersonInput('Test', $lastName, '1980-01-01', 'Some notes', city: 'Bern', mobilePhone: '+41 79 123 45 67', email: 'test@example.com'));
 		$this->onTearDown(fn () => $this->persons->delete('admin', $person->getId()));
 		$this->persons->addSlice('admin', $person->getId(), new SliceInput($treasurer->getId(), '2015-01-01', '2018-12-31', 'Minutes 2014', 'Resignation letter', "Interim at first\nThen elected"));
 		$this->persons->addSlice('admin', $person->getId(), new SliceInput($treasurer->getId(), '2019-01-01'));
@@ -66,7 +66,8 @@ final class ExportImportTest extends IntegrationTestCase {
 		$this->onTearDown(fn () => $this->deleteCopies($groupName . $copySuffix, $lastName . $copySuffix));
 
 		$export = $this->exportOf($groupName, $lastName);
-		$this->assertSame(2, $export['version']);
+		$this->assertSame(3, $export['version']);
+		$this->assertSame('test@example.com', $export['persons'][0]['email']);
 		$this->assertCount(1, $export['groups']);
 		$this->assertCount(1, $export['persons']);
 		$this->assertCount(3, $export['persons'][0]['terms']);

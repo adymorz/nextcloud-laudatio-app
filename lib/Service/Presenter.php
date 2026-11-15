@@ -177,6 +177,7 @@ class Presenter {
 			'country' => $sensitive ? $person->getCountry() : null,
 			'mobilePhone' => $sensitive ? $person->getMobilePhone() : null,
 			'otherPhone' => $sensitive ? $person->getOtherPhone() : null,
+			'email' => $sensitive ? $person->getEmail() : null,
 			'sensitiveVisible' => $sensitive,
 			'currentFunctions' => array_map(fn (Slice $slice): array => $this->slice($slice, $viewer), array_values($current)),
 		];

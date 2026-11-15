@@ -279,6 +279,7 @@
                     "country",
                     "mobilePhone",
                     "otherPhone",
+                    "email",
                     "terms"
                 ],
                 "properties": {
@@ -320,6 +321,10 @@
                         "nullable": true
                     },
                     "otherPhone": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "email": {
                         "type": "string",
                         "nullable": true
                     },
@@ -578,6 +583,7 @@
                     "country",
                     "mobilePhone",
                     "otherPhone",
+                    "email",
                     "sensitiveVisible",
                     "currentFunctions"
                 ],
@@ -631,6 +637,10 @@
                         "type": "string",
                         "nullable": true
                     },
+                    "email": {
+                        "type": "string",
+                        "nullable": true
+                    },
                     "sensitiveVisible": {
                         "type": "boolean"
                     },
@@ -658,6 +668,7 @@
                     "country",
                     "mobilePhone",
                     "otherPhone",
+                    "email",
                     "sensitiveVisible",
                     "currentFunctions",
                     "slices"
@@ -709,6 +720,10 @@
                         "nullable": true
                     },
                     "otherPhone": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "email": {
                         "type": "string",
                         "nullable": true
                     },
@@ -3321,6 +3336,12 @@
                                         "nullable": true,
                                         "default": null,
                                         "description": "Additional phone number"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Email address"
                                     }
                                 }
                             }
@@ -3697,6 +3718,12 @@
                                         "nullable": true,
                                         "default": null,
                                         "description": "Additional phone number"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Email address"
                                     }
                                 }
                             }

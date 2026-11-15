@@ -40,6 +40,7 @@ const contact = reactive({
 	country: '',
 	mobilePhone: '',
 	otherPhone: '',
+	email: '',
 })
 type ContactField = keyof typeof contact
 const contactFields = Object.keys(contact) as ContactField[]
@@ -86,6 +87,7 @@ async function save() {
 		country: optional(contact.country),
 		mobilePhone: optional(contact.mobilePhone),
 		otherPhone: optional(contact.otherPhone),
+		email: optional(contact.email),
 	}
 	try {
 		const saved = props.person === null
@@ -135,10 +137,15 @@ async function save() {
 				type="tel"
 				:label="t('laudatio', 'Additional phone number')"
 				autocomplete="off" />
+			<NcTextField
+				v-model="contact.email"
+				type="email"
+				:label="t('laudatio', 'Email')"
+				autocomplete="off" />
 			<NcTextArea
 				v-model="notes"
 				:label="t('laudatio', 'Notes')"
-				:helper-text="t('laudatio', 'Date of birth, address, phone numbers and notes are only visible to managers and the responsible persons of the person\'s groups. Interested persons see the name, the functions and the day of the birthday.')"
+				:helper-text="t('laudatio', 'Date of birth, address, phone numbers, email address and notes are only visible to managers and the responsible persons of the person\'s groups. Interested persons see the name, the functions and the day of the birthday.')"
 				resize="vertical" />
 			<button type="submit" hidden />
 		</form>

@@ -13,7 +13,7 @@ Requires Nextcloud 34 or 35 (PHP 8.2 or newer). Available in English and German.
 
 ## Features
 
-- **Persons** with date of birth, address, phone numbers and notes, and their **functions** over time (e.g. "Treasurer" from 2021 to 2024, a *term*) in **groups** (e.g. "Board").
+- **Persons** with date of birth, address, phone numbers, email address and notes, and their **functions** over time (e.g. "Treasurer" from 2021 to 2024, a *term*) in **groups** (e.g. "Board").
 - **Birthdays and anniversaries** are generated automatically for the next 400 days, for every person who currently holds a function.
 - **Yearly gifts**: functions can be marked "One gift per year", so the responsible person is reminded to present one gift per calendar year to everybody holding them.
 - **Calendar**: everybody involved in a group gets a read-only calendar "Birthdays & anniversaries" in the Calendar app and on CalDAV devices, with a reminder before each event (yearly gifts have no fixed day and are not in the calendar).
@@ -75,7 +75,7 @@ Then the administrator imports the file in the app and sets the admin settings a
 
 Laudatio stores personal data of people who usually have no Nextcloud account. What you should know as the organization responsible for that data:
 
-- **What is stored**: first and last name, date of birth, address, phone numbers and free-text notes per person; their terms (function, group, start and end date with their sources, free-text notes); the generated events with their "congratulated" marks; who was already notified about which event; and the audit log (IDs and field names only).
+- **What is stored**: first and last name, date of birth, address, phone numbers, email address and free-text notes per person; their terms (function, group, start and end date with their sources, free-text notes); the generated events with their "congratulated" marks; who was already notified about which event; and the audit log (IDs and field names only).
 - **Where**: only in the app's own tables of your Nextcloud database (`laudatio_*`). Nothing is sent to any other server.
 - **Who sees what**: see [Roles](#roles). Date of birth, contact data, notes and the sources of term dates are shown to managers and the responsible persons only, in the app and in its API.
 - **Where data leaves the database**: Nextcloud notifications hold only the event ID and render the title when shown. Reminder emails carry the title (name, age or years of service, function) and the date. The CalDAV calendar carries the title and the date to the devices of the responsible and interested users. The printed data sheet carries everything but the notes of the person: it includes the terms the printing user may see, with their sources and notes (managers all terms, responsible persons those in their groups). Interested users never get the age. An export carries all persons with their dates of birth, contact data and notes as an unencrypted file to the device of the manager who downloads it; storing that file safely is up to you.
@@ -213,8 +213,8 @@ The export is a JSON file, written by `ExportService` and read by `ImportValidat
 ```json
 {
 	"format": "laudatio-export",
-	"version": 2,
-	"exportedAt": "2026-10-30",
+	"version": 3,
+	"exportedAt": "2026-11-15",
 	"groups": [
 		{
 			"name": "Board",
@@ -237,6 +237,7 @@ The export is a JSON file, written by `ExportService` and read by `ImportValidat
 			"country": null,
 			"mobilePhone": null,
 			"otherPhone": null,
+			"email": "anna.muster@example.com",
 			"terms": [
 				{
 					"functionId": 3,

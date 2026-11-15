@@ -24,6 +24,7 @@ use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\TTransactional;
 use OCP\IDBConnection;
 use OCP\IL10N;
+use OCP\Mail\IEmailValidator;
 
 /**
  * Persons and their terms. Every change is written to the audit log and
@@ -51,6 +52,7 @@ class PersonService {
 		private RecipientService $recipients,
 		private AccessService $access,
 		private Clock $clock,
+		private IEmailValidator $emailValidator,
 		private IDBConnection $db,
 		private IL10N $l10n,
 	) {
@@ -287,6 +289,7 @@ class PersonService {
 		$country = $this->optionalText($input->country, self::MAX_TEXT_LENGTH, $this->l10n->t('Country'));
 		$mobilePhone = $this->phone($input->mobilePhone, $this->l10n->t('Mobile phone'));
 		$otherPhone = $this->phone($input->otherPhone, $this->l10n->t('Additional phone number'));
+		$email = $this->email($input->email);
 
 		// Entity setters ignore unchanged values, dates are objects and need a comparison
 		$person->setFirstName($firstName);
@@ -302,6 +305,7 @@ class PersonService {
 		$person->setCountry($country);
 		$person->setMobilePhone($mobilePhone);
 		$person->setOtherPhone($otherPhone);
+		$person->setEmail($email);
 	}
 
 	/**
@@ -363,6 +367,20 @@ class PersonService {
 	}
 
 	/**
+	 * Checks the address with the rules Nextcloud applies to the email
+	 * addresses of accounts.
+	 *
+	 * @throws ValidationException when the address is too long or invalid
+	 */
+	private function email(?string $value): ?string {
+		$value = $this->optionalText($value, self::MAX_TEXT_LENGTH, $this->l10n->t('Email'));
+		if ($value !== null && !$this->emailValidator->isValid($value)) {
+			throw new ValidationException($this->l10n->t('The email address is not valid.'));
+		}
+		return $value;
+	}
+
+	/**
 	 * Names of the updated fields in database notation.
 	 *
 	 * @return list<string>
@@ -380,6 +398,7 @@ class PersonService {
 			'country' => 'country',
 			'mobilePhone' => 'mobile_phone',
 			'otherPhone' => 'other_phone',
+			'email' => 'email',
 		];
 		$fields = [];
 		foreach (array_keys($person->getUpdatedFields()) as $property) {

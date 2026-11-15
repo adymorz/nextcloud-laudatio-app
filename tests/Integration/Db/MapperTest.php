@@ -63,12 +63,14 @@ final class MapperTest extends IntegrationTestCase {
 		$person->setStreet('Bahnhofstrasse');
 		$person->setPostalCode('8001');
 		$person->setMobilePhone('+41 79 123 45 67');
+		$person->setEmail('anna.muster@example.com');
 		$this->persons->update($person);
 		$loaded = $this->persons->find($person->getId());
 		$this->assertSame('Bahnhofstrasse', $loaded->getStreet());
 		$this->assertSame('8001', $loaded->getPostalCode());
 		$this->assertSame('+41 79 123 45 67', $loaded->getMobilePhone());
 		$this->assertNull($loaded->getOtherPhone());
+		$this->assertSame('anna.muster@example.com', $loaded->getEmail());
 	}
 
 	public function testCurrentMembersOfGroups(): void {

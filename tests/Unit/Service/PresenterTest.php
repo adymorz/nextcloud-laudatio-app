@@ -76,11 +76,12 @@ final class PresenterTest extends TestCase {
 		$this->assertSame('1986-11-01', $forAlice['dateOfBirth']);
 		$this->assertSame('Prefers flowers.', $forAlice['notes']);
 		$this->assertSame('+41 79 123 45 67', $forAlice['mobilePhone']);
+		$this->assertSame('anna.muster@example.com', $forAlice['email']);
 
 		$forBob = $this->presenter->person($person, [], 'bob');
 		$this->assertFalse($forBob['sensitiveVisible']);
 		$this->assertSame('Anna Muster', $forBob['displayName']);
-		foreach (['dateOfBirth', 'notes', 'street', 'streetNumber', 'postalCode', 'city', 'country', 'mobilePhone', 'otherPhone'] as $field) {
+		foreach (['dateOfBirth', 'notes', 'street', 'streetNumber', 'postalCode', 'city', 'country', 'mobilePhone', 'otherPhone', 'email'] as $field) {
 			$this->assertNull($forBob[$field], $field);
 		}
 	}
@@ -147,6 +148,7 @@ final class PresenterTest extends TestCase {
 		$person->setDateOfBirth(Dates::parse('1986-11-01') ?? throw new \LogicException());
 		$person->setNotes('Prefers flowers.');
 		$person->setMobilePhone('+41 79 123 45 67');
+		$person->setEmail('anna.muster@example.com');
 		return $person;
 	}
 
