@@ -26,13 +26,8 @@ cd "$(dirname "$0")/.."
 version=$(sed -n 's:.*<version>\(.*\)</version>.*:\1:p' appinfo/info.xml)
 [ -n "$version" ] || fail "No version found in appinfo/info.xml."
 
-# The App Store takes the release notes from this heading; pre-releases from "Unreleased"
-case $version in
-	*-*) heading='## [Unreleased]' ;;
-	*) heading="## $version" ;;
-esac
-awk -v h="$heading" '$0 == h || index($0, h " ") == 1 { found = 1 } END { exit !found }' CHANGELOG.md \
-	|| fail "CHANGELOG.md has no heading \"$heading\" (e.g. \"$heading – $(date +%Y-%m-%d)\")."
+# The App Store needs release notes for the version in CHANGELOG.md
+scripts/release-notes.sh > /dev/null
 
 [ -f js/laudatio-main.mjs ] || fail "The frontend is not built, run 'npm run build' first."
 

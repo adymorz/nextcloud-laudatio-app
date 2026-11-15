@@ -15,6 +15,7 @@ path = [
 	"openapi.json",
 	"tsconfig.json",
 	".nvmrc",
+	".npmrc",
 	".gitignore",
 	".gitattributes",
 	"l10n/**",

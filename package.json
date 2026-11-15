@@ -22,6 +22,8 @@
     "stylelint": "stylelint 'src/**/*.vue' 'src/**/*.scss' 'src/**/*.css'",
     "typecheck": "vue-tsc --noEmit",
     "typescript:generate": "openapi-typescript openapi.json -o src/types/openapi.ts",
+    "version": "node scripts/version.mjs sync",
+    "version:check": "node scripts/version.mjs check",
     "watch": "vite --mode development build --watch"
   },
   "browserslist": [
