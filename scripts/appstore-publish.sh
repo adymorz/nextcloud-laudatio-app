@@ -6,6 +6,10 @@
 # GitHub release of the tag v<version> on the public mirror, then registers the
 # release in the Nextcloud App Store, which downloads it from there.
 #
+# The mirror may have immutable releases enabled: a published release then takes
+# no more assets and its tag can never get another release. So the release is
+# created as a draft and only published once the archive is attached.
+#
 #   GITHUB_TOKEN       fine-grained token with "Contents: read and write" on the mirror
 #   APPSTORE_TOKEN     API token from https://apps.nextcloud.com/account/token
 #   GITHUB_REPOSITORY  owner/name of the mirror (default: adymorz/nextcloud-laudatio-app)
@@ -40,7 +44,7 @@ esac
 notes=$(scripts/release-notes.sh)
 
 release=$(jq -n --arg tag "$tag" --arg body "$notes" --argjson prerelease "$prerelease" \
-	'{tag_name: $tag, name: $tag, body: ($body | sub("^\\s+"; "") | sub("\\s+$"; "")), prerelease: $prerelease}')
+	'{tag_name: $tag, name: $tag, body: ($body | sub("^\\s+"; "") | sub("\\s+$"; "")), prerelease: $prerelease, draft: true}')
 appstore=$(jq -n --arg download "https://github.com/$repo/releases/download/$tag/$name" --arg signature "$(cat "$archive.sig")" \
 	'{download: $download, signature: $signature, nightly: false}')
 
@@ -76,19 +80,28 @@ while :; do
 	sleep 30
 done
 
-existing=$(github "$api/releases/tags/$tag" 2>/dev/null) || existing=
-if [ -n "$existing" ]; then
-	id=$(echo "$existing" | jq -r .id)
+# A draft left by an earlier run is reused. The lookup by tag ignores drafts, the list has them.
+releases=$(github "$api/releases?per_page=100")
+existing=$(echo "$releases" | jq --arg tag "$tag" 'map(select(.tag_name == $tag)) | .[0] // empty')
+[ -n "$existing" ] || existing=$(echo "$release" | github -X POST --data @- "$api/releases")
+id=$(echo "$existing" | jq -r .id)
+
+if [ "$(echo "$existing" | jq .draft)" = true ]; then
 	# Replace an archive from an earlier run, the App Store gets the signature of this one
 	for asset in $(echo "$existing" | jq -r --arg name "$name" '.assets[] | select(.name == $name) | .id'); do
 		github -X DELETE "$api/releases/assets/$asset"
 	done
+	github -X POST -H 'Content-Type: application/gzip' --data-binary "@$archive" \
+		"https://uploads.github.com/repos/$repo/releases/$id/assets?name=$name" > /dev/null
+	github -X PATCH --data '{"draft": false}' "$api/releases/$id" > /dev/null
+	echo "Published https://github.com/$repo/releases/tag/$tag with $name"
 else
-	id=$(echo "$release" | github -X POST --data @- "$api/releases" | jq -r .id)
+	# Published by an earlier run that failed at the App Store: go on if it has this very archive
+	digest=$(echo "$existing" | jq -r --arg name "$name" '.assets[] | select(.name == $name) | .digest')
+	[ "$digest" = "sha256:$(sha256sum "$archive" | cut -d ' ' -f 1)" ] \
+		|| fail "The release $tag in $repo is already published without this archive. Delete it on GitHub and run this job again; if it is immutable, its tag cannot be released again, release a new version instead."
+	echo "https://github.com/$repo/releases/tag/$tag is already published with $name"
 fi
-github -X POST -H 'Content-Type: application/gzip' --data-binary "@$archive" \
-	"https://uploads.github.com/repos/$repo/releases/$id/assets?name=$name" > /dev/null
-echo "Attached $name to https://github.com/$repo/releases/tag/$tag"
 
 response=$(mktemp)
 status=$(echo "$appstore" | curl -sS -o "$response" -w '%{http_code}' -X POST \
