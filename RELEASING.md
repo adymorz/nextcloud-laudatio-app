@@ -5,16 +5,28 @@
 
 # Releasing
 
-Releases go to the [Nextcloud App Store](https://apps.nextcloud.com/apps/laudatio) through the GitLab CI pipeline of a version tag. The release archives are attached to the GitHub releases of the mirror, from where the App Store and every Nextcloud server download them.
+Releases go to the [Nextcloud App Store](https://apps.nextcloud.com/apps/laudatio) through the GitLab CI pipeline of a version tag `vX.Y.Z`. The release archives are attached to the GitHub releases of the mirror, from where the App Store and every Nextcloud server download them. The pipeline also creates a release in GitLab.
 
 ## For each release
 
-1. Set the new version in [appinfo/info.xml](appinfo/info.xml) and `package.json`.
+1. Set the new version with `ddev npm version X.Y.Z`. It writes the version to `package.json`, `package-lock.json` and [appinfo/info.xml](appinfo/info.xml), but doesn't commit or tag (see [.npmrc](.npmrc)).
 2. In [CHANGELOG.md](CHANGELOG.md), rename `## [Unreleased]` to `## X.Y.Z – YYYY-MM-DD` and add a new empty `## [Unreleased]` above it. The App Store only finds headings that start with the plain version (no brackets). Pre-releases (`X.Y.Z-beta.1`) take their notes from `## [Unreleased]`.
 3. Retake the screenshots in `screenshots/` if the UI changed; the App Store loads them from the `main` branch of the mirror.
-4. Merge to `main`, then tag and push: `git tag vX.Y.Z && git push origin vX.Y.Z`.
+4. Merge to `main`, then tag the merged commit on `main` and push: `git switch main && git pull && git tag vX.Y.Z && git push origin vX.Y.Z`.
 
-After all checks pass, `release:package` builds the archive and signs both the code (`appinfo/signature.json`) and the archive ([scripts/appstore-package.sh](scripts/appstore-package.sh)). `release:publish` then attaches it to the GitHub release and registers it in the App Store ([scripts/appstore-publish.sh](scripts/appstore-publish.sh)). The pipeline fails if the tag, the version in info.xml and the changelog heading don't match.
+Before tagging, `ddev npm run version:check -- vX.Y.Z` checks the versions against the tag and `ddev exec scripts/release-notes.sh` prints the release notes.
+
+## What the pipeline checks and does
+
+`lint:version` runs in every pipeline and fails if the versions in `appinfo/info.xml`, `package.json` and `package-lock.json` differ ([scripts/version.mjs](scripts/version.mjs)). In the pipeline of a tag, it also fails if:
+
+- the tag is not exactly `v` followed by that version, e.g. `0.4.0` or `v0.4` for version 0.4.0;
+- the tagged commit is not on `main`;
+- CHANGELOG.md has no heading for the version ([scripts/release-notes.sh](scripts/release-notes.sh)).
+
+After all checks pass, `release:package` builds the archive and signs both the code (`appinfo/signature.json`) and the archive ([scripts/appstore-package.sh](scripts/appstore-package.sh)). `release:publish` then attaches it to the GitHub release and registers it in the App Store ([scripts/appstore-publish.sh](scripts/appstore-publish.sh)). Last, `release:gitlab` creates the GitLab release with the same notes and a link to the archive on GitHub.
+
+If the pipeline of a tag fails before `release:publish`, delete the tag, fix the cause on `main` and tag again: `git tag -d vX.Y.Z && git push origin :refs/tags/vX.Y.Z`. Deleting a protected tag needs the Maintainer role. If only `release:publish` or `release:gitlab` failed, retry the job instead; `release:publish` can run again safely.
 
 To try the packaging locally, run `ddev npm run build` and then `ddev exec scripts/appstore-package.sh`, which builds the unsigned archive in `build/appstore/`.
 

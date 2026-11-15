@@ -145,6 +145,7 @@ To get some data to work with, run `ddev occ laudatio:demo-data`. It creates two
 | `ddev occ laudatio:sync` | Generate events and send due reminders now (otherwise hourly) |
 | `ddev occ laudatio:demo-data` | Create demo data on an empty app (`--force` adds it to existing data) |
 | `ddev occ laudatio:purge` | Delete all data of the app, then `ddev occ app:enable laudatio` starts over |
+| `ddev npm version X.Y.Z` | Set the app version in `appinfo/info.xml`, `package.json` and `package-lock.json`, see [RELEASING.md](RELEASING.md) |
 | `ddev exec scripts/appstore-package.sh` | Build the unsigned App Store archive in `build/appstore/` (after `ddev npm run build`), see [RELEASING.md](RELEASING.md) |
 | `ddev exec node scripts/screenshots.mjs` | Retake the App Store screenshots with headless Chromium, see the preparation in [scripts/screenshots.mjs](scripts/screenshots.mjs) |
 | `ddev occ <command>` | Run Nextcloud's `occ`, e.g. `ddev occ app:list` |

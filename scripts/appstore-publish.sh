@@ -34,14 +34,10 @@ archive="build/appstore/$name"
 	|| fail "$archive or its signature is missing, run scripts/appstore-package.sh with the signing key first."
 
 case $version in
-	*-*) heading='## [Unreleased]' prerelease=true ;;
-	*) heading="## $version" prerelease=false ;;
+	*-*) prerelease=true ;;
+	*) prerelease=false ;;
 esac
-notes=$(awk -v h="$heading" '
-	found && /^## / { exit }
-	found { print }
-	$0 == h || index($0, h " ") == 1 { found = 1 }
-' CHANGELOG.md)
+notes=$(scripts/release-notes.sh)
 
 release=$(jq -n --arg tag "$tag" --arg body "$notes" --argjson prerelease "$prerelease" \
 	'{tag_name: $tag, name: $tag, body: ($body | sub("^\\s+"; "") | sub("\\s+$"; "")), prerelease: $prerelease}')
