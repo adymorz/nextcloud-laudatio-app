@@ -16,7 +16,6 @@ import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { api, errorMessage, isNotFound } from '../api'
 import LoadError from '../components/LoadError.vue'
-import SliceDetails from '../components/SliceDetails.vue'
 import { formatDate, toIsoDate } from '../dates'
 import { me } from '../store'
 
@@ -150,22 +149,20 @@ watch(() => props.id, load, { immediate: true })
 			<table v-if="slices.length > 0" class="sheet__table">
 				<thead>
 					<tr>
-						<th>{{ t('laudatio', 'Function') }}</th>
-						<th>{{ t('laudatio', 'Group') }}</th>
-						<th>{{ t('laudatio', 'Start date') }}</th>
-						<th>{{ t('laudatio', 'End date') }}</th>
+						<th>{{ t('laudatio', 'Function') }}<br>{{ t('laudatio', 'Group') }}</th>
+						<th>{{ t('laudatio', 'Start date') }}<br>{{ t('laudatio', 'Source') }}</th>
+						<th>{{ t('laudatio', 'End date') }}<br>{{ t('laudatio', 'Source') }}</th>
 					</tr>
 				</thead>
 				<tbody v-for="slice in slices" :key="slice.id">
 					<tr>
-						<td>{{ slice.functionName }}</td>
-						<td>{{ slice.groupName }}</td>
-						<td>{{ formatDate(slice.startDate) }}</td>
-						<td>{{ slice.endDate ? formatDate(slice.endDate) : '' }}</td>
+						<td>{{ slice.functionName }}<br>{{ slice.groupName }}</td>
+						<td>{{ formatDate(slice.startDate) }}<br>{{ slice.startDateSource }}</td>
+						<td>{{ slice.endDate ? formatDate(slice.endDate) : '' }}<br>{{ slice.endDateSource }}</td>
 					</tr>
-					<tr v-if="slice.startDateSource || slice.endDateSource || slice.notes">
-						<td colspan="4">
-							<SliceDetails :slice="slice" />
+					<tr v-if="slice.notes">
+						<td colspan="3" class="sheet__notes">
+							<span class="sheet__label">{{ t('laudatio', 'Notes') }}:</span> {{ slice.notes }}
 						</td>
 					</tr>
 				</tbody>
@@ -253,6 +250,14 @@ watch(() => props.id, load, { immediate: true })
 .sheet__table tbody th {
 	width: 30%;
 	font-weight: normal;
+}
+
+.sheet__notes {
+	white-space: pre-wrap;
+}
+
+.sheet__label {
+	color: var(--color-text-maxcontrast);
 }
 
 .sheet__blank {
