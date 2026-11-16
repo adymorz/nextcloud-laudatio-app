@@ -34,14 +34,7 @@ class AdminForm implements IDeclarativeSettingsFormWithHandlers {
 
 	#[\Override]
 	public function getSchema(): array {
-		$groupOptions = [['name' => $this->l10n->t('Administrators only'), 'value' => '']];
-		$groups = $this->groupManager->search('');
-		usort($groups, static fn (IGroup $a, IGroup $b): int => strcasecmp($a->getDisplayName(), $b->getDisplayName()));
-		foreach ($groups as $group) {
-			if ($group->getGID() !== 'admin') {
-				$groupOptions[] = ['name' => $group->getDisplayName(), 'value' => $group->getGID()];
-			}
-		}
+		$adminsOnly = $this->l10n->t('Administrators only');
 
 		return [
 			'id' => 'laudatio-admin',
@@ -57,8 +50,10 @@ class AdminForm implements IDeclarativeSettingsFormWithHandlers {
 					'title' => $this->l10n->t('Managers'),
 					'description' => $this->l10n->t('Members of this group can see and edit all persons, groups and functions, in addition to administrators.'),
 					'type' => DeclarativeSettingsTypes::SELECT,
-					'options' => $groupOptions,
-					'default' => '',
+					'options' => array_column($this->getManagerGroupOptions(), 'label'),
+					// Shown when the selection is cleared, which is saved as administrators only
+					'placeholder' => $adminsOnly,
+					'default' => $adminsOnly,
 				],
 				[
 					'id' => SettingsService::JUBILEE_YEARS,
@@ -127,7 +122,7 @@ class AdminForm implements IDeclarativeSettingsFormWithHandlers {
 	#[\Override]
 	public function getValue(string $fieldId, IUser $user): mixed {
 		return match ($fieldId) {
-			SettingsService::MANAGER_GROUP => $this->settings->getManagerGroup(),
+			SettingsService::MANAGER_GROUP => $this->getManagerGroupLabel($this->settings->getManagerGroup()),
 			SettingsService::JUBILEE_YEARS => SettingsService::formatJubileeYears($this->settings->getJubileeYears()),
 			SettingsService::LEAD_TIME_DAYS => $this->settings->getLeadTimeDays(),
 			SettingsService::BIRTHDAY_EVENTS => $this->settings->isBirthdayEventsEnabled(),
@@ -147,11 +142,7 @@ class AdminForm implements IDeclarativeSettingsFormWithHandlers {
 	public function setValue(string $fieldId, mixed $value, IUser $user): void {
 		switch ($fieldId) {
 			case SettingsService::MANAGER_GROUP:
-				$groupId = is_string($value) ? $value : '';
-				if ($groupId !== '' && !$this->groupManager->groupExists($groupId)) {
-					throw new ValidationException($this->l10n->t('The group does not exist.'));
-				}
-				$this->settings->setManagerGroup($groupId);
+				$this->settings->setManagerGroup($this->getManagerGroupId($value));
 				return;
 			case SettingsService::JUBILEE_YEARS:
 				$this->settings->setJubileeYears(is_scalar($value) ? (string)$value : '');
@@ -179,6 +170,60 @@ class AdminForm implements IDeclarativeSettingsFormWithHandlers {
 				$this->settings->setSheetNote(is_string($value) ? $value : '');
 				return;
 		}
+	}
+
+	/**
+	 * Options of the manager group field. The select field of the declarative
+	 * settings shows, sets and saves its options as plain strings, so each
+	 * option is a unique label that is mapped to its group ID. A display name
+	 * that is not unique gets the group ID appended.
+	 *
+	 * @return list<array{label: string, groupId: string}>
+	 */
+	private function getManagerGroupOptions(): array {
+		$adminsOnly = $this->l10n->t('Administrators only');
+		$groups = array_values(array_filter(
+			$this->groupManager->search(''),
+			static fn (IGroup $group): bool => $group->getGID() !== 'admin',
+		));
+		usort($groups, static fn (IGroup $a, IGroup $b): int => strcasecmp($a->getDisplayName(), $b->getDisplayName()) ?: strcmp($a->getGID(), $b->getGID()));
+		$nameCounts = array_count_values([$adminsOnly, ...array_map(static fn (IGroup $group): string => $group->getDisplayName(), $groups)]);
+
+		$options = [['label' => $adminsOnly, 'groupId' => '']];
+		foreach ($groups as $group) {
+			$name = $group->getDisplayName();
+			$options[] = [
+				'label' => $nameCounts[$name] > 1 ? $name . ' (' . $group->getGID() . ')' : $name,
+				'groupId' => $group->getGID(),
+			];
+		}
+		return $options;
+	}
+
+	private function getManagerGroupLabel(string $groupId): string {
+		foreach ($this->getManagerGroupOptions() as $option) {
+			if ($option['groupId'] === $groupId) {
+				return $option['label'];
+			}
+		}
+		// A group that no longer exists keeps showing its ID
+		return $groupId;
+	}
+
+	/**
+	 * @throws ValidationException
+	 */
+	private function getManagerGroupId(mixed $label): string {
+		// Clearing the selection sends null
+		if ($label === null || $label === '') {
+			return '';
+		}
+		foreach ($this->getManagerGroupOptions() as $option) {
+			if ($option['label'] === $label) {
+				return $option['groupId'];
+			}
+		}
+		throw new ValidationException($this->l10n->t('The group does not exist.'));
 	}
 
 	private function toBool(mixed $value): bool {
