@@ -24,6 +24,7 @@ import type {
 import axios, { isAxiosError } from '@nextcloud/axios'
 import { t } from '@nextcloud/l10n'
 import { generateOcsUrl } from '@nextcloud/router'
+import { PLAIN } from './l10n'
 
 interface OcsResponse<T> {
 	ocs: {
@@ -77,6 +78,7 @@ export const api = {
 
 	createFunction: (groupId: number, input: FunctionInput) => post<OrgFunction>(`/groups/${groupId}/functions`, input),
 	updateFunction: (id: number, input: FunctionInput) => put<OrgFunction>(`/functions/${id}`, input),
+	moveFunction: (id: number, groupId: number) => put<OrgFunction>(`/functions/${id}/group`, { groupId }),
 	deleteFunction: (id: number) => del(`/functions/${id}`),
 
 	events: (days: number) => get<LaudatioEvent[]>('/events', { days }),
@@ -113,7 +115,7 @@ export function isNotFound(error: unknown): boolean {
 
 /**
  * The message to show for a failed request: the (translated) message of the
- * server if there is one.
+ * server if there is one. Plain text, so use showErrorText() for toasts.
  *
  * @param error Error thrown by an API call
  */
@@ -125,5 +127,5 @@ export function errorMessage(error: unknown): string {
 			return message
 		}
 	}
-	return t('laudatio', 'Something went wrong. Please try again.')
+	return t('laudatio', 'Something went wrong. Please try again.', {}, PLAIN)
 }

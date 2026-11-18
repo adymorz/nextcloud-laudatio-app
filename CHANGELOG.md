@@ -10,6 +10,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Managers can move a function to another group with "Move to another group" on the groups page, e.g. after a reorganization; all its terms, also past ones, then belong to the new group
+
+### Changed
+
+- The responsible person gets no reminder for a birthday or anniversary that is already marked as congratulated, and an earlier reminder disappears once it is marked; interested persons still get it
+
+### Fixed
+
+- Names containing &, ' or " show correctly in dialogs, confirmations and the "congratulated by" and "presented by" lines of the upcoming events instead of as HTML codes
+- A user who loses a role in a group and gets it back, e.g. when the responsible person is changed back, is reminded of upcoming events again
+- Error messages show names containing < or >, e.g. from an import file, in full instead of cutting them off
+
 ## 0.4.1 – 2026-11-16
 
 ### Fixed

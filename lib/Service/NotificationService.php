@@ -26,7 +26,9 @@ use Psr\Log\LoggerInterface;
  * Sends one reminder per event and recipient when the event (for yearly gifts:
  * the due date) enters the lead time: a Nextcloud notification and, if the
  * user opted in, an email. Gifts that are already presented get no reminder,
- * disabled accounts get none at all. Notifications of past events are removed.
+ * nor does the responsible person for events that are already congratulated
+ * (interested users still get those for information); disabled accounts get
+ * none at all. Notifications of past events are removed.
  * Also tells the managers when a group lost its responsible person.
  */
 class NotificationService {
@@ -60,13 +62,18 @@ class NotificationService {
 		$until = Dates::addDays($today, $this->settings->getLeadTimeDays());
 		$sent = 0;
 		foreach ($this->eventMapper->findBetween($today, $until) as $event) {
-			if ($event->getType() === Event::TYPE_GIFT && $event->getGreetedAt() !== null) {
+			$greeted = $event->getGreetedAt() !== null;
+			if ($event->getType() === Event::TYPE_GIFT && $greeted) {
 				// Presented before the reminder was due
 				continue;
 			}
 			$alreadyNotified = $this->notifiedMapper->findUserIdsByEvent($event->getId());
 			foreach ($this->recipients->recipients($event) as $userId => $role) {
 				if (in_array($userId, $alreadyNotified, true)) {
+					continue;
+				}
+				if ($greeted && $role === RecipientService::ROLE_RESPONSIBLE) {
+					// Congratulated before the reminder was due
 					continue;
 				}
 				$user = $this->userManager->get($userId);

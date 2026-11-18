@@ -7,7 +7,6 @@
 import type { Person, PersonDetail } from '../types'
 
 import { mdiAccountMultiple, mdiMagnify, mdiPlus } from '@mdi/js'
-import { showError } from '@nextcloud/dialogs'
 import { t } from '@nextcloud/l10n'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
@@ -21,6 +20,7 @@ import LoadError from '../components/LoadError.vue'
 import PersonDialog from '../components/PersonDialog.vue'
 import { formatDate } from '../dates'
 import { me } from '../store'
+import { showErrorText } from '../toast'
 
 const router = useRouter()
 const persons = ref<Person[]>([])
@@ -50,7 +50,7 @@ async function load() {
 		persons.value = await api.persons()
 	} catch (error) {
 		loadError.value = errorMessage(error)
-		showError(loadError.value)
+		showErrorText(loadError.value)
 	} finally {
 		loading.value = false
 	}

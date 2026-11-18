@@ -7,7 +7,6 @@
 import type { PersonDetail } from '../types'
 
 import { mdiArrowLeft, mdiPrinter } from '@mdi/js'
-import { showError } from '@nextcloud/dialogs'
 import { t } from '@nextcloud/l10n'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
@@ -18,6 +17,7 @@ import { api, errorMessage, isNotFound } from '../api'
 import LoadError from '../components/LoadError.vue'
 import { formatDate, toIsoDate } from '../dates'
 import { me } from '../store'
+import { showErrorText } from '../toast'
 
 const props = defineProps<{
 	id: number
@@ -68,7 +68,7 @@ async function load() {
 		} else {
 			loadError.value = errorMessage(error)
 		}
-		showError(errorMessage(error))
+		showErrorText(errorMessage(error))
 	} finally {
 		loading.value = false
 	}

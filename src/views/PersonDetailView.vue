@@ -7,7 +7,7 @@
 import type { Group, PersonDetail, Slice } from '../types'
 
 import { mdiArrowLeft, mdiDelete, mdiFileDocumentOutline, mdiPencil, mdiPlus } from '@mdi/js'
-import { showConfirmation, showError } from '@nextcloud/dialogs'
+import { showConfirmation } from '@nextcloud/dialogs'
 import { n, t } from '@nextcloud/l10n'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActions from '@nextcloud/vue/components/NcActions'
@@ -23,7 +23,9 @@ import PersonDialog from '../components/PersonDialog.vue'
 import SliceDetails from '../components/SliceDetails.vue'
 import SliceDialog from '../components/SliceDialog.vue'
 import { age, daysUntil, formatDate } from '../dates'
+import { PLAIN } from '../l10n'
 import { me } from '../store'
+import { showErrorText } from '../toast'
 
 const props = defineProps<{
 	id: number
@@ -87,7 +89,7 @@ async function load() {
 		} else {
 			loadError.value = errorMessage(error)
 		}
-		showError(errorMessage(error))
+		showErrorText(errorMessage(error))
 	} finally {
 		loading.value = false
 	}
@@ -95,7 +97,7 @@ async function load() {
 		try {
 			groups.value = await api.groups()
 		} catch (error) {
-			showError(errorMessage(error))
+			showErrorText(errorMessage(error))
 		}
 	}
 }
@@ -124,7 +126,7 @@ async function deletePerson() {
 	}
 	const confirmed = await showConfirmation({
 		name: t('laudatio', 'Delete person'),
-		text: t('laudatio', 'Delete {name} with their function history and events? This cannot be undone.', { name: person.value.displayName }),
+		text: t('laudatio', 'Delete {name} with their function history and events? This cannot be undone.', { name: person.value.displayName }, PLAIN),
 		labelConfirm: t('laudatio', 'Delete'),
 		labelReject: t('laudatio', 'Cancel'),
 		severity: 'warning',
@@ -136,7 +138,7 @@ async function deletePerson() {
 		await api.deletePerson(person.value.id)
 		router.push({ name: 'persons' })
 	} catch (error) {
-		showError(errorMessage(error))
+		showErrorText(errorMessage(error))
 	}
 }
 
@@ -146,7 +148,7 @@ async function deletePerson() {
 async function deleteSlice(slice: Slice) {
 	const confirmed = await showConfirmation({
 		name: t('laudatio', 'Delete term'),
-		text: t('laudatio', 'Delete the term as "{function}" from {start}?', { function: slice.functionName, start: formatDate(slice.startDate) }),
+		text: t('laudatio', 'Delete the term as "{function}" from {start}?', { function: slice.functionName, start: formatDate(slice.startDate) }, PLAIN),
 		labelConfirm: t('laudatio', 'Delete'),
 		labelReject: t('laudatio', 'Cancel'),
 		severity: 'warning',
@@ -158,7 +160,7 @@ async function deleteSlice(slice: Slice) {
 		await api.deleteSlice(slice.id)
 		await load()
 	} catch (error) {
-		showError(errorMessage(error))
+		showErrorText(errorMessage(error))
 	}
 }
 
@@ -263,7 +265,7 @@ watch(() => props.id, load, { immediate: true })
 						</span>
 						<SliceDetails :slice="slice" />
 					</div>
-					<NcActions v-if="me.isManager" class="timeline__actions" :aria-label="t('laudatio', 'Actions for {name}', { name: slice.functionName })">
+					<NcActions v-if="me.isManager" class="timeline__actions" :aria-label="t('laudatio', 'Actions for {name}', { name: slice.functionName }, PLAIN)">
 						<NcActionButton close-after-click @click="openSlice(slice)">
 							<template #icon>
 								<NcIconSvgWrapper :path="mdiPencil" />

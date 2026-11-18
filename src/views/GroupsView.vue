@@ -6,8 +6,8 @@
 <script setup lang="ts">
 import type { Group, OrgFunction } from '../types'
 
-import { mdiAccountGroup, mdiAlert, mdiDelete, mdiGift, mdiPencil, mdiPlus } from '@mdi/js'
-import { showConfirmation, showError } from '@nextcloud/dialogs'
+import { mdiAccountGroup, mdiAlert, mdiDelete, mdiGift, mdiPencil, mdiPlus, mdiSwapHorizontal } from '@mdi/js'
+import { showConfirmation } from '@nextcloud/dialogs'
 import { t } from '@nextcloud/l10n'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActions from '@nextcloud/vue/components/NcActions'
@@ -21,7 +21,10 @@ import { api, errorMessage } from '../api'
 import FunctionDialog from '../components/FunctionDialog.vue'
 import GroupDialog from '../components/GroupDialog.vue'
 import LoadError from '../components/LoadError.vue'
+import MoveFunctionDialog from '../components/MoveFunctionDialog.vue'
+import { PLAIN } from '../l10n'
 import { me } from '../store'
+import { showErrorText } from '../toast'
 
 const groups = ref<Group[]>([])
 const loading = ref(true)
@@ -31,6 +34,8 @@ const editedGroup = ref<Group | null>(null)
 const functionDialogOpen = ref(false)
 const functionGroup = ref<Group | null>(null)
 const editedFunction = ref<OrgFunction | null>(null)
+const moveDialogOpen = ref(false)
+const movedFunction = ref<OrgFunction | null>(null)
 
 const roleLabels: Record<Group['role'], string> = {
 	manager: t('laudatio', 'Manager'),
@@ -52,7 +57,7 @@ async function load() {
 		groups.value = await api.groups()
 	} catch (error) {
 		loadError.value = errorMessage(error)
-		showError(loadError.value)
+		showErrorText(loadError.value)
 	} finally {
 		loading.value = false
 	}
@@ -72,7 +77,7 @@ function openGroup(group: Group | null) {
 async function deleteGroup(group: Group) {
 	const confirmed = await showConfirmation({
 		name: t('laudatio', 'Delete group'),
-		text: t('laudatio', 'Delete the group "{name}"?', { name: group.name }),
+		text: t('laudatio', 'Delete the group "{name}"?', { name: group.name }, PLAIN),
 		labelConfirm: t('laudatio', 'Delete'),
 		labelReject: t('laudatio', 'Cancel'),
 		severity: 'warning',
@@ -93,12 +98,22 @@ function openFunction(group: Group, fn: OrgFunction | null) {
 }
 
 /**
+ * @param group Current group of the function
+ * @param fn Function to move to another group
+ */
+function openMove(group: Group, fn: OrgFunction) {
+	functionGroup.value = group
+	movedFunction.value = fn
+	moveDialogOpen.value = true
+}
+
+/**
  * @param fn The function
  */
 async function deleteFunction(fn: OrgFunction) {
 	const confirmed = await showConfirmation({
 		name: t('laudatio', 'Delete function'),
-		text: t('laudatio', 'Delete the function "{name}"?', { name: fn.name }),
+		text: t('laudatio', 'Delete the function "{name}"?', { name: fn.name }, PLAIN),
 		labelConfirm: t('laudatio', 'Delete'),
 		labelReject: t('laudatio', 'Cancel'),
 		severity: 'warning',
@@ -118,7 +133,7 @@ async function run(change: () => Promise<unknown>) {
 		await change()
 		await load()
 	} catch (error) {
-		showError(errorMessage(error))
+		showErrorText(errorMessage(error))
 	}
 }
 
@@ -151,7 +166,7 @@ onMounted(load)
 			<div class="group__header">
 				<h3>{{ group.name }}</h3>
 				<span class="group__role">{{ roleLabels[group.role] }}</span>
-				<NcActions v-if="me.isManager" :aria-label="t('laudatio', 'Actions for {name}', { name: group.name })">
+				<NcActions v-if="me.isManager" :aria-label="t('laudatio', 'Actions for {name}', { name: group.name }, PLAIN)">
 					<NcActionButton close-after-click @click="openGroup(group)">
 						<template #icon>
 							<NcIconSvgWrapper :path="mdiPencil" />
@@ -213,12 +228,18 @@ onMounted(load)
 								:size="16"
 								:name="t('laudatio', 'One gift per year')"
 								:title="t('laudatio', 'One gift per year')" />
-							<NcActions v-if="me.isManager" :aria-label="t('laudatio', 'Actions for {name}', { name: fn.name })">
+							<NcActions v-if="me.isManager" :aria-label="t('laudatio', 'Actions for {name}', { name: fn.name }, PLAIN)">
 								<NcActionButton close-after-click @click="openFunction(group, fn)">
 									<template #icon>
 										<NcIconSvgWrapper :path="mdiPencil" />
 									</template>
 									{{ t('laudatio', 'Edit') }}
+								</NcActionButton>
+								<NcActionButton v-if="groups.length > 1" close-after-click @click="openMove(group, fn)">
+									<template #icon>
+										<NcIconSvgWrapper :path="mdiSwapHorizontal" />
+									</template>
+									{{ t('laudatio', 'Move to another group') }}
 								</NcActionButton>
 								<NcActionButton close-after-click @click="deleteFunction(fn)">
 									<template #icon>
@@ -239,6 +260,13 @@ onMounted(load)
 			v-model:open="functionDialogOpen"
 			:group="functionGroup"
 			:org-function="editedFunction"
+			@saved="load" />
+		<MoveFunctionDialog
+			v-if="functionGroup && movedFunction"
+			v-model:open="moveDialogOpen"
+			:group="functionGroup"
+			:org-function="movedFunction"
+			:groups="groups"
 			@saved="load" />
 	</div>
 </template>

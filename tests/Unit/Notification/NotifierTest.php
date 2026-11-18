@@ -13,6 +13,7 @@ use OCA\Laudatio\Db\Event;
 use OCA\Laudatio\Db\EventMapper;
 use OCA\Laudatio\Db\Group;
 use OCA\Laudatio\Db\GroupMapper;
+use OCA\Laudatio\Db\NotifiedMapper;
 use OCA\Laudatio\Notification\Notifier;
 use OCA\Laudatio\Service\Dates;
 use OCA\Laudatio\Service\NotificationService;
@@ -32,6 +33,7 @@ use PHPUnit\Framework\TestCase;
 final class NotifierTest extends TestCase {
 	private EventMapper&MockObject $eventMapper;
 	private GroupMapper&MockObject $groupMapper;
+	private NotifiedMapper&MockObject $notifiedMapper;
 	private RecipientService&MockObject $recipients;
 	private Notifier $notifier;
 
@@ -43,6 +45,7 @@ final class NotifierTest extends TestCase {
 		$factory->method('get')->willReturn($l10n);
 		$this->eventMapper = $this->createMock(EventMapper::class);
 		$this->groupMapper = $this->createMock(GroupMapper::class);
+		$this->notifiedMapper = $this->createMock(NotifiedMapper::class);
 		$this->recipients = $this->createMock(RecipientService::class);
 		$titles = $this->createMock(TitleBuilder::class);
 		$titles->method('build')->willReturnCallback(static fn (Event $e, ?string $role): string => ($e->getType() === Event::TYPE_GIFT ? 'Yearly gift for Anna Muster (Treasurer)' : '40th birthday of Anna Muster') . ($role === 'interested' ? ' (for information)' : ''));
@@ -52,7 +55,7 @@ final class NotifierTest extends TestCase {
 		$urls->method('linkToRouteAbsolute')->willReturn('https://cloud.example/apps/laudatio/');
 		$urls->method('getAbsoluteURL')->willReturnArgument(0);
 
-		$this->notifier = new Notifier($factory, $this->eventMapper, $this->groupMapper, $this->recipients, $titles, $formatter, $urls);
+		$this->notifier = new Notifier($factory, $this->eventMapper, $this->groupMapper, $this->notifiedMapper, $this->recipients, $titles, $formatter, $urls);
 	}
 
 	public function testRendersTitleAndDateForTheRole(): void {
@@ -86,14 +89,25 @@ final class NotifierTest extends TestCase {
 
 	public function testPresentedGiftRemovesTheNotification(): void {
 		$this->eventMapper->method('find')->willReturn($this->event(Event::TYPE_GIFT, 1000));
-		$this->recipients->method('roleOf')->willReturn(RecipientService::ROLE_RESPONSIBLE);
+		$this->recipients->method('roleOf')->willReturn(RecipientService::ROLE_INTERESTED);
+		// Unmarking the gift reminds the user again
+		$this->notifiedMapper->expects($this->once())->method('deleteByEventAndUser')->with(7, 'bob');
 		$this->expectException(AlreadyProcessedException::class);
 		$this->notifier->prepare($this->notification('laudatio', NotificationService::SUBJECT_UPCOMING), 'en');
 	}
 
-	public function testGreetedBirthdayKeepsTheNotification(): void {
+	public function testCongratulatedEventRemovesTheNotificationOfTheResponsiblePerson(): void {
+		$this->eventMapper->method('find')->willReturn($this->event(Event::TYPE_BIRTHDAY, 1000));
+		$this->recipients->method('roleOf')->willReturn(RecipientService::ROLE_RESPONSIBLE);
+		$this->notifiedMapper->expects($this->once())->method('deleteByEventAndUser')->with(7, 'bob');
+		$this->expectException(AlreadyProcessedException::class);
+		$this->notifier->prepare($this->notification('laudatio', NotificationService::SUBJECT_UPCOMING), 'en');
+	}
+
+	public function testCongratulatedEventKeepsTheNotificationOfInterestedUsers(): void {
 		$this->eventMapper->method('find')->willReturn($this->event(Event::TYPE_BIRTHDAY, 1000));
 		$this->recipients->method('roleOf')->willReturn(RecipientService::ROLE_INTERESTED);
+		$this->notifiedMapper->expects($this->never())->method('deleteByEventAndUser');
 
 		$notification = $this->notification('laudatio', NotificationService::SUBJECT_UPCOMING);
 		$notification->expects($this->once())->method('setParsedSubject')->willReturnSelf();
@@ -114,6 +128,8 @@ final class NotifierTest extends TestCase {
 	public function testUserNoLongerRecipientRemovesTheNotification(): void {
 		$this->eventMapper->method('find')->willReturn($this->event());
 		$this->recipients->method('roleOf')->willReturn(null);
+		// E.g. the function moved to another group: moving it back reminds the user again
+		$this->notifiedMapper->expects($this->once())->method('deleteByEventAndUser')->with(7, 'bob');
 		$this->expectException(AlreadyProcessedException::class);
 		$this->notifier->prepare($this->notification('laudatio', NotificationService::SUBJECT_UPCOMING), 'en');
 	}

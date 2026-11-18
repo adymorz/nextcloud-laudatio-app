@@ -6,7 +6,6 @@
 <script setup lang="ts">
 import type { PersonDetail, PersonInput } from '../types'
 
-import { showError } from '@nextcloud/dialogs'
 import { t } from '@nextcloud/l10n'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcDateTimePickerNative from '@nextcloud/vue/components/NcDateTimePickerNative'
@@ -16,6 +15,7 @@ import NcTextField from '@nextcloud/vue/components/NcTextField'
 import { computed, reactive, ref, watch } from 'vue'
 import { api, errorMessage } from '../api'
 import { parseIsoDate, toIsoDate } from '../dates'
+import { showErrorText } from '../toast'
 
 const props = defineProps<{
 	/** Person to edit, null to create a new one */
@@ -96,7 +96,7 @@ async function save() {
 		emit('saved', saved)
 		open.value = false
 	} catch (error) {
-		showError(errorMessage(error))
+		showErrorText(errorMessage(error))
 	} finally {
 		saving.value = false
 	}

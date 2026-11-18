@@ -13,6 +13,7 @@ use OCA\Laudatio\AppInfo\Application;
 use OCA\Laudatio\Db\Event;
 use OCA\Laudatio\Db\EventMapper;
 use OCA\Laudatio\Db\GroupMapper;
+use OCA\Laudatio\Db\NotifiedMapper;
 use OCA\Laudatio\Service\NotificationService;
 use OCA\Laudatio\Service\RecipientService;
 use OCA\Laudatio\Service\TitleBuilder;
@@ -29,14 +30,16 @@ use OCP\Notification\UnknownNotificationException;
 /**
  * Renders the notifications at display time, so titles follow the current
  * language and role of the user, and notifications that are no longer
- * relevant disappear: reminders of deleted events, and the hint about a
- * missing responsible person once the group has one again.
+ * relevant disappear: reminders of deleted events, of events the user no
+ * longer receives or that are already done, and the hint about a missing
+ * responsible person once the group has one again.
  */
 class Notifier implements INotifier {
 	public function __construct(
 		private IFactory $l10nFactory,
 		private EventMapper $eventMapper,
 		private GroupMapper $groupMapper,
+		private NotifiedMapper $notifiedMapper,
 		private RecipientService $recipients,
 		private TitleBuilder $titles,
 		private IDateTimeFormatter $dateFormatter,
@@ -69,7 +72,9 @@ class Notifier implements INotifier {
 	}
 
 	/**
-	 * @throws AlreadyProcessedException when the event is gone, the user no longer receives it or the gift was presented
+	 * @throws AlreadyProcessedException when the event is gone, the user no
+	 *                                   longer receives it, the gift was presented or, for the responsible
+	 *                                   person, the event was congratulated
 	 */
 	private function prepareUpcoming(INotification $notification, IL10N $l, string $languageCode): INotification {
 		try {
@@ -77,10 +82,17 @@ class Notifier implements INotifier {
 		} catch (DoesNotExistException) {
 			throw new AlreadyProcessedException();
 		}
-		$role = $this->recipients->roleOf($event, $notification->getUser());
+		$userId = $notification->getUser();
+		$role = $this->recipients->roleOf($event, $userId);
 		$isGift = $event->getType() === Event::TYPE_GIFT;
-		// A presented gift needs no reminder any more
-		if ($role === null || ($isGift && $event->getGreetedAt() !== null)) {
+		// A presented gift needs no reminder any more, nor does the responsible
+		// person need one for a congratulated event (see NotificationService)
+		$done = $event->getGreetedAt() !== null && ($isGift || $role === RecipientService::ROLE_RESPONSIBLE);
+		if ($role === null || $done) {
+			// Nextcloud deletes the notification now. Should the user receive
+			// the event again, e.g. after a function was moved back to their
+			// group or the event was unmarked, they are notified again.
+			$this->notifiedMapper->deleteByEventAndUser($event->getId(), $userId);
 			throw new AlreadyProcessedException();
 		}
 

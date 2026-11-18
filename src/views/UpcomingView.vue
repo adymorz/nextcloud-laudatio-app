@@ -7,7 +7,6 @@
 import type { LaudatioEvent } from '../types'
 
 import { mdiCakeVariant, mdiGift, mdiTrophyAward } from '@mdi/js'
-import { showError } from '@nextcloud/dialogs'
 import { n, t } from '@nextcloud/l10n'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
@@ -18,6 +17,8 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { api, errorMessage } from '../api'
 import LoadError from '../components/LoadError.vue'
 import { formatDate, relativeDay } from '../dates'
+import { PLAIN } from '../l10n'
+import { showErrorText } from '../toast'
 
 interface RangeOption {
 	label: string
@@ -57,7 +58,7 @@ async function load() {
 		events.value = await api.events(range.value.days)
 	} catch (error) {
 		loadError.value = errorMessage(error)
-		showError(loadError.value)
+		showErrorText(loadError.value)
 	} finally {
 		loading.value = false
 	}
@@ -72,7 +73,7 @@ async function setGreeted(event: LaudatioEvent, greeted: boolean) {
 		const updated = await api.setGreeted(event.id, greeted)
 		events.value = events.value.map((e) => e.id === updated.id ? updated : e)
 	} catch (error) {
-		showError(errorMessage(error))
+		showErrorText(errorMessage(error))
 	}
 }
 
@@ -120,7 +121,7 @@ watch(range, load)
 							<span class="event__date">
 								{{ t('laudatio', 'due {date}', { date: formatDate(event.date) }) }} · {{ relativeDay(event.date) }}
 								<template v-if="event.greeted && event.greetedBy">
-									· {{ t('laudatio', 'presented by {name}', { name: event.greetedBy.displayName }) }}
+									· {{ t('laudatio', 'presented by {name}', { name: event.greetedBy.displayName }, PLAIN) }}
 								</template>
 							</span>
 						</div>
@@ -156,7 +157,7 @@ watch(range, load)
 							<span class="event__date">
 								{{ formatDate(event.date) }} · {{ relativeDay(event.date) }}
 								<template v-if="event.greeted && event.greetedBy">
-									· {{ t('laudatio', 'congratulated by {name}', { name: event.greetedBy.displayName }) }}
+									· {{ t('laudatio', 'congratulated by {name}', { name: event.greetedBy.displayName }, PLAIN) }}
 								</template>
 							</span>
 						</div>

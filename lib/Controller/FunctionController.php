@@ -94,6 +94,32 @@ class FunctionController extends BaseOCSController {
 	}
 
 	/**
+	 * Move a function to another group
+	 *
+	 * All terms of the function, also past ones, belong to the new group from
+	 * now on: its responsible person gets the reminders, its responsible and
+	 * interested users see the holders, and its jubilee years apply.
+	 *
+	 * @param int $id ID of the function
+	 * @param int $groupId ID of the new group
+	 * @return DataResponse<Http::STATUS_OK, LaudatioFunction, array{}>
+	 * @throws OCSForbiddenException Not a manager
+	 * @throws OCSNotFoundException Function or group not found
+	 *
+	 * 200: Function moved
+	 */
+	#[NoAdminRequired]
+	#[ApiRoute(verb: 'PUT', url: '/api/v1/functions/{id}/group', requirements: ['id' => '\d+'])]
+	public function move(int $id, int $groupId): DataResponse {
+		$userId = $this->currentUserId();
+		$function = $this->call(function () use ($userId, $id, $groupId): OrgFunction {
+			$this->access->requireManager($userId);
+			return $this->groups->moveFunction($userId, $id, $groupId);
+		});
+		return new DataResponse($this->presenter->function($function));
+	}
+
+	/**
 	 * Delete a function without time slices
 	 *
 	 * @param int $id ID of the function

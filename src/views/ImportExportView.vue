@@ -14,6 +14,7 @@ import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import { ref } from 'vue'
 import { api, errorMessage } from '../api'
 import { toIsoDate } from '../dates'
+import { showErrorText } from '../toast'
 
 const exporting = ref(false)
 const importing = ref(false)
@@ -34,7 +35,7 @@ async function download() {
 		link.click()
 		URL.revokeObjectURL(url)
 	} catch (error) {
-		showError(errorMessage(error))
+		showErrorText(errorMessage(error))
 	} finally {
 		exporting.value = false
 	}
@@ -75,7 +76,7 @@ async function importFile(files: File[]) {
 		imported.value = true
 		showSuccess(t('laudatio', 'Imported groups: {groups}, functions: {functions}, persons: {persons}, terms: {terms}', result))
 	} catch (error) {
-		showError(errorMessage(error))
+		showErrorText(errorMessage(error))
 	} finally {
 		importing.value = false
 		// Allows picking the same file again after correcting it
