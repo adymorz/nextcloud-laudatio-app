@@ -23,6 +23,7 @@ import PersonDialog from '../components/PersonDialog.vue'
 import SliceDetails from '../components/SliceDetails.vue'
 import SliceDialog from '../components/SliceDialog.vue'
 import { age, daysUntil, formatDate } from '../dates'
+import { PLAIN } from '../l10n'
 import { me } from '../store'
 
 const props = defineProps<{
@@ -124,7 +125,7 @@ async function deletePerson() {
 	}
 	const confirmed = await showConfirmation({
 		name: t('laudatio', 'Delete person'),
-		text: t('laudatio', 'Delete {name} with their function history and events? This cannot be undone.', { name: person.value.displayName }),
+		text: t('laudatio', 'Delete {name} with their function history and events? This cannot be undone.', { name: person.value.displayName }, PLAIN),
 		labelConfirm: t('laudatio', 'Delete'),
 		labelReject: t('laudatio', 'Cancel'),
 		severity: 'warning',
@@ -146,7 +147,7 @@ async function deletePerson() {
 async function deleteSlice(slice: Slice) {
 	const confirmed = await showConfirmation({
 		name: t('laudatio', 'Delete term'),
-		text: t('laudatio', 'Delete the term as "{function}" from {start}?', { function: slice.functionName, start: formatDate(slice.startDate) }),
+		text: t('laudatio', 'Delete the term as "{function}" from {start}?', { function: slice.functionName, start: formatDate(slice.startDate) }, PLAIN),
 		labelConfirm: t('laudatio', 'Delete'),
 		labelReject: t('laudatio', 'Cancel'),
 		severity: 'warning',
@@ -263,7 +264,7 @@ watch(() => props.id, load, { immediate: true })
 						</span>
 						<SliceDetails :slice="slice" />
 					</div>
-					<NcActions v-if="me.isManager" class="timeline__actions" :aria-label="t('laudatio', 'Actions for {name}', { name: slice.functionName })">
+					<NcActions v-if="me.isManager" class="timeline__actions" :aria-label="t('laudatio', 'Actions for {name}', { name: slice.functionName }, PLAIN)">
 						<NcActionButton close-after-click @click="openSlice(slice)">
 							<template #icon>
 								<NcIconSvgWrapper :path="mdiPencil" />

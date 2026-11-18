@@ -68,6 +68,18 @@ class NotifiedMapper extends QBMapper {
 	}
 
 	/**
+	 * Forgets that the user was notified about the event, so they are notified
+	 * again should they receive it (again).
+	 */
+	public function deleteByEventAndUser(int $eventId, string $userId): void {
+		$qb = $this->db->getQueryBuilder();
+		$qb->delete($this->getTableName())
+			->where($qb->expr()->eq('event_id', $qb->createNamedParameter($eventId, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)));
+		$qb->executeStatement();
+	}
+
+	/**
 	 * @param list<int> $eventIds
 	 */
 	public function deleteByEventIds(array $eventIds): void {

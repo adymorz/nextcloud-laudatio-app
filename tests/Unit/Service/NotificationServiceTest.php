@@ -116,6 +116,25 @@ final class NotificationServiceTest extends TestCase {
 		$this->assertSame(1, $this->service->sendDue());
 	}
 
+	public function testCongratulatedEventsAreOnlySentForInformation(): void {
+		$event = $this->event();
+		$event->setGreetedAt(900);
+		$this->eventMapper->method('findBetween')->willReturn([$event]);
+		$this->notifiedMapper->method('findUserIdsByEvent')->willReturn([]);
+		$this->recipients->method('recipients')->willReturn([
+			'alice' => RecipientService::ROLE_RESPONSIBLE,
+			'bob' => RecipientService::ROLE_INTERESTED,
+		]);
+		$this->userManager->method('get')->willReturnCallback(fn (string $uid): IUser => $this->user($uid, true));
+		$this->settings->method('isEmailEnabledForUser')->willReturn(false);
+		$notification = $this->notification();
+		$notification->expects($this->once())->method('setUser')->with('bob')->willReturnSelf();
+		$this->notificationManager->method('createNotification')->willReturn($notification);
+		$this->notifiedMapper->expects($this->once())->method('add')->with(7, 'bob', 1000);
+
+		$this->assertSame(1, $this->service->sendDue());
+	}
+
 	public function testEmailSaysWhyTheUserGetsItAndHowToStopIt(): void {
 		$event = $this->event();
 		$this->eventMapper->method('findBetween')->willReturn([$event]);

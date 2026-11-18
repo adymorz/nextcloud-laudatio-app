@@ -15,6 +15,7 @@ import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
 import { computed, ref, watch } from 'vue'
 import { api, errorMessage } from '../api'
+import { PLAIN } from '../l10n'
 
 const props = defineProps<{
 	/** Group of the function */
@@ -70,7 +71,7 @@ async function save() {
 <template>
 	<NcDialog
 		v-model:open="open"
-		:name="orgFunction === null ? t('laudatio', 'New function in {group}', { group: group.name }) : t('laudatio', 'Edit function')"
+		:name="orgFunction === null ? t('laudatio', 'New function in {group}', { group: group.name }, PLAIN) : t('laudatio', 'Edit function')"
 		size="small">
 		<form class="form" @submit.prevent="save">
 			<NcTextField v-model="name" :label="t('laudatio', 'Name of the function')" required />

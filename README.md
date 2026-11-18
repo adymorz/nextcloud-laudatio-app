@@ -17,7 +17,7 @@ Requires Nextcloud 34 or 35 (PHP 8.2 or newer). Available in English and German.
 - **Birthdays and anniversaries** are generated automatically for the next 400 days, for every person who currently holds a function.
 - **Yearly gifts**: functions can be marked "One gift per year", so the responsible person is reminded to present one gift per calendar year to everybody holding them.
 - **Calendar**: everybody involved in a group gets a read-only calendar "Birthdays & anniversaries" in the Calendar app and on CalDAV devices, with a reminder before each event (yearly gifts have no fixed day and are not in the calendar).
-- **Reminders**: a Nextcloud notification when an event comes within the lead time (default 14 days), optionally also by email. Every email says why you receive it and how to turn it off.
+- **Reminders**: a Nextcloud notification when an event comes within the lead time (default 14 days), optionally also by email. Every email says why you receive it and how to turn it off. The responsible person gets no reminder for an event that is already marked as congratulated; interested persons still do.
 - **Upcoming** view with a "congratulated" checklist for the responsible persons, and the yearly gifts of the year with a "presented" checklist.
 - **Data sheet** per person to print (or save as PDF) and hand over, so the person can check, correct and complete their data, with their function history. The notes of the person are never printed; the sources and notes of their terms are, and so is an optional note of your organization on who stores the data and why.
 - **Audit log** of who created, changed or deleted persons, groups, functions and terms, and who exported them.

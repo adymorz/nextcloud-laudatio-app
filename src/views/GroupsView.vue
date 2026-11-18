@@ -22,6 +22,7 @@ import FunctionDialog from '../components/FunctionDialog.vue'
 import GroupDialog from '../components/GroupDialog.vue'
 import LoadError from '../components/LoadError.vue'
 import MoveFunctionDialog from '../components/MoveFunctionDialog.vue'
+import { PLAIN } from '../l10n'
 import { me } from '../store'
 
 const groups = ref<Group[]>([])
@@ -75,7 +76,7 @@ function openGroup(group: Group | null) {
 async function deleteGroup(group: Group) {
 	const confirmed = await showConfirmation({
 		name: t('laudatio', 'Delete group'),
-		text: t('laudatio', 'Delete the group "{name}"?', { name: group.name }),
+		text: t('laudatio', 'Delete the group "{name}"?', { name: group.name }, PLAIN),
 		labelConfirm: t('laudatio', 'Delete'),
 		labelReject: t('laudatio', 'Cancel'),
 		severity: 'warning',
@@ -111,7 +112,7 @@ function openMove(group: Group, fn: OrgFunction) {
 async function deleteFunction(fn: OrgFunction) {
 	const confirmed = await showConfirmation({
 		name: t('laudatio', 'Delete function'),
-		text: t('laudatio', 'Delete the function "{name}"?', { name: fn.name }),
+		text: t('laudatio', 'Delete the function "{name}"?', { name: fn.name }, PLAIN),
 		labelConfirm: t('laudatio', 'Delete'),
 		labelReject: t('laudatio', 'Cancel'),
 		severity: 'warning',
@@ -164,7 +165,7 @@ onMounted(load)
 			<div class="group__header">
 				<h3>{{ group.name }}</h3>
 				<span class="group__role">{{ roleLabels[group.role] }}</span>
-				<NcActions v-if="me.isManager" :aria-label="t('laudatio', 'Actions for {name}', { name: group.name })">
+				<NcActions v-if="me.isManager" :aria-label="t('laudatio', 'Actions for {name}', { name: group.name }, PLAIN)">
 					<NcActionButton close-after-click @click="openGroup(group)">
 						<template #icon>
 							<NcIconSvgWrapper :path="mdiPencil" />
@@ -226,7 +227,7 @@ onMounted(load)
 								:size="16"
 								:name="t('laudatio', 'One gift per year')"
 								:title="t('laudatio', 'One gift per year')" />
-							<NcActions v-if="me.isManager" :aria-label="t('laudatio', 'Actions for {name}', { name: fn.name })">
+							<NcActions v-if="me.isManager" :aria-label="t('laudatio', 'Actions for {name}', { name: fn.name }, PLAIN)">
 								<NcActionButton close-after-click @click="openFunction(group, fn)">
 									<template #icon>
 										<NcIconSvgWrapper :path="mdiPencil" />

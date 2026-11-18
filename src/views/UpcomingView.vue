@@ -18,6 +18,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { api, errorMessage } from '../api'
 import LoadError from '../components/LoadError.vue'
 import { formatDate, relativeDay } from '../dates'
+import { PLAIN } from '../l10n'
 
 interface RangeOption {
 	label: string
@@ -120,7 +121,7 @@ watch(range, load)
 							<span class="event__date">
 								{{ t('laudatio', 'due {date}', { date: formatDate(event.date) }) }} · {{ relativeDay(event.date) }}
 								<template v-if="event.greeted && event.greetedBy">
-									· {{ t('laudatio', 'presented by {name}', { name: event.greetedBy.displayName }) }}
+									· {{ t('laudatio', 'presented by {name}', { name: event.greetedBy.displayName }, PLAIN) }}
 								</template>
 							</span>
 						</div>
@@ -156,7 +157,7 @@ watch(range, load)
 							<span class="event__date">
 								{{ formatDate(event.date) }} · {{ relativeDay(event.date) }}
 								<template v-if="event.greeted && event.greetedBy">
-									· {{ t('laudatio', 'congratulated by {name}', { name: event.greetedBy.displayName }) }}
+									· {{ t('laudatio', 'congratulated by {name}', { name: event.greetedBy.displayName }, PLAIN) }}
 								</template>
 							</span>
 						</div>
