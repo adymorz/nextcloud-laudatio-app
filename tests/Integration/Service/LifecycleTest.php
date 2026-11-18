@@ -13,7 +13,10 @@ use OCA\Laudatio\Db\AuditEntry;
 use OCA\Laudatio\Db\AuditMapper;
 use OCA\Laudatio\Db\Event;
 use OCA\Laudatio\Db\EventMapper;
+use OCA\Laudatio\Db\Slice;
+use OCA\Laudatio\Db\SliceMapper;
 use OCA\Laudatio\Exception\ConflictException;
+use OCA\Laudatio\Exception\NotFoundException;
 use OCA\Laudatio\Exception\ValidationException;
 use OCA\Laudatio\Model\PersonInput;
 use OCA\Laudatio\Model\SliceInput;
@@ -138,6 +141,54 @@ final class LifecycleTest extends IntegrationTestCase {
 		// Switching the yearly gift off removes this year's gift
 		$this->groups->updateFunction('admin', $function->getId(), 'Gift tester', false);
 		$this->assertSame([], $gifts());
+	}
+
+	public function testMovingAFunctionKeepsItsTerms(): void {
+		$today = $this->service(Clock::class)->today();
+		$in = static fn (int $days, int $yearsBack = 0): string => Dates::format(Dates::anniversary(Dates::addDays($today, $days), -$yearsBack));
+
+		$from = $this->groups->create('admin', $this->uniqueName('Group'), 'admin', [], '2');
+		$this->onTearDown(fn () => $this->groups->delete('admin', $from->getId()));
+		$to = $this->groups->create('admin', $this->uniqueName('Group'), 'admin', [], '3');
+		$this->onTearDown(fn () => $this->groups->delete('admin', $to->getId()));
+		$function = $this->groups->createFunction('admin', $from->getId(), 'Mover');
+		$this->onTearDown(fn () => $this->groups->deleteFunction('admin', $function->getId()));
+		$person = $this->persons->create('admin', new PersonInput('Test', $this->uniqueName('Person'), '1980-01-01'));
+		$this->onTearDown(fn () => $this->persons->delete('admin', $person->getId()));
+		$slice = $this->persons->addSlice('admin', $person->getId(), new SliceInput($function->getId(), $in(20, 3)));
+
+		$jubilees = fn (): array => $this->describe(array_values(array_filter(
+			$this->events->findByPerson($person->getId()),
+			static fn (Event $e): bool => $e->getType() === Event::TYPE_JUBILEE,
+		)));
+		// The 2nd anniversary is over, the 3rd does not count in the old group
+		$this->assertSame([], $jubilees());
+
+		$this->groups->moveFunction('admin', $function->getId(), $to->getId());
+		$this->assertSame($to->getId(), $this->groups->getFunction($function->getId())->getGroupId());
+		$this->assertSame([$slice->getId()], array_map(
+			static fn (Slice $s): int => $s->getId(),
+			$this->service(SliceMapper::class)->findByPerson($person->getId()),
+		));
+		// The jubilee years of the new group apply to the same term
+		$this->assertSame([['jubilee', $in(20), 3]], $jubilees());
+
+		// Moving to the same group changes nothing
+		$this->groups->moveFunction('admin', $function->getId(), $to->getId());
+
+		try {
+			$this->groups->moveFunction('admin', $function->getId(), PHP_INT_MAX);
+			$this->fail('Function was moved to a group that does not exist');
+		} catch (NotFoundException) {
+		}
+		$this->assertSame($to->getId(), $this->groups->getFunction($function->getId())->getGroupId());
+
+		$audit = array_values(array_filter(
+			$this->service(AuditMapper::class)->findPage(50, 0),
+			static fn (AuditEntry $entry): bool => $entry->getEntityType() === 'function' && $entry->getEntityId() === $function->getId(),
+		));
+		$this->assertSame(['update', 'create'], array_map(static fn (AuditEntry $e): string => $e->getAction(), $audit));
+		$this->assertSame(['group_id'], $audit[0]->getChangedFieldList());
 	}
 
 	public function testValidation(): void {

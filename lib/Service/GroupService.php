@@ -192,9 +192,6 @@ class GroupService {
 	}
 
 	/**
-	 * @throws NotFoundException|ValidationException
-	 */
-	/**
 	 * @param bool $yearlyGift whether the holders get one gift per calendar year
 	 * @throws NotFoundException|ValidationException
 	 */
@@ -245,6 +242,32 @@ class GroupService {
 			$this->audit->log($actor, AuditEntry::ACTION_UPDATE, AuditService::ENTITY_FUNCTION, $function->getId(), $changed);
 		}, $this->db);
 		$this->afterChange($giftChanged);
+		return $function;
+	}
+
+	/**
+	 * Moves a function to another group, e.g. after a reorganization. All its
+	 * terms, also past ones, belong to the new group from now on: its
+	 * responsible person gets the reminders and its jubilee years apply.
+	 *
+	 * @throws NotFoundException
+	 */
+	public function moveFunction(?string $actor, int $id, int $groupId): OrgFunction {
+		$function = $this->getFunction($id);
+		$target = $this->get($groupId);
+		if ($function->getGroupId() === $groupId) {
+			return $function;
+		}
+		// Exists: groups with functions cannot be deleted
+		$source = $this->get($function->getGroupId());
+		$function->setGroupId($groupId);
+		$function->setUpdatedAt($this->clock->time());
+
+		$this->atomic(function () use ($actor, $function): void {
+			$this->functionMapper->update($function);
+			$this->audit->log($actor, AuditEntry::ACTION_UPDATE, AuditService::ENTITY_FUNCTION, $function->getId(), ['group_id']);
+		}, $this->db);
+		$this->afterChange($this->eventService->jubileeYearsForGroup($source) !== $this->eventService->jubileeYearsForGroup($target));
 		return $function;
 	}
 

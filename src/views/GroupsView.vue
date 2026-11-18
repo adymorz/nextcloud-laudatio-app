@@ -6,7 +6,7 @@
 <script setup lang="ts">
 import type { Group, OrgFunction } from '../types'
 
-import { mdiAccountGroup, mdiAlert, mdiDelete, mdiGift, mdiPencil, mdiPlus } from '@mdi/js'
+import { mdiAccountGroup, mdiAlert, mdiDelete, mdiGift, mdiPencil, mdiPlus, mdiSwapHorizontal } from '@mdi/js'
 import { showConfirmation, showError } from '@nextcloud/dialogs'
 import { t } from '@nextcloud/l10n'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
@@ -21,6 +21,7 @@ import { api, errorMessage } from '../api'
 import FunctionDialog from '../components/FunctionDialog.vue'
 import GroupDialog from '../components/GroupDialog.vue'
 import LoadError from '../components/LoadError.vue'
+import MoveFunctionDialog from '../components/MoveFunctionDialog.vue'
 import { me } from '../store'
 
 const groups = ref<Group[]>([])
@@ -31,6 +32,8 @@ const editedGroup = ref<Group | null>(null)
 const functionDialogOpen = ref(false)
 const functionGroup = ref<Group | null>(null)
 const editedFunction = ref<OrgFunction | null>(null)
+const moveDialogOpen = ref(false)
+const movedFunction = ref<OrgFunction | null>(null)
 
 const roleLabels: Record<Group['role'], string> = {
 	manager: t('laudatio', 'Manager'),
@@ -90,6 +93,16 @@ function openFunction(group: Group, fn: OrgFunction | null) {
 	functionGroup.value = group
 	editedFunction.value = fn
 	functionDialogOpen.value = true
+}
+
+/**
+ * @param group Current group of the function
+ * @param fn Function to move to another group
+ */
+function openMove(group: Group, fn: OrgFunction) {
+	functionGroup.value = group
+	movedFunction.value = fn
+	moveDialogOpen.value = true
 }
 
 /**
@@ -220,6 +233,12 @@ onMounted(load)
 									</template>
 									{{ t('laudatio', 'Edit') }}
 								</NcActionButton>
+								<NcActionButton v-if="groups.length > 1" close-after-click @click="openMove(group, fn)">
+									<template #icon>
+										<NcIconSvgWrapper :path="mdiSwapHorizontal" />
+									</template>
+									{{ t('laudatio', 'Move to another group') }}
+								</NcActionButton>
 								<NcActionButton close-after-click @click="deleteFunction(fn)">
 									<template #icon>
 										<NcIconSvgWrapper :path="mdiDelete" />
@@ -239,6 +258,13 @@ onMounted(load)
 			v-model:open="functionDialogOpen"
 			:group="functionGroup"
 			:org-function="editedFunction"
+			@saved="load" />
+		<MoveFunctionDialog
+			v-if="functionGroup && movedFunction"
+			v-model:open="moveDialogOpen"
+			:group="functionGroup"
+			:org-function="movedFunction"
+			:groups="groups"
 			@saved="load" />
 	</div>
 </template>

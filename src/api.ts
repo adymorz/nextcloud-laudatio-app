@@ -77,6 +77,7 @@ export const api = {
 
 	createFunction: (groupId: number, input: FunctionInput) => post<OrgFunction>(`/groups/${groupId}/functions`, input),
 	updateFunction: (id: number, input: FunctionInput) => put<OrgFunction>(`/functions/${id}`, input),
+	moveFunction: (id: number, groupId: number) => put<OrgFunction>(`/functions/${id}/group`, { groupId }),
 	deleteFunction: (id: number) => del(`/functions/${id}`),
 
 	events: (days: number) => get<LaudatioEvent[]>('/events', { days }),
