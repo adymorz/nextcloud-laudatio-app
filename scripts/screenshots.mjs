@@ -16,7 +16,8 @@
  * and notes, set the display names "Alice Keller" and "Bob Meier", create the
  * Nextcloud group "Office" and choose it as manager group, set a gift
  * regulations link and a data sheet note in the admin settings, and install the
- * Calendar app. Build the frontend first (`ddev npm run build`).
+ * Calendar app. Build the frontend first (`ddev npm run build`), and after a
+ * version bump in appinfo/info.xml upgrade the app (`ddev occ upgrade`).
  *
  * Usage: ddev exec node scripts/screenshots.mjs [base URL]
  */
@@ -36,6 +37,18 @@ const browser = await puppeteer.launch({
 	defaultViewport: { width, height: 900 },
 	env: { ...process.env, TZ: timezone },
 })
+
+// Nextcloud shows the upgrade or maintenance page instead of the login form,
+// for example after the app version was bumped
+const statusPage = await browser.newPage()
+const status = await (await statusPage.goto(`${base}/status.php`)).json()
+await statusPage.close()
+if (status.needsDbUpgrade || status.maintenance) {
+	await browser.close()
+	throw new Error(status.needsDbUpgrade
+		? 'Nextcloud needs an upgrade, run `ddev occ upgrade` first'
+		: 'Nextcloud is in maintenance mode, run `ddev occ maintenance:mode --off` first')
+}
 
 /**
  * @param {string} user Login name, the password is the same (DDEV test users)
