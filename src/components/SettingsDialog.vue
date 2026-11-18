@@ -4,7 +4,6 @@
 -->
 
 <script setup lang="ts">
-import { showError } from '@nextcloud/dialogs'
 import { n, t } from '@nextcloud/l10n'
 import NcAppSettingsDialog from '@nextcloud/vue/components/NcAppSettingsDialog'
 import NcAppSettingsSection from '@nextcloud/vue/components/NcAppSettingsSection'
@@ -13,6 +12,7 @@ import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import { ref } from 'vue'
 import { api, errorMessage } from '../api'
 import { me } from '../store'
+import { showErrorText } from '../toast'
 
 const open = defineModel<boolean>('open', { required: true })
 const saving = ref(false)
@@ -25,7 +25,7 @@ async function setEmail(enabled: boolean) {
 	try {
 		Object.assign(me, await api.saveSettings(enabled))
 	} catch (error) {
-		showError(errorMessage(error))
+		showErrorText(errorMessage(error))
 	} finally {
 		saving.value = false
 	}

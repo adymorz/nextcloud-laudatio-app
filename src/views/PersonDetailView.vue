@@ -7,7 +7,7 @@
 import type { Group, PersonDetail, Slice } from '../types'
 
 import { mdiArrowLeft, mdiDelete, mdiFileDocumentOutline, mdiPencil, mdiPlus } from '@mdi/js'
-import { showConfirmation, showError } from '@nextcloud/dialogs'
+import { showConfirmation } from '@nextcloud/dialogs'
 import { n, t } from '@nextcloud/l10n'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActions from '@nextcloud/vue/components/NcActions'
@@ -25,6 +25,7 @@ import SliceDialog from '../components/SliceDialog.vue'
 import { age, daysUntil, formatDate } from '../dates'
 import { PLAIN } from '../l10n'
 import { me } from '../store'
+import { showErrorText } from '../toast'
 
 const props = defineProps<{
 	id: number
@@ -88,7 +89,7 @@ async function load() {
 		} else {
 			loadError.value = errorMessage(error)
 		}
-		showError(errorMessage(error))
+		showErrorText(errorMessage(error))
 	} finally {
 		loading.value = false
 	}
@@ -96,7 +97,7 @@ async function load() {
 		try {
 			groups.value = await api.groups()
 		} catch (error) {
-			showError(errorMessage(error))
+			showErrorText(errorMessage(error))
 		}
 	}
 }
@@ -137,7 +138,7 @@ async function deletePerson() {
 		await api.deletePerson(person.value.id)
 		router.push({ name: 'persons' })
 	} catch (error) {
-		showError(errorMessage(error))
+		showErrorText(errorMessage(error))
 	}
 }
 
@@ -159,7 +160,7 @@ async function deleteSlice(slice: Slice) {
 		await api.deleteSlice(slice.id)
 		await load()
 	} catch (error) {
-		showError(errorMessage(error))
+		showErrorText(errorMessage(error))
 	}
 }
 

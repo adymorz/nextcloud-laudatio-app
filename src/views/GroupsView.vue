@@ -7,7 +7,7 @@
 import type { Group, OrgFunction } from '../types'
 
 import { mdiAccountGroup, mdiAlert, mdiDelete, mdiGift, mdiPencil, mdiPlus, mdiSwapHorizontal } from '@mdi/js'
-import { showConfirmation, showError } from '@nextcloud/dialogs'
+import { showConfirmation } from '@nextcloud/dialogs'
 import { t } from '@nextcloud/l10n'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActions from '@nextcloud/vue/components/NcActions'
@@ -24,6 +24,7 @@ import LoadError from '../components/LoadError.vue'
 import MoveFunctionDialog from '../components/MoveFunctionDialog.vue'
 import { PLAIN } from '../l10n'
 import { me } from '../store'
+import { showErrorText } from '../toast'
 
 const groups = ref<Group[]>([])
 const loading = ref(true)
@@ -56,7 +57,7 @@ async function load() {
 		groups.value = await api.groups()
 	} catch (error) {
 		loadError.value = errorMessage(error)
-		showError(loadError.value)
+		showErrorText(loadError.value)
 	} finally {
 		loading.value = false
 	}
@@ -132,7 +133,7 @@ async function run(change: () => Promise<unknown>) {
 		await change()
 		await load()
 	} catch (error) {
-		showError(errorMessage(error))
+		showErrorText(errorMessage(error))
 	}
 }
 

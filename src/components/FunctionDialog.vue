@@ -6,7 +6,6 @@
 <script setup lang="ts">
 import type { FunctionInput, Group, OrgFunction } from '../types'
 
-import { showError } from '@nextcloud/dialogs'
 import { t } from '@nextcloud/l10n'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
@@ -16,6 +15,7 @@ import NcTextField from '@nextcloud/vue/components/NcTextField'
 import { computed, ref, watch } from 'vue'
 import { api, errorMessage } from '../api'
 import { PLAIN } from '../l10n'
+import { showErrorText } from '../toast'
 
 const props = defineProps<{
 	/** Group of the function */
@@ -61,7 +61,7 @@ async function save() {
 		emit('saved', saved)
 		open.value = false
 	} catch (error) {
-		showError(errorMessage(error))
+		showErrorText(errorMessage(error))
 	} finally {
 		saving.value = false
 	}

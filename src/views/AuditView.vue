@@ -6,7 +6,6 @@
 <script setup lang="ts">
 import type { AuditEntry } from '../types'
 
-import { showError } from '@nextcloud/dialogs'
 import { t } from '@nextcloud/l10n'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
@@ -14,6 +13,7 @@ import { onMounted, ref } from 'vue'
 import { api, errorMessage } from '../api'
 import LoadError from '../components/LoadError.vue'
 import { formatDateTime } from '../dates'
+import { showErrorText } from '../toast'
 
 const PAGE_SIZE = 50
 
@@ -84,7 +84,7 @@ async function loadMore() {
 		total.value = page.total
 	} catch (error) {
 		loadError.value = errorMessage(error)
-		showError(loadError.value)
+		showErrorText(loadError.value)
 	} finally {
 		loading.value = false
 	}

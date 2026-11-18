@@ -6,7 +6,7 @@
 <script setup lang="ts">
 import type { Group, OrgFunction } from '../types'
 
-import { showError, showSuccess } from '@nextcloud/dialogs'
+import { showSuccess } from '@nextcloud/dialogs'
 import { t } from '@nextcloud/l10n'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
@@ -15,6 +15,7 @@ import NcSelect from '@nextcloud/vue/components/NcSelect'
 import { computed, ref, watch } from 'vue'
 import { api, errorMessage } from '../api'
 import { PLAIN } from '../l10n'
+import { showErrorText } from '../toast'
 
 interface GroupOption {
 	id: number
@@ -74,17 +75,19 @@ watch(open, (isOpen) => {
  */
 async function save() {
 	const group = target.value
-	if (group === null) {
+	// The warning asks to rename one of the functions first
+	if (group === null || duplicateWarning.value !== null) {
 		return
 	}
 	saving.value = true
 	try {
 		const saved = await api.moveFunction(props.orgFunction.id, group.id)
-		showSuccess(t('laudatio', 'Function "{name}" moved to the group "{group}"', { name: saved.name, group: group.label }, PLAIN))
+		// Toasts read HTML: the default t() escapes the names
+		showSuccess(t('laudatio', 'Function "{name}" moved to the group "{group}"', { name: saved.name, group: group.label }))
 		emit('saved', saved)
 		open.value = false
 	} catch (error) {
-		showError(errorMessage(error))
+		showErrorText(errorMessage(error))
 	} finally {
 		saving.value = false
 	}
@@ -120,7 +123,7 @@ async function save() {
 			<NcButton @click="open = false">
 				{{ t('laudatio', 'Cancel') }}
 			</NcButton>
-			<NcButton variant="primary" :disabled="target === null || saving" @click="save">
+			<NcButton variant="primary" :disabled="target === null || duplicateWarning !== null || saving" @click="save">
 				{{ t('laudatio', 'Move') }}
 			</NcButton>
 		</template>

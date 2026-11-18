@@ -6,13 +6,13 @@
 <script setup lang="ts">
 import type { Group, User } from '../types'
 
-import { showError } from '@nextcloud/dialogs'
 import { t } from '@nextcloud/l10n'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
 import { computed, ref, watch } from 'vue'
 import { api, errorMessage } from '../api'
+import { showErrorText } from '../toast'
 import UserSelect from './UserSelect.vue'
 
 const props = defineProps<{
@@ -66,7 +66,7 @@ async function save() {
 		emit('saved', saved)
 		open.value = false
 	} catch (error) {
-		showError(errorMessage(error))
+		showErrorText(errorMessage(error))
 	} finally {
 		saving.value = false
 	}
