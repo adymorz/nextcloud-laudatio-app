@@ -4,7 +4,7 @@
 -->
 
 <script setup lang="ts">
-import { mdiAccountGroup, mdiAccountMultiple, mdiCakeVariant, mdiCog, mdiHistory, mdiScaleBalance, mdiSwapVertical } from '@mdi/js'
+import { mdiAccountGroup, mdiAccountMultiple, mdiCakeVariant, mdiCog, mdiFileTree, mdiHistory, mdiScaleBalance, mdiSwapVertical } from '@mdi/js'
 import { t } from '@nextcloud/l10n'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
 import NcAppNavigation from '@nextcloud/vue/components/NcAppNavigation'
@@ -35,6 +35,11 @@ const settingsOpen = ref(false)
 				<NcAppNavigationItem :name="t('laudatio', 'Groups & functions')" :to="{ name: 'groups' }">
 					<template #icon>
 						<NcIconSvgWrapper :path="mdiAccountGroup" />
+					</template>
+				</NcAppNavigationItem>
+				<NcAppNavigationItem :name="t('laudatio', 'Overview')" :to="{ name: 'overview' }">
+					<template #icon>
+						<NcIconSvgWrapper :path="mdiFileTree" />
 					</template>
 				</NcAppNavigationItem>
 				<NcAppNavigationItem v-if="me.isManager" :name="t('laudatio', 'Audit log')" :to="{ name: 'audit' }">

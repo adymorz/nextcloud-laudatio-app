@@ -1,0 +1,40 @@
+/**
+ * SPDX-FileCopyrightText: 2026 Adrian Dymorz <dev@adrian.dymorz.ch>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+/* Nextcloud's layout is fixed to the viewport and clips its content: print the view only, across pages */
+@media print {
+	@page {
+		margin: 15mm;
+	}
+
+	html.laudatio-print,
+	html.laudatio-print body {
+		position: static !important;
+		height: auto !important;
+		overflow: visible !important;
+		background: none !important;
+	}
+
+	html.laudatio-print #header,
+	html.laudatio-print #skip-actions,
+	html.laudatio-print #profiler-toolbar,
+	html.laudatio-print .app-navigation {
+		display: none !important;
+	}
+
+	html.laudatio-print #content,
+	html.laudatio-print #content-vue,
+	html.laudatio-print #app-content-vue {
+		position: static !important;
+		width: auto !important;
+		height: auto !important;
+		margin: 0 !important;
+		padding: 0 !important;
+		overflow: visible !important;
+		border-radius: 0 !important;
+		background: none !important;
+		backdrop-filter: none !important;
+	}
+}
