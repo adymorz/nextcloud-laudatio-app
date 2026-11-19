@@ -39,7 +39,7 @@ Persons don't need a Nextcloud account. Available in English and German.]]></des
 - **Datenschutz**: Alle Daten bleiben in der Datenbank deiner Nextcloud, außer die Verwaltung exportiert sie, und nichts wird woandershin gesendet. Das Löschen einer Person entfernt alle ihre Daten aus der App, `occ laudatio:purge` entfernt alles.
 
 Die Personen brauchen kein Nextcloud-Konto. Verfügbar auf Englisch und Deutsch.]]></description>
-	<version>0.5.0</version>
+	<version>0.6.0</version>
 	<licence>AGPL-3.0-or-later</licence>
 	<author mail="dev@adrian.dymorz.ch">Adrian Dymorz</author>
 	<namespace>Laudatio</namespace>
