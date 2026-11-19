@@ -12,10 +12,11 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { api, errorMessage, isNotFound } from '../api'
 import LoadError from '../components/LoadError.vue'
 import { formatDate, toIsoDate } from '../dates'
+import { usePrintLayout } from '../print'
 import { me } from '../store'
 import { showErrorText } from '../toast'
 
@@ -28,6 +29,7 @@ const loading = ref(true)
 const notFound = ref(false)
 const loadError = ref<string | null>(null)
 const printedOn = formatDate(toIsoDate(new Date()))
+const { print } = usePrintLayout()
 
 // The sheet is handed to the person: the internal notes of the person are
 // deliberately left out, the notes of the terms are not
@@ -73,17 +75,6 @@ async function load() {
 		loading.value = false
 	}
 }
-
-/**
- * Opens the browser's print dialog.
- */
-function print() {
-	window.print()
-}
-
-// Enables the print styles below that hide the Nextcloud header and navigation
-onMounted(() => document.documentElement.classList.add('laudatio-print'))
-onBeforeUnmount(() => document.documentElement.classList.remove('laudatio-print'))
 
 watch(() => props.id, load, { immediate: true })
 </script>
@@ -313,44 +304,6 @@ watch(() => props.id, load, { immediate: true })
 	.sheet__lines span,
 	.sheet__signature div {
 		border-color: #000 !important;
-	}
-}
-</style>
-
-<style>
-/* Nextcloud's layout is fixed to the viewport and clips its content: print the sheet only, across pages */
-@media print {
-	@page {
-		margin: 15mm;
-	}
-
-	html.laudatio-print,
-	html.laudatio-print body {
-		position: static !important;
-		height: auto !important;
-		overflow: visible !important;
-		background: none !important;
-	}
-
-	html.laudatio-print #header,
-	html.laudatio-print #skip-actions,
-	html.laudatio-print #profiler-toolbar,
-	html.laudatio-print .app-navigation {
-		display: none !important;
-	}
-
-	html.laudatio-print #content,
-	html.laudatio-print #content-vue,
-	html.laudatio-print #app-content-vue {
-		position: static !important;
-		width: auto !important;
-		height: auto !important;
-		margin: 0 !important;
-		padding: 0 !important;
-		overflow: visible !important;
-		border-radius: 0 !important;
-		background: none !important;
-		backdrop-filter: none !important;
 	}
 }
 </style>
