@@ -265,6 +265,7 @@ OC.L10N.register(
         "presented by {name}": "überreicht von {name}",
         "since {date}": "seit {date}",
         "today": "heute",
-        "tomorrow": "morgen"
+        "tomorrow": "morgen",
+        "{function} from {date}": "{function} ab {date}"
     },
 "nplurals=2; plural=(n != 1);");

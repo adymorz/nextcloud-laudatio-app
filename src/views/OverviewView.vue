@@ -4,7 +4,7 @@
 -->
 
 <script setup lang="ts">
-import type { Group, Person } from '../types'
+import type { Group, OrgFunction, Person } from '../types'
 
 import { mdiAccountGroup, mdiPrinter } from '@mdi/js'
 import { t } from '@nextcloud/l10n'
@@ -16,6 +16,7 @@ import { computed, onMounted, ref } from 'vue'
 import { api, errorMessage } from '../api'
 import LoadError from '../components/LoadError.vue'
 import { formatDate, toIsoDate } from '../dates'
+import { PLAIN } from '../l10n'
 import { usePrintLayout } from '../print'
 import { showErrorText } from '../toast'
 
@@ -23,22 +24,43 @@ const groups = ref<Group[]>([])
 const persons = ref<Person[]>([])
 const loading = ref(true)
 const loadError = ref<string | null>(null)
-const printedOn = formatDate(toIsoDate(new Date()))
+const today = toIsoDate(new Date())
+const printedOn = formatDate(today)
 const { print } = usePrintLayout()
+
+/**
+ * The function as it is listed for the person: the name if they hold it
+ * today, with the start date if all their terms in it start later (e.g. after
+ * an election), null if they have no current or later term in it.
+ *
+ * @param person The person
+ * @param fn Function of the group
+ */
+function functionLabel(person: Person, fn: OrgFunction): string | null {
+	const starts = person.currentFunctions
+		.filter((slice) => slice.functionId === fn.id)
+		.map((slice) => slice.startDate)
+		.sort()
+	if (starts.length === 0) {
+		return null
+	}
+	// Dates as YYYY-MM-DD compare as strings; a re-election starts after the current term
+	if (starts[0]! <= today) {
+		return fn.name
+	}
+	return t('laudatio', '{function} from {date}', { function: fn.name, date: formatDate(starts[0]!) }, PLAIN)
+}
 
 // Names and functions only: the date of birth and contact data are in the
 // payload for managers and responsible persons, but never shown here
 const sections = computed(() => groups.value.map((group) => {
 	const members = persons.value
-		.map((person) => {
-			const held = new Set(person.currentFunctions
-				.filter((slice) => slice.groupId === group.id)
-				.map((slice) => slice.functionId))
-			return {
-				person,
-				functions: group.functions.filter((fn) => held.has(fn.id)).map((fn) => fn.name),
-			}
-		})
+		.map((person) => ({
+			person,
+			functions: group.functions
+				.map((fn) => functionLabel(person, fn))
+				.filter((label) => label !== null),
+		}))
 		.filter((member) => member.functions.length > 0)
 		.sort((a, b) => a.person.lastName.localeCompare(b.person.lastName) || a.person.firstName.localeCompare(b.person.firstName))
 	return { group, members }

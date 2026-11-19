@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- "Overview" in the app navigation lists the current persons of every group with their functions and the responsible person, to print or save as PDF; it shows no dates of birth or contact data
+- "Overview" in the app navigation lists the current persons of every group with their functions, those starting later with their start date, and the responsible person, to print or save as PDF; it shows no dates of birth or contact data
 
 ## 0.5.0 – 2026-11-18
 
